@@ -2,6 +2,7 @@
 #define TRIE_H
 	
 #define MAX_SONS 26
+#define LENG(x) (sizeof(x) / sizeof(x[0])) //sprawdzac tylko dla niepustej!
 
 	struct Node
 	{
