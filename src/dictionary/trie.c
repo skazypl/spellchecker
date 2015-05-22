@@ -24,7 +24,6 @@
 
 int startsWith(char* needle, char* haystack); //szukamy igly w stogu siana
 
-
 void Tree_init(struct Tree *t);
 void Tree_destroy(struct Tree *t);
 
