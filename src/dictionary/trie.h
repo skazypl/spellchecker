@@ -36,6 +36,8 @@
 
 	char* getWords(struct Tree *t);
 
+	void printTree(struct Node* n, int k);
+
 
 
 
