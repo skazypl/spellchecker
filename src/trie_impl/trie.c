@@ -64,7 +64,7 @@ void Node_destroy(struct Node *n)
 	for (int i = 0; i < n->childCount; ++i)
 		Node_destroy(n->children[i]);
 	
-	free(n->children);
+	//free(n->children);
 	free(n);
 }
 
@@ -79,6 +79,9 @@ void addNode(struct Node *n, char* word)
 {
 	//todo: co zakladamy wchodzac do wezla?
 	//1. ze nie jest null
+
+	//todo2: podwojnie dodaje pusty wezel przy wstawianiu 
+	//dwa razy tego samego slowa - usunac usterke
 
 	printf("word[0]: %c\n", word[0]);
 
@@ -100,18 +103,19 @@ void addNode(struct Node *n, char* word)
 	newNode->parent = n;
 	newNode->key = word[0];
 
-	if(*word == '\0') return;
-	
-	word++;
-	addNode(newNode, word);
+	if(*word != '\0')
+	{
+		word++;
+		addNode(newNode, word);
+	}
 
 }
 
 
 void add(struct Tree *t, char* word)
 {
-	//if(find(t, word) == 1)) return; //?? zmniejsza efektywnosc
-	addNode(t->root, word);
+	if(find(t, word) == 0) //?? zmniejsza efektywnosc
+		addNode(t->root, word);
 
 }
 
@@ -133,7 +137,28 @@ void printTree(struct Node* n, int k)
 
 
 
-int find(struct Tree *t, char* word); //1 - slowo jest w slowniku; 0 - nie ma
+int find(struct Tree* t, char* word) //1 - slowo jest w slowniku; 0 - nie ma
+{
+	return findNode(t->root);
+}
+
+int findNode(struct Node* n, char* word)
+{
+	for (int i = 0; i < n->childCount; ++i)
+	{
+		if(n->children[i]->key == word[0])
+		{
+			if(word[0] == '\0')
+				return 1;
+			else
+			{
+				word++;
+				return findNode(n->children[i], word);
+			}
+		}
+	}
+	return 0;
+}
 
 size_t sizeOf(struct Tree *t);
 
