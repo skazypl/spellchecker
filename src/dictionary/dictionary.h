@@ -13,7 +13,7 @@
 #ifndef __DICTIONARY_H__
 #define __DICTIONARY_H__
 
-#include "word_list.h"
+#include "trie.h"
 #include <stdbool.h>
 #include <wchar.h>
 

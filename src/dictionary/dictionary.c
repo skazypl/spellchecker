@@ -21,7 +21,8 @@
  */
 struct dictionary
 {
-    struct word_list list; ///< Lista przechowująca słowa w słowniku.
+    struct Tree tree; ///< Lista przechowująca słowa w słowniku.
+
 };
 
 /** @name Funkcje pomocnicze
@@ -33,7 +34,7 @@ struct dictionary
  */
 static void dictionary_free(struct dictionary *dict)
 {
-    word_list_done(&dict->list);
+    Tree_destroy(dict->tree);
 }
 
 static void skip_equal(const wchar_t **a, const wchar_t **b)
@@ -81,7 +82,7 @@ struct dictionary * dictionary_new()
 {
     struct dictionary *dict =
         (struct dictionary *) malloc(sizeof(struct dictionary));
-    word_list_init(&dict->list);
+    Tree_init(dict->tree);
     return dict;
 }
 
@@ -95,7 +96,7 @@ int dictionary_insert(struct dictionary *dict, const wchar_t *word)
 {
     if (dictionary_find(dict, word))
         return 0;
-    word_list_add(&dict->list, word);
+    add(dict->tree, word);
     return 1;
 }
 
@@ -107,25 +108,26 @@ int dictionary_delete(struct dictionary *dict, const wchar_t *word)
 
 bool dictionary_find(const struct dictionary *dict, const wchar_t* word)
 {
-    const wchar_t * const * a = word_list_get(&dict->list);
-    for (size_t i = 0; i < word_list_size(&dict->list); i++)
-        if (!wcscmp(a[i], word))
-            return true;
+  if (find(dict->tree, word) == 0)
     return false;
+  return true;
 }
 
-int dictionary_save(const struct dictionary *dict, FILE* stream)
+int dictionary_save(const struct dictionary *dict, FILE* stream)//todo
 {
+  /*
     const wchar_t * const * a = word_list_get(&dict->list);
     for (size_t i = 0; i < word_list_size(&dict->list); i++)
         if (fprintf(stream, "%ls\n", a[i]) < 0)
             return -1;
+  */
     return 0;
 }
 
-struct dictionary * dictionary_load(FILE* stream)
+struct dictionary * dictionary_load(FILE* stream)//todo
 {
     struct dictionary *dict = dictionary_new();
+    /*
     wchar_t buf[32];
     while (fscanf(stream, "%32ls", buf) != EOF)
         dictionary_insert(dict, buf);
@@ -134,6 +136,7 @@ struct dictionary * dictionary_load(FILE* stream)
         dictionary_done(dict);
         dict = NULL;
     }
+    */
     return dict;
 }
 
