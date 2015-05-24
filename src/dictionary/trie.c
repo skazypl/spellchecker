@@ -49,7 +49,7 @@ void Node_init(struct Node *n)
 	n->key = 0; //0 == '\0'
 	n->parent = NULL;
 	n->childCount = 0;
-}
+}a
 
 /// root bedzie wezlem atrapa - nie bedziemy przechowywac w nim stringa
 void Tree_init(struct Tree *t)
@@ -160,6 +160,5 @@ int findNode(struct Node* n, char* word)
 	return 0;
 }
 
-size_t sizeOf(struct Tree *t);
-
-char* getWords(struct Tree *t);
+struct Tree Tree_load(FILE* stream);
+int Tree_save(struct Tree* t, FILE* stream);

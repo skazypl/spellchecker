@@ -32,9 +32,9 @@
 	void add(struct Tree *t, char* word);
 	int find(struct Tree *t, char* word); //1 - slowo jest w slowniku; 0 - nie ma
 
-	size_t sizeOf(struct Tree *t);
+	struct Tree Tree_load(FILE* stream);
+	int Tree_save(struct Tree* t, FILE* stream);
 
-	char* getWords(struct Tree *t);
 
 	void printTree(struct Node* n, int k);
 
