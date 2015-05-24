@@ -47,7 +47,7 @@ void Node_init(struct Node *n)
 	n->key = 0; //0 == '\0'
 	n->parent = NULL;
 	n->childCount = 0;
-}a
+};
 
 /// root bedzie wezlem atrapa - nie bedziemy przechowywac w nim stringa
 void Tree_init(struct Tree *t)
@@ -134,12 +134,6 @@ void printTree(struct Node* n, int k)
 }
 
 
-
-int find(struct Tree* t, char* word) //1 - slowo jest w slowniku; 0 - nie ma
-{
-	return findNode(t->root);
-}
-
 int findNode(struct Node* n, char* word)
 {
 	for (int i = 0; i < n->childCount; ++i)
@@ -159,32 +153,39 @@ int findNode(struct Node* n, char* word)
 }
 
 
+int find(struct Tree* t, char* word) //1 - slowo jest w slowniku; 0 - nie ma
+{
+	return findNode(t->root, word);
+}
+
+
 struct Queue
 {
-	size_t size;
-	struct Node* content; //tablica
+	int size;
+	struct Node* *content; //tablica
 };
 
 void Queue_init(struct Queue* q)
 {
 	q->size = 0;
+	q->content = NULL;
 }
 
 void Queue_push(struct Node* n, struct Queue* q)
 {
-	struct Node* newContent = (struct Node*)malloc(q->size * sizeof(struct Node*));
+	struct Node** newContent = (struct Node**)malloc((q->size + 1) * sizeof(struct Node*));
 	for (int i = 0; i < q->size; ++i)
 		newContent[i] = q->content[i];
 	newContent[q->size] = n;
 	q->size++;
-	free(q->content);
+	free(q->content); //nie no to trzeba zwalniac
 	q->content = newContent;
 }
 
 struct Node* Queue_pop(struct Queue* q) //!przed wywolaniem sprawdzac size > 0
 {
 	struct Node* toReturn = q->content[0];
-	struct Node* newContent = (struct Node*)malloc(q->size * sizeof(struct Node*));
+	struct Node** newContent = (struct Node**)malloc(q->size * sizeof(struct Node*));
 	for (int i = 1; i < q->size; ++i)
 		newContent[i-1] = q->content[i];
 	q->size--;
@@ -200,7 +201,7 @@ struct Tree* Tree_load(FILE* stream)
 	size_t zero = 0;
 	struct Tree* toReturn = (struct Tree*)(malloc(sizeof(struct Tree)));
 	Tree_init(toReturn);
-	struct Node* nodeLineArr = toReturn->root;
+	struct Node** nodeLineArr = &(toReturn->root);//adres? adres.
 	size_t arrSize = 1;
 	//wskaznik do tablicy node'ow z aktualnie przerabianego wiersza
 	//najpierw - roota
@@ -218,7 +219,7 @@ struct Tree* Tree_load(FILE* stream)
 		for (int i = 0; i < arrSize; ++i)
 		{
 			struct Node* newNode = (struct Node*)(malloc(sizeof(struct Node)));
-			newNode->key = 
+			//newNode->key = 
 		}
 	}
 }
@@ -227,6 +228,7 @@ int Tree_save(struct Tree* t, FILE* stream)
 {
 	struct Queue nodeQueue;
 	struct Queue* Q = &nodeQueue;
+	Queue_init(Q);
 	struct Node* n;
 
 	Queue_push(t->root, Q);
@@ -235,7 +237,8 @@ int Tree_save(struct Tree* t, FILE* stream)
 		n = Queue_pop(Q);
 		for (int i = 0; i < n->childCount; ++i)
 		{
-			fprintf(stream, "%c%i", n->key, n->childCount);
+			printf("%c%i ", n->children[i]->key, n->childCount);
+			//fprintf(stream, "%c%i", n->key, n->childCount);
 			Queue_push(n->children[i], Q);
 		}
 	}

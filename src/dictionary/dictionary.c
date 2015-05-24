@@ -141,7 +141,7 @@ struct dictionary * dictionary_load(FILE* stream)//todo
 }
 
 void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
-        struct word_list *list)
+        struct Tree* t)
 {
     word_list_init(list);
     size_t wlen = wcslen(word);

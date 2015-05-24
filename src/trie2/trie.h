@@ -35,7 +35,7 @@
 	void add(struct Tree *t, char* word);
 	int find(struct Tree *t, char* word); //1 - slowo jest w slowniku; 0 - nie ma
 
-	struct Tree Tree_load(FILE* stream);
+	struct Tree* Tree_load(FILE* stream);
 	int Tree_save(struct Tree* t, FILE* stream);
 
 
