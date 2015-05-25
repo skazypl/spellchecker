@@ -22,6 +22,8 @@
 
 */
 
+//todo: trzymac w lisciach wysokosc - pomoze w load()
+
 int startsWith(const char* haystack, const char* needle) //0 - nie, 1 - tak
 //szukamy czy tekst igly rozpoczyna tekst stoguSiana
 {
@@ -237,7 +239,10 @@ int Tree_save(struct Tree* t, FILE* stream)
 		n = Queue_pop(Q);
 		for (int i = 0; i < n->childCount; ++i)
 		{
-			printf("%c%i ", n->children[i]->key, n->childCount);
+			if(n->children[i]->key == '\0')
+				fprintf(stream, "! ");
+			else
+				fprintf(stream, "%c%i ", n->children[i]->key, n->children[i]->childCount);
 			//fprintf(stream, "%c%i", n->key, n->childCount);
 			Queue_push(n->children[i], Q);
 		}

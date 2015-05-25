@@ -30,8 +30,13 @@ int main()
 	printf("slowo %s: %i\n", marmolada, find(drzewo, marmolada));
 	printf("slowo %s: %i\n", matkara, find(drzewo, matkara));
 
-	Tree_save(drzewo, "beefes.txt");
+	FILE* fileToSave;
+	fileToSave = fopen("z_BFS.txt", "w");
 
+	Tree_save(drzewo, fileToSave);
+	if(fileToSave == NULL)
+		printf("ERR: nie udalo sie otworzyc pliku to_save\n");
+	fclose(fileToSave);
 	/*
 	add(drzewo, matkara);
 	printTree(drzewo->root, 0);
