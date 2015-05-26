@@ -183,13 +183,13 @@ struct Tree* Tree_load(FILE* stream)
 	wchar_t buf;
 	int numb;
 	struct Tree* toReturn = (struct Tree*)(malloc(sizeof(struct Tree)));
-	int oldSum;
+	int oldSum; //suma liczby dzieci z tablicy z poprzedniego kroku petli
 	if (fscanf(stream, "%i", &oldSum) == EOF) 
 	//najpierw wczytujemy ilu synow ma root
 		return NULL;
 	printf("oldsum: %i\n", oldSum);
 
-	int sumChild = oldSum; // jezeli == 0 to oznacza puste drzewo
+	int sumChild = 1;
 	toReturn->root = (struct Node*)(malloc(sizeof(struct Node)));
 	toReturn->root->childCount = oldSum;
 	toReturn->root->key = 0; //'\0'
@@ -198,35 +198,27 @@ struct Tree* Tree_load(FILE* stream)
 		(struct Node**)malloc(sizeof(struct Node*));
 	nodeLineArr[0] = toReturn->root;
 
-	
+	//czym jest nodeLineArr przy kazdorazowym wejsciu do ponizszej petli?
+	//jest tablica wskaznikow do nodow z poprzedniego kroku - nizszej glebokosci
+	//przy 1 wejsciu jest tylko zlozona z roota
 	while (sumChild != 0)
 	{
 		oldSum = sumChild;
 		sumChild = 0;
-		PTD(1);
 		for (int i = 0; i < oldSum; ++i)
 			sumChild +=	nodeLineArr[i]->childCount;
 		//1
-
-		PTD(2);
-
 		struct Node** newNodeArr = 
 			(struct Node**)malloc(sumChild * sizeof(struct Node**)); //2
 
-		PTD(3);
 
 		for (int i = 0; i < sumChild; ++i)
 		{
-			PTD(4);
-
 			if(fscanf(stream, "%c %i", &buf, &numb) == EOF)
 			{
 				printf("ERROR: bledny plik\n");
 				return NULL;
 			}
-
-			PTD(5);
-			printf("wczytalem >%c< jako char oraz [%i] jako int \n", buf, numb);
 
 			struct Node* newNode = (struct Node*)(malloc(sizeof(struct Node)));
 			if(buf == '!')

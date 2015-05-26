@@ -17,13 +17,15 @@ int main()
 	struct Tree* drzewo = &drz;
 	Tree_init(drzewo);
 
+	/*
 	add(drzewo, matka);
-	printTree(drzewo->root, 0);
-
-	add(drzewo, matka);
-	printTree(drzewo->root, 0);
-
+	add(drzewo, matkara);
+	add(drzewo, marmite);
 	add(drzewo, marmolada);
+	add(drzewo, inneSlowo);
+	add(drzewo, matka);
+	add(drzewo, marmolada);
+	*/
 	printTree(drzewo->root, 0);
 	
 	printf("slowo %s: %i\n", matka, find(drzewo, matka));
@@ -44,25 +46,12 @@ int main()
 	struct Tree* drzewo2 = Tree_load(fileToLoad);
 	fclose(fileToLoad);
 
+
+	printf("drzewo wczytane:\n");
 	if(drzewo2 != NULL)
 		printTree(drzewo2->root, 0);
 	else
 		printf("null err\n");
-
-	/*
-	add(drzewo, matkara);
-	printTree(drzewo->root, 0);
-
-
-	add(drzewo, marmite);
-	printTree(drzewo->root, 0);
-
-	add(drzewo, marmolada);
-	printTree(drzewo->root, 0);
-
-	add(drzewo, inneSlowo);
-	printTree(drzewo->root, 0);
-	*/
 
 	printf("\nfin\n");
 	Tree_destroy(drzewo);
