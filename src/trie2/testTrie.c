@@ -37,6 +37,18 @@ int main()
 	if(fileToSave == NULL)
 		printf("ERR: nie udalo sie otworzyc pliku to_save\n");
 	fclose(fileToSave);
+
+	
+	FILE* fileToLoad;
+	fileToLoad = fopen("z_BFS.txt", "r");
+	struct Tree* drzewo2 = Tree_load(fileToLoad);
+	fclose(fileToLoad);
+
+	if(drzewo2 != NULL)
+		printTree(drzewo2->root, 0);
+	else
+		printf("null err\n");
+
 	/*
 	add(drzewo, matkara);
 	printTree(drzewo->root, 0);
@@ -52,8 +64,9 @@ int main()
 	printTree(drzewo->root, 0);
 	*/
 
-	printf("\n");
+	printf("\nfin\n");
 	Tree_destroy(drzewo);
+	Tree_destroy(drzewo2);	
 
 
 	return 0;

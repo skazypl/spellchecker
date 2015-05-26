@@ -24,26 +24,6 @@
 
 //todo: trzymac w lisciach wysokosc - pomoze w load()
 
-int startsWith(const char* haystack, const char* needle) //0 - nie, 1 - tak
-//szukamy czy tekst igly rozpoczyna tekst stoguSiana
-{
-	if( (haystack == NULL) && (needle == NULL) ) return 1;
-	if(haystack == NULL) return 0;
-	if(needle == NULL) return 1;
-
-	if(LENG(haystack) < LENG(needle))
-		return 0;
-
-	char* j = haystack;
-	for (char* i = needle; *i != '\0'; ++i)
-	{
-		if(*i != *j)
-			return 0;
-		j++;
-	}
-	return 1;
-}
-
 void Node_init(struct Node *n)
 {
 	n->key = 0; //0 == '\0'
@@ -196,34 +176,57 @@ struct Node* Queue_pop(struct Queue* q) //!przed wywolaniem sprawdzac size > 0
 	return toReturn;
 }
 
+#define PTD(x)	printf("debug czesc #%i\n", x);
 
 struct Tree* Tree_load(FILE* stream)
 {
-
-	wchar_t* buf;
-	int* numb;
+	wchar_t buf;
+	int numb;
 	struct Tree* toReturn = (struct Tree*)(malloc(sizeof(struct Tree)));
-	int sumChild = -1;
-	struct Node** nodeLineArr = &(toReturn->root); //tablica wskaznikow
-	int arrSize = 1;
+	int oldSum;
+	if (fscanf(stream, "%i", &oldSum) == EOF) 
+	//najpierw wczytujemy ilu synow ma root
+		return NULL;
+	printf("oldsum: %i\n", oldSum);
+
+	int sumChild = oldSum; // jezeli == 0 to oznacza puste drzewo
+	toReturn->root = (struct Node*)(malloc(sizeof(struct Node)));
+	toReturn->root->childCount = oldSum;
+	toReturn->root->key = 0; //'\0'
+
+	struct Node** nodeLineArr = 
+		(struct Node**)malloc(sizeof(struct Node*));
+	nodeLineArr[0] = toReturn->root;
+
+	
 	while (sumChild != 0)
 	{
-		int oldSum = sumChild;
+		oldSum = sumChild;
 		sumChild = 0;
-		for (int i = 0; i < arrSize; ++i)
-		{
+		PTD(1);
+		for (int i = 0; i < oldSum; ++i)
 			sumChild +=	nodeLineArr[i]->childCount;
-		}//1
+		//1
 
-		struct Node** newNodeArr[sumChild]; //2
+		PTD(2);
+
+		struct Node** newNodeArr = 
+			(struct Node**)malloc(sumChild * sizeof(struct Node**)); //2
+
+		PTD(3);
 
 		for (int i = 0; i < sumChild; ++i)
 		{
-			if(fscanf(stream, "%32ls%i", buf, numb) == EOF)
+			PTD(4);
+
+			if(fscanf(stream, "%c %i", &buf, &numb) == EOF)
 			{
 				printf("ERROR: bledny plik\n");
 				return NULL;
 			}
+
+			PTD(5);
+			printf("wczytalem >%c< jako char oraz [%i] jako int \n", buf, numb);
 
 			struct Node* newNode = (struct Node*)(malloc(sizeof(struct Node)));
 			if(buf == '!')
@@ -233,8 +236,8 @@ struct Tree* Tree_load(FILE* stream)
 			}
 			else
 			{
-				newNode->key = *buf;
-				newNode->childCount = *numb;
+				newNode->key = buf;
+				newNode->childCount = numb;
 			}
 			newNodeArr[i] = newNode;
 		}//3
@@ -247,7 +250,8 @@ struct Tree* Tree_load(FILE* stream)
 			
 			index += nodeLineArr[i]->childCount;
 		}//4
-		
+
+		free(nodeLineArr);
 		nodeLineArr = newNodeArr; //5
 	}
 	return toReturn;
@@ -271,6 +275,8 @@ algo:
 
 int Tree_save(struct Tree* t, FILE* stream)
 {
+	fprintf(stream, "%i", t->root->childCount);
+
 	struct Queue nodeQueue;
 	struct Queue* Q = &nodeQueue;
 	Queue_init(Q);
