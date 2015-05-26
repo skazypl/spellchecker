@@ -199,32 +199,75 @@ struct Node* Queue_pop(struct Queue* q) //!przed wywolaniem sprawdzac size > 0
 
 struct Tree* Tree_load(FILE* stream)
 {
+
 	wchar_t* buf;
-	size_t zero = 0;
+	int* numb;
 	struct Tree* toReturn = (struct Tree*)(malloc(sizeof(struct Tree)));
-	Tree_init(toReturn);
-	struct Node** nodeLineArr = &(toReturn->root);//adres? adres.
-	size_t arrSize = 1;
-	//wskaznik do tablicy node'ow z aktualnie przerabianego wiersza
-	//najpierw - roota
-
-	while(getline(&buf, &zero, stream) != -1)
+	int sumChild = -1;
+	struct Node** nodeLineArr = &(toReturn->root); //tablica wskaznikow
+	int arrSize = 1;
+	while (sumChild != 0)
 	{
-		size_t sumOfChildren = 0;
-		//w danej linii przealokowujemy tablice wskaznikow do wezlow
+		int oldSum = sumChild;
+		sumChild = 0;
 		for (int i = 0; i < arrSize; ++i)
 		{
-			sumOfChildren += nodeLineArr[i]->childCount;
-		}
-		struct Node* nextStepArr[sumOfChildren];
+			sumChild +=	nodeLineArr[i]->childCount;
+		}//1
 
-		for (int i = 0; i < arrSize; ++i)
+		struct Node** newNodeArr[sumChild]; //2
+
+		for (int i = 0; i < sumChild; ++i)
 		{
+			if(fscanf(stream, "%32ls%i", buf, numb) == EOF)
+			{
+				printf("ERROR: bledny plik\n");
+				return NULL;
+			}
+
 			struct Node* newNode = (struct Node*)(malloc(sizeof(struct Node)));
-			//newNode->key = 
-		}
+			if(buf == '!')
+			{
+				newNode->key = 0; // '\0'
+				newNode->childCount = 0;
+			}
+			else
+			{
+				newNode->key = *buf;
+				newNode->childCount = *numb;
+			}
+			newNodeArr[i] = newNode;
+		}//3
+
+		int index = 0;
+		for (int i = 0; i < oldSum; ++i)
+		{
+			for (int j = 0; j < nodeLineArr[i]->childCount; ++j)
+				nodeLineArr[i]->children[j] = newNodeArr[index + j];
+			
+			index += nodeLineArr[i]->childCount;
+		}//4
+		
+		nodeLineArr = newNodeArr; //5
 	}
+	return toReturn;
 }
+/*
+
+algo:
+1. sumuj dzieci rzeczy z aktualnej array i =: SumKids
+2. alloc nowe_t[Sum]
+3. for(0 < i < Sum)
+       czytaj next char i int
+       dodaj nowy wezel
+       dowiaz do nowe_t[i]
+4. lec po stare_t[] i dodawaj im synow z nowe_t[]
+5.stara_t := nowe_t
+
+*/
+
+
+
 
 int Tree_save(struct Tree* t, FILE* stream)
 {
@@ -240,10 +283,11 @@ int Tree_save(struct Tree* t, FILE* stream)
 		for (int i = 0; i < n->childCount; ++i)
 		{
 			if(n->children[i]->key == '\0')
-				fprintf(stream, "! ");
+				fprintf(stream, "!0");
 			else
-				fprintf(stream, "%c%i ", n->children[i]->key, n->children[i]->childCount);
-			//fprintf(stream, "%c%i", n->key, n->childCount);
+				fprintf(stream, "%c%i", n->children[i]->key, n->children[i]->childCount);
+				//patrz konwencja
+			
 			Queue_push(n->children[i], Q);
 		}
 	}

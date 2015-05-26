@@ -37,7 +37,16 @@
 
 	struct Tree* Tree_load(FILE* stream);
 	int Tree_save(struct Tree* t, FILE* stream);
+	/*
+	konwencja przechowywania drzewa na dysku: ciag par
+	
+	<char - klucz node'a><int - liczba potomkow>
+	
+	dla liscia: "!0"
 
+	mozna czytac za pomoca scanfa i "%c%i"
+
+	*/
 
 	void printTree(struct Node* n, int k);
 
