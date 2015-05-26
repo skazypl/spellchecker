@@ -35,9 +35,18 @@
 	void add(struct Tree *t, char* word);
 	int find(struct Tree *t, char* word); //1 - slowo jest w slowniku; 0 - nie ma
 
-	struct Tree Tree_load(FILE* stream);
+	struct Tree* Tree_load(FILE* stream);
 	int Tree_save(struct Tree* t, FILE* stream);
+	/*
+	konwencja przechowywania drzewa na dysku: ciag par
+	
+	<char - klucz node'a><int - liczba potomkow>
+	
+	dla liscia: "!0"
 
+	mozna czytac za pomoca scanfa i "%c%i"
+
+	*/
 
 	void printTree(struct Node* n, int k);
 

@@ -17,7 +17,7 @@ int main()
 	struct Tree* drzewo = &drz;
 	Tree_init(drzewo);
 
-	/*
+	
 	add(drzewo, matka);
 	add(drzewo, matkara);
 	add(drzewo, marmite);
@@ -25,7 +25,7 @@ int main()
 	add(drzewo, inneSlowo);
 	add(drzewo, matka);
 	add(drzewo, marmolada);
-	*/
+	
 	printTree(drzewo->root, 0);
 	
 	printf("slowo %s: %i\n", matka, find(drzewo, matka));

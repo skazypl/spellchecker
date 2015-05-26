@@ -22,7 +22,7 @@
 
 */
 
-//todo: trzymac w lisciach wysokosc - pomoze w load()
+//todo: dodawanie .parent, np przy _load() - moze pomoc w implementacji delete()
 
 void Node_init(struct Node *n)
 {
@@ -44,7 +44,6 @@ void Node_destroy(struct Node *n)
 	for (int i = 0; i < n->childCount; ++i)
 		Node_destroy(n->children[i]);
 	
-	//free(n->children);
 	free(n);
 }
 
@@ -160,7 +159,7 @@ void Queue_push(struct Node* n, struct Queue* q)
 		newContent[i] = q->content[i];
 	newContent[q->size] = n;
 	q->size++;
-	free(q->content); //nie no to trzeba zwalniac
+	free(q->content);
 	q->content = newContent;
 }
 
@@ -175,8 +174,6 @@ struct Node* Queue_pop(struct Queue* q) //!przed wywolaniem sprawdzac size > 0
 	q->content = newContent;
 	return toReturn;
 }
-
-#define PTD(x)	printf("debug czesc #%i\n", x);
 
 struct Tree* Tree_load(FILE* stream)
 {
@@ -263,11 +260,10 @@ algo:
 */
 
 
-
-
-int Tree_save(struct Tree* t, FILE* stream)
+int Tree_save(struct Tree* t, FILE* stream) //todo: czasem zwracac -1
 {
-	fprintf(stream, "%i", t->root->childCount);
+	if(fprintf(stream, "%i", t->root->childCount) < 0)
+		return -1;
 
 	struct Queue nodeQueue;
 	struct Queue* Q = &nodeQueue;
@@ -281,14 +277,22 @@ int Tree_save(struct Tree* t, FILE* stream)
 		for (int i = 0; i < n->childCount; ++i)
 		{
 			if(n->children[i]->key == '\0')
-				fprintf(stream, "!0");
+			{
+				if(fprintf(stream, "!0") < 0)
+					return -1;
+			}
 			else
-				fprintf(stream, "%c%i", n->children[i]->key, n->children[i]->childCount);
+			{
+				if(fprintf(stream, "%c%i", n->children[i]->key, 
+					n->children[i]->childCount) < 0)
+					return -1;
 				//patrz konwencja
+			}
 			
 			Queue_push(n->children[i], Q);
 		}
 	}
+	return 0;
 }
 
 

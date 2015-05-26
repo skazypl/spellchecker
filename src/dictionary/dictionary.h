@@ -90,6 +90,6 @@ struct dictionary * dictionary_load(FILE* stream);
   @param[in,out] list Lista, w której zostaną umieszczone podpowiedzi.
   */
 void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
-                      struct Tree* t);
+                      struct word_list *list);
 
 #endif /* __DICTIONARY_H__ */

@@ -10,6 +10,7 @@
  */
 
 #include "dictionary.h"
+#include "word_list.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -17,12 +18,11 @@
 
 /**
   Struktura przechowująca słownik.
-  Na razie prosta implementacja z użyciem listy słów.
+  Uzywamy drzewa trie
  */
 struct dictionary
 {
     struct Tree tree; ///< Lista przechowująca słowa w słowniku.
-
 };
 
 /** @name Funkcje pomocnicze
@@ -113,35 +113,20 @@ bool dictionary_find(const struct dictionary *dict, const wchar_t* word)
   return true;
 }
 
-int dictionary_save(const struct dictionary *dict, FILE* stream)//todo
+int dictionary_save(const struct dictionary *dict, FILE* stream)
 {
-  /*
-    const wchar_t * const * a = word_list_get(&dict->list);
-    for (size_t i = 0; i < word_list_size(&dict->list); i++)
-        if (fprintf(stream, "%ls\n", a[i]) < 0)
-            return -1;
-  */
-    return 0;
+  return Tree_save(dict->tree, stream);
 }
 
-struct dictionary * dictionary_load(FILE* stream)//todo
+struct dictionary * dictionary_load(FILE* stream)
 {
     struct dictionary *dict = dictionary_new();
-    /*
-    wchar_t buf[32];
-    while (fscanf(stream, "%32ls", buf) != EOF)
-        dictionary_insert(dict, buf);
-    if (ferror(stream))
-    {
-        dictionary_done(dict);
-        dict = NULL;
-    }
-    */
+    dict->tree = Tree_load(stream);
     return dict;
 }
 
 void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
-        struct Tree* t)
+        struct word_list *list)
 {
     word_list_init(list);
     size_t wlen = wcslen(word);

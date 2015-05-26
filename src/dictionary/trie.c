@@ -22,32 +22,14 @@
 
 */
 
-int startsWith(const char* haystack, const char* needle) //0 - nie, 1 - tak
-//szukamy czy tekst igly rozpoczyna tekst stoguSiana
-{
-	if( (haystack == NULL) && (needle == NULL) ) return 1;
-	if(haystack == NULL) return 0;
-	if(needle == NULL) return 1;
-
-	if(LENG(haystack) < LENG(needle))
-		return 0;
-
-	char* j = haystack;
-	for (char* i = needle; *i != '\0'; ++i)
-	{
-		if(*i != *j)
-			return 0;
-		j++;
-	}
-	return 1;
-}
+//todo: dodawanie .parent, np przy _load() - moze pomoc w implementacji delete()
 
 void Node_init(struct Node *n)
 {
 	n->key = 0; //0 == '\0'
 	n->parent = NULL;
 	n->childCount = 0;
-}a
+};
 
 /// root bedzie wezlem atrapa - nie bedziemy przechowywac w nim stringa
 void Tree_init(struct Tree *t)
@@ -62,7 +44,6 @@ void Node_destroy(struct Node *n)
 	for (int i = 0; i < n->childCount; ++i)
 		Node_destroy(n->children[i]);
 	
-	//free(n->children);
 	free(n);
 }
 
@@ -134,12 +115,6 @@ void printTree(struct Node* n, int k)
 }
 
 
-
-int find(struct Tree* t, char* word) //1 - slowo jest w slowniku; 0 - nie ma
-{
-	return findNode(t->root);
-}
-
 int findNode(struct Node* n, char* word)
 {
 	for (int i = 0; i < n->childCount; ++i)
@@ -159,20 +134,27 @@ int findNode(struct Node* n, char* word)
 }
 
 
+int find(struct Tree* t, char* word) //1 - slowo jest w slowniku; 0 - nie ma
+{
+	return findNode(t->root, word);
+}
+
+
 struct Queue
 {
-	size_t size;
-	struct Node* content; //tablica
+	int size;
+	struct Node* *content; //tablica
 };
 
 void Queue_init(struct Queue* q)
 {
 	q->size = 0;
+	q->content = NULL;
 }
 
 void Queue_push(struct Node* n, struct Queue* q)
 {
-	struct Node* newContent = (struct Node*)malloc(q->size * sizeof(struct Node*));
+	struct Node** newContent = (struct Node**)malloc((q->size + 1) * sizeof(struct Node*));
 	for (int i = 0; i < q->size; ++i)
 		newContent[i] = q->content[i];
 	newContent[q->size] = n;
@@ -184,7 +166,7 @@ void Queue_push(struct Node* n, struct Queue* q)
 struct Node* Queue_pop(struct Queue* q) //!przed wywolaniem sprawdzac size > 0
 {
 	struct Node* toReturn = q->content[0];
-	struct Node* newContent = (struct Node*)malloc(q->size * sizeof(struct Node*));
+	struct Node** newContent = (struct Node**)malloc(q->size * sizeof(struct Node*));
 	for (int i = 1; i < q->size; ++i)
 		newContent[i-1] = q->content[i];
 	q->size--;
@@ -193,40 +175,98 @@ struct Node* Queue_pop(struct Queue* q) //!przed wywolaniem sprawdzac size > 0
 	return toReturn;
 }
 
-
 struct Tree* Tree_load(FILE* stream)
 {
-	wchar_t* buf;
-	size_t zero = 0;
+	wchar_t buf;
+	int numb;
 	struct Tree* toReturn = (struct Tree*)(malloc(sizeof(struct Tree)));
-	Tree_init(toReturn);
-	struct Node* nodeLineArr = toReturn->root;
-	size_t arrSize = 1;
-	//wskaznik do tablicy node'ow z aktualnie przerabianego wiersza
-	//najpierw - roota
+	int oldSum; //suma liczby dzieci z tablicy z poprzedniego kroku petli
+	if (fscanf(stream, "%i", &oldSum) == EOF) 
+	//najpierw wczytujemy ilu synow ma root
+		return NULL;
+	printf("oldsum: %i\n", oldSum);
 
-	while(getline(&buf, &zero, stream) != -1)
+	int sumChild = 1;
+	toReturn->root = (struct Node*)(malloc(sizeof(struct Node)));
+	toReturn->root->childCount = oldSum;
+	toReturn->root->key = 0; //'\0'
+
+	struct Node** nodeLineArr = 
+		(struct Node**)malloc(sizeof(struct Node*));
+	nodeLineArr[0] = toReturn->root;
+
+	//czym jest nodeLineArr przy kazdorazowym wejsciu do ponizszej petli?
+	//jest tablica wskaznikow do nodow z poprzedniego kroku - nizszej glebokosci
+	//przy 1 wejsciu jest tylko zlozona z roota
+	while (sumChild != 0)
 	{
-		size_t sumOfChildren = 0;
-		//w danej linii przealokowujemy tablice wskaznikow do wezlow
-		for (int i = 0; i < arrSize; ++i)
-		{
-			sumOfChildren += nodeLineArr[i]->childCount;
-		}
-		struct Node* nextStepArr[sumOfChildren];
+		oldSum = sumChild;
+		sumChild = 0;
+		for (int i = 0; i < oldSum; ++i)
+			sumChild +=	nodeLineArr[i]->childCount;
+		//1
+		struct Node** newNodeArr = 
+			(struct Node**)malloc(sumChild * sizeof(struct Node**)); //2
 
-		for (int i = 0; i < arrSize; ++i)
+
+		for (int i = 0; i < sumChild; ++i)
 		{
+			if(fscanf(stream, "%c %i", &buf, &numb) == EOF)
+			{
+				printf("ERROR: bledny plik\n");
+				return NULL;
+			}
+
 			struct Node* newNode = (struct Node*)(malloc(sizeof(struct Node)));
-			newNode->key = 
-		}
+			if(buf == '!')
+			{
+				newNode->key = 0; // '\0'
+				newNode->childCount = 0;
+			}
+			else
+			{
+				newNode->key = buf;
+				newNode->childCount = numb;
+			}
+			newNodeArr[i] = newNode;
+		}//3
+
+		int index = 0;
+		for (int i = 0; i < oldSum; ++i)
+		{
+			for (int j = 0; j < nodeLineArr[i]->childCount; ++j)
+				nodeLineArr[i]->children[j] = newNodeArr[index + j];
+			
+			index += nodeLineArr[i]->childCount;
+		}//4
+
+		free(nodeLineArr);
+		nodeLineArr = newNodeArr; //5
 	}
+	return toReturn;
 }
+/*
+
+algo:
+1. sumuj dzieci rzeczy z aktualnej array i =: SumKids
+2. alloc nowe_t[Sum]
+3. for(0 < i < Sum)
+       czytaj next char i int
+       dodaj nowy wezel
+       dowiaz do nowe_t[i]
+4. lec po stare_t[] i dodawaj im synow z nowe_t[]
+5.stara_t := nowe_t
+
+*/
+
 
 int Tree_save(struct Tree* t, FILE* stream)
 {
+	fprintf(stream, "%i", t->root->childCount);
+
 	struct Queue nodeQueue;
 	struct Queue* Q = &nodeQueue;
+	Queue_init(Q);
 	struct Node* n;
 
 	Queue_push(t->root, Q);
@@ -235,10 +275,16 @@ int Tree_save(struct Tree* t, FILE* stream)
 		n = Queue_pop(Q);
 		for (int i = 0; i < n->childCount; ++i)
 		{
-			fprintf(stream, "%c%i", n->key, n->childCount);
+			if(n->children[i]->key == '\0')
+				fprintf(stream, "!0");
+			else
+				fprintf(stream, "%c%i", n->children[i]->key, n->children[i]->childCount);
+				//patrz konwencja
+			
 			Queue_push(n->children[i], Q);
 		}
 	}
+	return 0;
 }
 
 
