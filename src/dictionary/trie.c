@@ -260,9 +260,10 @@ algo:
 */
 
 
-int Tree_save(struct Tree* t, FILE* stream)
+int Tree_save(struct Tree* t, FILE* stream) //todo: czasem zwracac -1
 {
-	fprintf(stream, "%i", t->root->childCount);
+	if(fprintf(stream, "%i", t->root->childCount) < 0)
+		return -1;
 
 	struct Queue nodeQueue;
 	struct Queue* Q = &nodeQueue;
@@ -276,10 +277,17 @@ int Tree_save(struct Tree* t, FILE* stream)
 		for (int i = 0; i < n->childCount; ++i)
 		{
 			if(n->children[i]->key == '\0')
-				fprintf(stream, "!0");
+			{
+				if(fprintf(stream, "!0") < 0)
+					return -1;
+			}
 			else
-				fprintf(stream, "%c%i", n->children[i]->key, n->children[i]->childCount);
+			{
+				if(fprintf(stream, "%c%i", n->children[i]->key, 
+					n->children[i]->childCount) < 0)
+					return -1;
 				//patrz konwencja
+			}
 			
 			Queue_push(n->children[i], Q);
 		}
