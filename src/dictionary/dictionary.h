@@ -14,6 +14,7 @@
 #define __DICTIONARY_H__
 
 #include "trie.h"
+#include "word_list.h"
 #include <stdbool.h>
 #include <wchar.h>
 

@@ -17,11 +17,11 @@
 		//int ifWord; //1 - slowo; 0 - nie
 		//lepsza konwencja: pusty wezel tzn '\0'
 
-		char key;
+		wchar_t key;
 		struct Node* parent;
 		struct Node* children[MAX_SONS]; // wolalbym sons
 		//todo: synowie alfabetycznie
-		size_t childCount;
+		int childCount;
 	};
 
 	struct Tree
@@ -32,15 +32,15 @@
 	void Tree_init(struct Tree *t);
 	void Tree_destroy(struct Tree *t);
 
-	void add(struct Tree *t, char* word);
-	int find(struct Tree *t, char* word); //1 - slowo jest w slowniku; 0 - nie ma
+	void add(struct Tree *t, const wchar_t* word);
+	int find(struct Tree *t, const wchar_t* word); //1 - slowo jest w slowniku; 0 - nie ma
 
 	struct Tree* Tree_load(FILE* stream);
 	int Tree_save(struct Tree* t, FILE* stream);
 	/*
 	konwencja przechowywania drzewa na dysku: ciag par
 	
-	<char - klucz node'a><int - liczba potomkow>
+	<wchar_t - klucz node'a><int - liczba potomkow>
 	
 	dla liscia: "!0"
 

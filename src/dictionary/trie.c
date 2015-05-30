@@ -34,8 +34,12 @@ void Node_init(struct Node *n)
 /// root bedzie wezlem atrapa - nie bedziemy przechowywac w nim stringa
 void Tree_init(struct Tree *t)
 {
+	printf("pl 1\n");
 	t->root = (struct Node*)malloc(sizeof(struct Node));
+	printf("moj malloc\n");
+	printf("pl 2\n");
 	Node_init(t->root);
+	printf("pl 3\n");
 }
 
 
@@ -54,7 +58,7 @@ void Tree_destroy(struct Tree *t)
 }
 
 
-void addNode(struct Node *n, char* word)
+void addNode(struct Node *n, const wchar_t* word)
 {
 	//todo: co zakladamy wchodzac do wezla?
 	//1. ze nie jest null
@@ -77,6 +81,7 @@ void addNode(struct Node *n, char* word)
 	//jezeli nie znaleziono
 	n->childCount++;
 	struct Node* newNode = (struct Node*)(malloc(sizeof(struct Node)));
+	printf("moj malloc\n");
 	n->children[n->childCount - 1] = newNode;
 	Node_init(newNode);
 	newNode->parent = n;
@@ -91,7 +96,7 @@ void addNode(struct Node *n, char* word)
 }
 
 
-void add(struct Tree *t, char* word)
+void add(struct Tree *t, const wchar_t* word)
 {
 	if(find(t, word) == 0) //?? zmniejsza efektywnosc
 		addNode(t->root, word);
@@ -106,7 +111,7 @@ void printTree(struct Node* n, int k)
 		for (int j = 0; j < 5; j++)
 			printf(" ");
 
-	printf("|>%c<\n", n->key);
+	printf("|>%lc<\n", n->key);
 	
 	for (int i = 0; i < n->childCount; ++i)
 	{
@@ -115,7 +120,7 @@ void printTree(struct Node* n, int k)
 }
 
 
-int findNode(struct Node* n, char* word)
+int findNode(struct Node* n, const wchar_t* word)
 {
 	for (int i = 0; i < n->childCount; ++i)
 	{
@@ -134,7 +139,7 @@ int findNode(struct Node* n, char* word)
 }
 
 
-int find(struct Tree* t, char* word) //1 - slowo jest w slowniku; 0 - nie ma
+int find(struct Tree* t, const wchar_t* word) //1 - slowo jest w slowniku; 0 - nie ma
 {
 	return findNode(t->root, word);
 }
@@ -155,6 +160,7 @@ void Queue_init(struct Queue* q)
 void Queue_push(struct Node* n, struct Queue* q)
 {
 	struct Node** newContent = (struct Node**)malloc((q->size + 1) * sizeof(struct Node*));
+	printf("moj malloc\n");
 	for (int i = 0; i < q->size; ++i)
 		newContent[i] = q->content[i];
 	newContent[q->size] = n;
@@ -167,6 +173,7 @@ struct Node* Queue_pop(struct Queue* q) //!przed wywolaniem sprawdzac size > 0
 {
 	struct Node* toReturn = q->content[0];
 	struct Node** newContent = (struct Node**)malloc(q->size * sizeof(struct Node*));
+	printf("moj malloc\n");
 	for (int i = 1; i < q->size; ++i)
 		newContent[i-1] = q->content[i];
 	q->size--;
@@ -180,6 +187,7 @@ struct Tree* Tree_load(FILE* stream)
 	wchar_t buf;
 	int numb;
 	struct Tree* toReturn = (struct Tree*)(malloc(sizeof(struct Tree)));
+	printf("moj malloc\n");
 	int oldSum; //suma liczby dzieci z tablicy z poprzedniego kroku petli
 	if (fscanf(stream, "%i", &oldSum) == EOF) 
 	//najpierw wczytujemy ilu synow ma root
@@ -188,11 +196,13 @@ struct Tree* Tree_load(FILE* stream)
 
 	int sumChild = 1;
 	toReturn->root = (struct Node*)(malloc(sizeof(struct Node)));
+	printf("moj malloc\n");
 	toReturn->root->childCount = oldSum;
 	toReturn->root->key = 0; //'\0'
 
 	struct Node** nodeLineArr = 
 		(struct Node**)malloc(sizeof(struct Node*));
+		printf("moj malloc\n");
 	nodeLineArr[0] = toReturn->root;
 
 	//czym jest nodeLineArr przy kazdorazowym wejsciu do ponizszej petli?
@@ -207,19 +217,23 @@ struct Tree* Tree_load(FILE* stream)
 		//1
 		struct Node** newNodeArr = 
 			(struct Node**)malloc(sumChild * sizeof(struct Node**)); //2
+			printf("moj malloc\n");
 
 
 		for (int i = 0; i < sumChild; ++i)
 		{
-			if(fscanf(stream, "%c %i", &buf, &numb) == EOF)
+			if(fscanf(stream, "%lc %i", &buf, &numb) == EOF)
 			{
 				printf("ERROR: bledny plik\n");
 				return NULL;
 			}
 
 			struct Node* newNode = (struct Node*)(malloc(sizeof(struct Node)));
-			if(buf == '!')
+			printf("moj malloc\n");
+			printf("buf: >%lc<\n", &buf);
+			if(buf == L'!')
 			{
+				printf("jest wykrzyknik\n");
 				newNode->key = 0; // '\0'
 				newNode->childCount = 0;
 			}
@@ -260,10 +274,9 @@ algo:
 */
 
 
-int Tree_save(struct Tree* t, FILE* stream) //todo: czasem zwracac -1
+int Tree_save(struct Tree* t, FILE* stream)
 {
-	if(fprintf(stream, "%i", t->root->childCount) < 0)
-		return -1;
+	fprintf(stream, "%i", t->root->childCount);
 
 	struct Queue nodeQueue;
 	struct Queue* Q = &nodeQueue;
@@ -277,17 +290,10 @@ int Tree_save(struct Tree* t, FILE* stream) //todo: czasem zwracac -1
 		for (int i = 0; i < n->childCount; ++i)
 		{
 			if(n->children[i]->key == '\0')
-			{
-				if(fprintf(stream, "!0") < 0)
-					return -1;
-			}
+				fprintf(stream, "!0");
 			else
-			{
-				if(fprintf(stream, "%c%i", n->children[i]->key, 
-					n->children[i]->childCount) < 0)
-					return -1;
+				fprintf(stream, "%lc%i", n->children[i]->key, n->children[i]->childCount);
 				//patrz konwencja
-			}
 			
 			Queue_push(n->children[i], Q);
 		}
