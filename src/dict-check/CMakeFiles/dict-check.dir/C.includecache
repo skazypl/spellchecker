@@ -1,0 +1,44 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dict-check/dict-check.c
+stdio.h
+-
+stdlib.h
+-
+dictionary.h
+-
+string.h
+-
+
+dictionary/dictionary.h
+trie.h
+dictionary/trie.h
+word_list.h
+dictionary/word_list.h
+stdbool.h
+-
+wchar.h
+-
+
+dictionary/trie.h
+stdint.h
+-
+stdio.h
+-
+stddef.h
+-
+stdlib.h
+-
+wchar.h
+-
+
+dictionary/word_list.h
+wchar.h
+-
+
