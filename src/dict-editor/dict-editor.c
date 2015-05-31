@@ -270,11 +270,8 @@ int try_process_command(struct dictionary **dict)
  */
 int main(void)
 {
-    #define DBG(x) printf("test %i\n", x);
     setlocale(LC_ALL, "pl_PL.UTF-8");
-    DBG(1);
     struct dictionary *dict = dictionary_new();
-    DBG(2);
     do {} while (try_process_command(&dict));
     dictionary_done(dict);
     return 0;

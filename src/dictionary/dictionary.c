@@ -118,7 +118,6 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
     assert('Z' < 'a');
     assert('a' < 'z');
 
-    printf("wielka petla\n");
     for (size_t i = 0; i < wlen; ++i)
     {
         wchar_t *begin, *end;
@@ -134,7 +133,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
                 (wchar_t*)malloc((wlen + 1) * sizeof(wchar_t));
             wcscpy(newWordChange, word);
             newWordChange[i] = start;
-            printf("proponuje >%ls<\n", newWordChange);
+            //printf("nowe zastapione: >%ls<\n", newWordChange);
             word_list_add(list, newWordChange);
             free(newWordChange);
         }
@@ -143,89 +142,61 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         //dodajemy --przed-- kazda litera w word kazdy mozliwy znak
         //(w tym przed nieistniejaca na pozycji word[wlen])
 
-
         begin = (wchar_t*)malloc((i + 1 + 1) * sizeof(wchar_t));
         //jeden wchar na \0 a drugi na dodawany nowy wchar na koncu
         wcsncpy(begin, word, i);
+        begin[i] = '\0';
 
         end = (wchar_t*)malloc((wlen - i + 1) * sizeof(wchar_t));
         wcsncpy(end, word + i, wlen - i);
+        end[wlen - i] = '\0';
 
-        wchar_t* newWordAdd;
+        wchar_t* newWordAdd = (wchar_t*)malloc((wlen + 1 + 1) * sizeof(wchar_t));
 
-        //printf("word: %ls\nbegin: %ls\nend: %ls\n", word, begin, end);
-        free(begin);
-        free(end);
-
+        wcscpy(newWordAdd, begin);
+        newWordAdd[i] = 'a'; //dowolna litera, wazna inicjalizacja
+        newWordAdd[i + 1] = '\0';
+        wcscat(newWordAdd, end);
         
         for (wchar_t start = 'a'; start <= 'z'; start++)
         {
-            newWordAdd = (wchar_t*)malloc((wlen + 1 + 1) * sizeof(wchar_t));
-            // jeden wchar na \0 a jeden na start
-            wcscpy(newWordAdd, begin);
-        
-            newWordAdd[wcslen(begin)] = start;
-            newWordAdd[wcslen(begin) + 1] = '\0';
-            wcscat(newWordAdd, end);
+            newWordAdd[i] = start;            
             word_list_add(list, newWordAdd);
-            printf("nowe: %ls\n", newWordAdd);
-            free(newWordAdd);
-        
-            //i recznie za nieistniejacym znakiem
-            if (i == wlen - 1)
+        }
+        free(newWordAdd);
+
+        //i recznie za nieistniejacym znakiem
+        if (i == wlen - 1)
+        {   
+            for (wchar_t start = 'a'; start <= 'z'; start++)
             {
-                //free(newWordAdd);
-                newWordAdd = (wchar_t*)malloc((wlen + 1 + 1) * sizeof(wchar_t));              
+                newWordAdd = (wchar_t*)malloc((wlen + 1 + 1) * sizeof(wchar_t));
                 wcscpy(newWordAdd, word);
                 newWordAdd[wlen] = start;    //wcscat(newWordAdd, &start);
                 newWordAdd[wlen + 1] = '\0';
                 word_list_add(list, newWordAdd);
-                printf("nowe ostatnie: %ls\n", newWordAdd);
                 free(newWordAdd);
             }
         }
-        
 
+        //usuwamy ity znak - czyli zmieniamy tylko end
 
-        //usuwamy znaki
-        begin = (wchar_t*)malloc((i + 1 + 1) * sizeof(wchar_t));
-        wcsncpy(begin, word, i);
-        
-        end = (wchar_t*)malloc((wlen - i + 1) * sizeof(wchar_t));        
-        wcsncpy(end, word, wlen - i - 1);
+        free(end);
+        end = (wchar_t*)malloc((wlen - i) * sizeof(wchar_t));
+        wcsncpy(end, word + i + 1, wlen - i - 1);
+        end[wlen - i - 1] = '\0';
 
         wchar_t* newWordDel = (wchar_t*)malloc((wlen) * sizeof(wchar_t));
         wcscpy(newWordDel, begin);
         wcscat(newWordDel, end);
         word_list_add(list, newWordDel);
 
+        free(newWordDel);
+        free(begin);
+        free(end);
+
     }
 
-
-    /*
-    const wchar_t * const * a = word_list_get(&dict->list);
-    for (size_t i = 0; i < word_list_size(&dict->list); i++)
-    {
-        size_t len = wcslen(a[i]);
-        if (len == wlen - 1)
-        {
-            if (can_transform_by_delete(word, a[i]))
-                word_list_add(list, a[i]);
-        }
-        else if (len == wlen)
-        {
-            if (can_transform_by_replace(word, a[i]))
-                word_list_add(list, a[i]);
-        }
-        else if (len == wlen + 1)
-        {
-            if (can_transform_by_delete(a[i], word))
-                word_list_add(list, a[i]);
-        }
-    }
-    */
-
-    //free(wordUncapital);
 }
 
 /**@}*/
