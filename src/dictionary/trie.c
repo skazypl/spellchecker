@@ -34,12 +34,8 @@ void Node_init(struct Node *n)
 /// root bedzie wezlem atrapa - nie bedziemy przechowywac w nim stringa
 void Tree_init(struct Tree *t)
 {
-	printf("pl 1\n");
 	t->root = (struct Node*)malloc(sizeof(struct Node));
-	printf("moj malloc\n");
-	printf("pl 2\n");
 	Node_init(t->root);
-	printf("pl 3\n");
 }
 
 
@@ -66,11 +62,8 @@ void addNode(struct Node *n, const wchar_t* word)
 	//todo2: podwojnie dodaje pusty wezel przy wstawianiu 
 	//dwa razy tego samego slowa - usunac usterke
 
-	printf("word[0]: %c\n", word[0]);
-
 	for (int i = 0; i < n->childCount; ++i)
 	{
-		printf("n->children[i]->key: >%c<\n", n->children[i]->key);
 		if( word[0] == n->children[i]->key )
 		{
 			addNode(n->children[i], ++word);
@@ -81,7 +74,6 @@ void addNode(struct Node *n, const wchar_t* word)
 	//jezeli nie znaleziono
 	n->childCount++;
 	struct Node* newNode = (struct Node*)(malloc(sizeof(struct Node)));
-	printf("moj malloc\n");
 	n->children[n->childCount - 1] = newNode;
 	Node_init(newNode);
 	newNode->parent = n;
@@ -160,7 +152,6 @@ void Queue_init(struct Queue* q)
 void Queue_push(struct Node* n, struct Queue* q)
 {
 	struct Node** newContent = (struct Node**)malloc((q->size + 1) * sizeof(struct Node*));
-	printf("moj malloc\n");
 	for (int i = 0; i < q->size; ++i)
 		newContent[i] = q->content[i];
 	newContent[q->size] = n;
@@ -173,7 +164,6 @@ struct Node* Queue_pop(struct Queue* q) //!przed wywolaniem sprawdzac size > 0
 {
 	struct Node* toReturn = q->content[0];
 	struct Node** newContent = (struct Node**)malloc(q->size * sizeof(struct Node*));
-	printf("moj malloc\n");
 	for (int i = 1; i < q->size; ++i)
 		newContent[i-1] = q->content[i];
 	q->size--;
@@ -187,22 +177,18 @@ struct Tree* Tree_load(FILE* stream)
 	wchar_t buf;
 	int numb;
 	struct Tree* toReturn = (struct Tree*)(malloc(sizeof(struct Tree)));
-	printf("moj malloc\n");
 	int oldSum; //suma liczby dzieci z tablicy z poprzedniego kroku petli
 	if (fscanf(stream, "%i", &oldSum) == EOF) 
 	//najpierw wczytujemy ilu synow ma root
 		return NULL;
-	printf("oldsum: %i\n", oldSum);
 
 	int sumChild = 1;
 	toReturn->root = (struct Node*)(malloc(sizeof(struct Node)));
-	printf("moj malloc\n");
 	toReturn->root->childCount = oldSum;
 	toReturn->root->key = 0; //'\0'
 
 	struct Node** nodeLineArr = 
 		(struct Node**)malloc(sizeof(struct Node*));
-		printf("moj malloc\n");
 	nodeLineArr[0] = toReturn->root;
 
 	//czym jest nodeLineArr przy kazdorazowym wejsciu do ponizszej petli?
@@ -217,7 +203,6 @@ struct Tree* Tree_load(FILE* stream)
 		//1
 		struct Node** newNodeArr = 
 			(struct Node**)malloc(sumChild * sizeof(struct Node**)); //2
-			printf("moj malloc\n");
 
 
 		for (int i = 0; i < sumChild; ++i)
@@ -229,11 +214,8 @@ struct Tree* Tree_load(FILE* stream)
 			}
 
 			struct Node* newNode = (struct Node*)(malloc(sizeof(struct Node)));
-			printf("moj malloc\n");
-			printf("buf: >%lc<\n", &buf);
 			if(buf == L'!')
 			{
-				printf("jest wykrzyknik\n");
 				newNode->key = 0; // '\0'
 				newNode->childCount = 0;
 			}
