@@ -101,7 +101,8 @@ struct dictionary * dictionary_load(FILE* stream)
 {
     struct dictionary *dict = dictionary_new();
     dict->tree = Tree_load(stream);
-    printTree(dict->tree->root, 0);
+    if(dict->tree == NULL)
+        return NULL;
     return dict;
 }
 

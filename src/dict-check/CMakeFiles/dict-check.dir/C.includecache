@@ -15,6 +15,12 @@ dictionary.h
 -
 string.h
 -
+locale.h
+-
+wctype.h
+-
+errno.h
+-
 
 dictionary/dictionary.h
 trie.h
