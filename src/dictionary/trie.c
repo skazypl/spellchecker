@@ -149,6 +149,14 @@ void Queue_init(struct Queue* q)
 	q->content = NULL;
 }
 
+void Queue_destroy(struct Queue* q) //czy dobrze? jeszcze nie wiadomo
+{
+	for (int i = 0; i < q->size; ++i)
+	{
+		free(q->content[i]);
+	}
+}
+
 void Queue_push(struct Node* n, struct Queue* q)
 {
 	struct Node** newContent = (struct Node**)malloc((q->size + 1) * sizeof(struct Node*));

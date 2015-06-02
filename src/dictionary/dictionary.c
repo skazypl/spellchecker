@@ -13,6 +13,7 @@
 #include "dictionary.h"
 #include "word_list.h"
 #include <stdio.h>
+#include <wctype.h>
 #include <stdlib.h>
 #include <assert.h>
 
@@ -54,12 +55,9 @@ static void skip_equal(const wchar_t **a, const wchar_t **b)
  */
 struct dictionary * dictionary_new()
 {
-    printf("dictNew 0\n");
     struct dictionary *dict =
         (struct dictionary *) malloc(sizeof(struct dictionary));
-    printf("ich malloc dict\n");
     dict->tree = (struct Tree*)malloc(sizeof(struct Tree));
-    printf("ich malloc tree\n");
     Tree_init(dict->tree);
     return dict;
 }
@@ -72,9 +70,11 @@ void dictionary_done(struct dictionary *dict)
 }
 
 int dictionary_insert(struct dictionary *dict, const wchar_t *word)
-{
+{  
     if (dictionary_find(dict, word))
+    {
         return 0;
+    }
     add(dict->tree, word);
     return 1;
 }
@@ -87,9 +87,17 @@ int dictionary_delete(struct dictionary *dict, const wchar_t *word)
 
 bool dictionary_find(const struct dictionary *dict, const wchar_t* word)
 {
-  if (find(dict->tree, word) == 0)
-    return false;
-  return true;
+    //wchar_t* lowerWord = (wchar_t*)malloc(sizeof(word) + sizeof(wchar_t));
+    //for (int i = 0; i < wcslen(word); ++i)
+        //lowerWord[i] = towlower(word[i]);
+
+    if (find(dict->tree, word) == 0)
+    {
+        //free(lowerWord);
+        return false;
+    }
+    //free(lowerWord);
+    return true;
 }
 
 int dictionary_save(const struct dictionary *dict, FILE* stream)
@@ -103,6 +111,7 @@ struct dictionary * dictionary_load(FILE* stream)
     dict->tree = Tree_load(stream);
     if(dict->tree == NULL)
         return NULL;
+    printTree(dict->tree->root, 0);
     return dict;
 }
 
@@ -135,7 +144,8 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
             wcscpy(newWordChange, word);
             newWordChange[i] = start;
             //printf("nowe zastapione: >%ls<\n", newWordChange);
-            word_list_add(list, newWordChange);
+            if(dictionary_find(dict, newWordChange))
+                word_list_add(list, newWordChange);
             free(newWordChange);
         }
         
@@ -162,7 +172,8 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         for (wchar_t start = 'a'; start <= 'z'; start++)
         {
             newWordAdd[i] = start;            
-            word_list_add(list, newWordAdd);
+            if(dictionary_find(dict, newWordAdd))
+                word_list_add(list, newWordAdd);
         }
         free(newWordAdd);
 
@@ -175,7 +186,8 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
                 wcscpy(newWordAdd, word);
                 newWordAdd[wlen] = start;    //wcscat(newWordAdd, &start);
                 newWordAdd[wlen + 1] = '\0';
-                word_list_add(list, newWordAdd);
+                if(dictionary_find(dict, newWordAdd))
+                    word_list_add(list, newWordAdd);
                 free(newWordAdd);
             }
         }
@@ -190,7 +202,8 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         wchar_t* newWordDel = (wchar_t*)malloc((wlen) * sizeof(wchar_t));
         wcscpy(newWordDel, begin);
         wcscat(newWordDel, end);
-        word_list_add(list, newWordDel);
+        if(dictionary_find(dict, newWordDel))
+            word_list_add(list, newWordDel);
 
         free(newWordDel);
         free(begin);

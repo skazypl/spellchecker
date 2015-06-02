@@ -11,6 +11,7 @@ const int MAX_WORD_SIZE = 32; //rozsadnie
 void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int w, int z)
 //zakladamy ze na wejsciu jest slowo w sensie samych liter z jezyka pl
 {
+	//printf("word do checkowania: >%ls<\n", word);
 	if(word[0] != '\0')
 	{
 		if(dictionary_find(dict, word))
@@ -25,7 +26,14 @@ void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int w, int
 				struct word_list list;
 				word_list_init(&list);
 				dictionary_hints(dict, word, &list);
-				fwprintf(stderr, L"%i, %i %ls: %ls\n", w, z, word, list.buffer);
+				fwprintf(stderr, L"%i, %i %ls:", w, z - wcslen(word) + 1,
+					word);
+
+				const wchar_t * const *a = word_list_get(&list);
+				for (size_t i = 0; i < word_list_size(&list); ++i)
+                    fwprintf(stderr, L" %ls", a[i]);
+                
+                fwprintf(stderr, L"\n");
 				word_list_done(&list);
 			}
 		}
@@ -36,7 +44,7 @@ void parseWord(struct dictionary* dict, wchar_t* line, bool ifDbg, int lineNr)
 {
 	wchar_t* word = (wchar_t*)malloc(256 * sizeof(wchar_t)); //rozsadny rozmiar
 
-	printf("linia: %ls\n", line);
+	printf("\nlinia: %ls\n", line);
 	int i = 0;
 	int j = 0;
 	while(line[i] != '\0')
@@ -54,19 +62,20 @@ void parseWord(struct dictionary* dict, wchar_t* line, bool ifDbg, int lineNr)
 			checkForWord(word, dict, ifDbg, lineNr, i);
 			free(word);
 			word = (wchar_t*)malloc(256 * sizeof(wchar_t));
-			while(!iswalpha(line[i]))
+			while(!iswalpha(line[i]) && line[i] != '\0')
 			{
 				printf("%lc", line[i]);
 				i++;
 			}
-			i--;
+			if (line[i] != '\0')
+				i--;
 			j = 0;
 		}
 
 		i++;	
 	}
-	word[i] = '\0';
-	checkForWord(word, dict, ifDbg, lineNr, i);
+	//word[i] = '\0';
+	//checkForWord(word, dict, ifDbg, lineNr, i);
 	free(word);
 }
 
@@ -92,7 +101,7 @@ int main(int argc, char const *argv[])
 			}
 			break;
 		case 3:
-			if(strcmp("-v", argv[1]))
+			if(strcmp("-v", argv[1]) == 0)
 				ddebug = true;
 			else
 			{
