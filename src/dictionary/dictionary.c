@@ -40,15 +40,6 @@ static void dictionary_free(struct dictionary *dict)
     Tree_destroy(dict->tree);
 }
 
-static void skip_equal(const wchar_t **a, const wchar_t **b)
-{
-    while (**a == **b && **a != L'\0')
-    {
-        (*a)++;
-        (*b)++;
-    }
-}
-
 /**@}*/
 /** @name Elementy interfejsu 
   @{
@@ -107,11 +98,15 @@ int dictionary_save(const struct dictionary *dict, FILE* stream)
 
 struct dictionary * dictionary_load(FILE* stream)
 {
-    struct dictionary *dict = dictionary_new();
+    struct dictionary *dict =
+        (struct dictionary *) malloc(sizeof(struct dictionary));
     dict->tree = Tree_load(stream);
+<<<<<<< HEAD
     if(dict->tree == NULL)
         return NULL;
     printTree(dict->tree->root, 0);
+=======
+>>>>>>> dictLeak
     return dict;
 }
 
@@ -143,9 +138,15 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
                 (wchar_t*)malloc((wlen + 1) * sizeof(wchar_t));
             wcscpy(newWordChange, word);
             newWordChange[i] = start;
+<<<<<<< HEAD
             //printf("nowe zastapione: >%ls<\n", newWordChange);
             if(dictionary_find(dict, newWordChange))
                 word_list_add(list, newWordChange);
+=======
+            if(dictionary_find(dict, newWordChange))
+                word_list_add(list, newWordChange);
+
+>>>>>>> dictLeak
             free(newWordChange);
         }
         
@@ -171,7 +172,11 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         
         for (wchar_t start = 'a'; start <= 'z'; start++)
         {
+<<<<<<< HEAD
             newWordAdd[i] = start;            
+=======
+            newWordAdd[i] = start;   
+>>>>>>> dictLeak
             if(dictionary_find(dict, newWordAdd))
                 word_list_add(list, newWordAdd);
         }
@@ -184,7 +189,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
             {
                 newWordAdd = (wchar_t*)malloc((wlen + 1 + 1) * sizeof(wchar_t));
                 wcscpy(newWordAdd, word);
-                newWordAdd[wlen] = start;    //wcscat(newWordAdd, &start);
+                newWordAdd[wlen] = start;
                 newWordAdd[wlen + 1] = '\0';
                 if(dictionary_find(dict, newWordAdd))
                     word_list_add(list, newWordAdd);

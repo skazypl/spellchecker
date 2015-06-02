@@ -1,0 +1,1 @@
+/home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/CMakeFiles/dictionary.dir

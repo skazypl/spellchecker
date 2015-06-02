@@ -149,12 +149,20 @@ void Queue_init(struct Queue* q)
 	q->content = NULL;
 }
 
+<<<<<<< HEAD
 void Queue_destroy(struct Queue* q) //czy dobrze? jeszcze nie wiadomo
 {
 	for (int i = 0; i < q->size; ++i)
 	{
 		free(q->content[i]);
 	}
+=======
+void Queue_done(struct Queue* q)
+{
+	for (int i = 0; i < q->size; ++i)
+		free(q->content[i]);
+	free(q->content);
+>>>>>>> dictLeak
 }
 
 void Queue_push(struct Node* n, struct Queue* q)
@@ -248,6 +256,7 @@ struct Tree* Tree_load(FILE* stream)
 		free(nodeLineArr);
 		nodeLineArr = newNodeArr; //5
 	}
+	free(nodeLineArr);
 	return toReturn;
 }
 /*
@@ -289,6 +298,9 @@ int Tree_save(struct Tree* t, FILE* stream)
 			Queue_push(n->children[i], Q);
 		}
 	}
+	//free(n);
+	n = Queue_pop(Q);
+	Queue_done(Q);
 	return 0;
 }
 
