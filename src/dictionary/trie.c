@@ -149,6 +149,13 @@ void Queue_init(struct Queue* q)
 	q->content = NULL;
 }
 
+void Queue_done(struct Queue* q)
+{
+	for (int i = 0; i < q->size; ++i)
+		free(q->content[i]);
+	free(q->content);
+}
+
 void Queue_push(struct Node* n, struct Queue* q)
 {
 	struct Node** newContent = (struct Node**)malloc((q->size + 1) * sizeof(struct Node*));
@@ -239,6 +246,7 @@ struct Tree* Tree_load(FILE* stream)
 		free(nodeLineArr);
 		nodeLineArr = newNodeArr; //5
 	}
+	free(nodeLineArr);
 	return toReturn;
 }
 /*
@@ -280,6 +288,9 @@ int Tree_save(struct Tree* t, FILE* stream)
 			Queue_push(n->children[i], Q);
 		}
 	}
+	//free(n);
+	n = Queue_pop(Q);
+	Queue_done(Q);
 	return 0;
 }
 

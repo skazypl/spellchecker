@@ -87,7 +87,8 @@ int dictionary_save(const struct dictionary *dict, FILE* stream)
 
 struct dictionary * dictionary_load(FILE* stream)
 {
-    struct dictionary *dict = dictionary_new();
+    struct dictionary *dict =
+        (struct dictionary *) malloc(sizeof(struct dictionary));
     dict->tree = Tree_load(stream);
     return dict;
 }
