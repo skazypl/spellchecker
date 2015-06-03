@@ -55,40 +55,6 @@ wchar_t* decapitalize(const wchar_t* word)
     return smallWord;
 }
 
-struct InsertSet
-{
-    int size;
-    wchar_t array[MAX_ALPH_SIZE];
-};
-
-void set_init(struct InsertSet* s)
-{
-    s->size = 0;
-}
-
-int set_add(struct InsertSet* s, wchar_t wc)
-{
-    if(s->size == MAX_ALPH_SIZE)
-        return 0;
-    bool already = false;
-    for (int i = 0; i < s->size; ++i)
-        if (s->array[i] == wc)
-        {
-            already = true;
-            break;
-        }
-        
-    if(!already)
-    {
-        s->array[s->size] = wc;
-        s->size++;
-    }
-    return 1;
-}
-
-void set_done(struct InsertSet* s)
-{
-}
 
 /**@}*/
 /** @name Elementy interfejsu 
@@ -165,6 +131,7 @@ struct dictionary * dictionary_load(FILE* stream)
     dict->tree = Tree_load(stream);
     if(dict->tree == NULL)
         return NULL;
+    dict->usedLetters = usedInTree(dict->tree);
     return dict;
 }
 
@@ -181,6 +148,9 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
     assert('Z' < 'a');
     assert('a' < 'z');
 
+    if(dictionary_find(dict, word))
+        word_list_add(list, word);
+
     for (size_t i = 0; i < wlen; ++i)
     {
         wchar_t *begin, *end;
@@ -195,7 +165,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
 
             wchar_t* newWordChange =
                 (wchar_t*)malloc((wlen + 1) * sizeof(wchar_t));
-            wcscpy(newWordChange, word);
+            wcscpy(newWordChange, smallWord);
             newWordChange[i] = start;
             if(dictionary_find(dict, newWordChange))
                 word_list_add(list, newWordChange);

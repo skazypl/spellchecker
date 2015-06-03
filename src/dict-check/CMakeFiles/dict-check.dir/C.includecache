@@ -32,6 +32,12 @@ stdbool.h
 wchar.h
 -
 
+dictionary/set.h
+wchar.h
+-
+stdbool.h
+-
+
 dictionary/trie.h
 stdint.h
 -
@@ -43,6 +49,8 @@ stdlib.h
 -
 wchar.h
 -
+set.h
+dictionary/set.h
 
 dictionary/word_list.h
 wchar.h

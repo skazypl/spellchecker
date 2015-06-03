@@ -6,6 +6,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include "set.h"
 
 //typedef int size_t; //kompilator szwankuje
 
@@ -36,6 +37,7 @@
 	int find(struct Tree *t, const wchar_t* word); //1 - slowo jest w slowniku; 0 - nie ma
 	void delete(struct Tree *t, const wchar_t* word);
 
+	struct InsertSet* usedInTree(struct Tree* t);
 	struct Tree* Tree_load(FILE* stream);
 	int Tree_save(struct Tree* t, FILE* stream);
 	/*

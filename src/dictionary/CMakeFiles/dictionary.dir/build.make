@@ -118,11 +118,35 @@ dictionary/CMakeFiles/dictionary.dir/trie.c.o.provides: dictionary/CMakeFiles/di
 
 dictionary/CMakeFiles/dictionary.dir/trie.c.o.provides.build: dictionary/CMakeFiles/dictionary.dir/trie.c.o
 
+dictionary/CMakeFiles/dictionary.dir/set.c.o: dictionary/CMakeFiles/dictionary.dir/flags.make
+dictionary/CMakeFiles/dictionary.dir/set.c.o: dictionary/set.c
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/CMakeFiles $(CMAKE_PROGRESS_4)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object dictionary/CMakeFiles/dictionary.dir/set.c.o"
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary && /usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/dictionary.dir/set.c.o   -c /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/set.c
+
+dictionary/CMakeFiles/dictionary.dir/set.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/dictionary.dir/set.c.i"
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary && /usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -E /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/set.c > CMakeFiles/dictionary.dir/set.c.i
+
+dictionary/CMakeFiles/dictionary.dir/set.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/dictionary.dir/set.c.s"
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary && /usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -S /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/set.c -o CMakeFiles/dictionary.dir/set.c.s
+
+dictionary/CMakeFiles/dictionary.dir/set.c.o.requires:
+.PHONY : dictionary/CMakeFiles/dictionary.dir/set.c.o.requires
+
+dictionary/CMakeFiles/dictionary.dir/set.c.o.provides: dictionary/CMakeFiles/dictionary.dir/set.c.o.requires
+	$(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/set.c.o.provides.build
+.PHONY : dictionary/CMakeFiles/dictionary.dir/set.c.o.provides
+
+dictionary/CMakeFiles/dictionary.dir/set.c.o.provides.build: dictionary/CMakeFiles/dictionary.dir/set.c.o
+
 # Object files for target dictionary
 dictionary_OBJECTS = \
 "CMakeFiles/dictionary.dir/dictionary.c.o" \
 "CMakeFiles/dictionary.dir/word_list.c.o" \
-"CMakeFiles/dictionary.dir/trie.c.o"
+"CMakeFiles/dictionary.dir/trie.c.o" \
+"CMakeFiles/dictionary.dir/set.c.o"
 
 # External object files for target dictionary
 dictionary_EXTERNAL_OBJECTS =
@@ -130,6 +154,7 @@ dictionary_EXTERNAL_OBJECTS =
 dictionary/libdictionary.a: dictionary/CMakeFiles/dictionary.dir/dictionary.c.o
 dictionary/libdictionary.a: dictionary/CMakeFiles/dictionary.dir/word_list.c.o
 dictionary/libdictionary.a: dictionary/CMakeFiles/dictionary.dir/trie.c.o
+dictionary/libdictionary.a: dictionary/CMakeFiles/dictionary.dir/set.c.o
 dictionary/libdictionary.a: dictionary/CMakeFiles/dictionary.dir/build.make
 dictionary/libdictionary.a: dictionary/CMakeFiles/dictionary.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking C static library libdictionary.a"
@@ -143,6 +168,7 @@ dictionary/CMakeFiles/dictionary.dir/build: dictionary/libdictionary.a
 dictionary/CMakeFiles/dictionary.dir/requires: dictionary/CMakeFiles/dictionary.dir/dictionary.c.o.requires
 dictionary/CMakeFiles/dictionary.dir/requires: dictionary/CMakeFiles/dictionary.dir/word_list.c.o.requires
 dictionary/CMakeFiles/dictionary.dir/requires: dictionary/CMakeFiles/dictionary.dir/trie.c.o.requires
+dictionary/CMakeFiles/dictionary.dir/requires: dictionary/CMakeFiles/dictionary.dir/set.c.o.requires
 .PHONY : dictionary/CMakeFiles/dictionary.dir/requires
 
 dictionary/CMakeFiles/dictionary.dir/clean:

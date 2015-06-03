@@ -1,2 +1,2 @@
-/usr/bin/ar cq libdictionary.a  CMakeFiles/dictionary.dir/dictionary.c.o CMakeFiles/dictionary.dir/word_list.c.o CMakeFiles/dictionary.dir/trie.c.o
+/usr/bin/ar cq libdictionary.a  CMakeFiles/dictionary.dir/dictionary.c.o CMakeFiles/dictionary.dir/word_list.c.o CMakeFiles/dictionary.dir/trie.c.o CMakeFiles/dictionary.dir/set.c.o
 /usr/bin/ranlib libdictionary.a

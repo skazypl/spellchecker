@@ -2,6 +2,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/dictionary.dir/dictionary.c.o"
   "CMakeFiles/dictionary.dir/word_list.c.o"
   "CMakeFiles/dictionary.dir/trie.c.o"
+  "CMakeFiles/dictionary.dir/set.c.o"
   "libdictionary.pdb"
   "libdictionary.a"
 )

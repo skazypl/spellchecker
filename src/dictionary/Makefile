@@ -139,6 +139,30 @@ dictionary.c.s:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/dictionary.c.s
 .PHONY : dictionary.c.s
 
+set.o: set.c.o
+.PHONY : set.o
+
+# target to build an object file
+set.c.o:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/set.c.o
+.PHONY : set.c.o
+
+set.i: set.c.i
+.PHONY : set.i
+
+# target to preprocess a source file
+set.c.i:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/set.c.i
+.PHONY : set.c.i
+
+set.s: set.c.s
+.PHONY : set.s
+
+# target to generate assembly for a file
+set.c.s:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/set.c.s
+.PHONY : set.c.s
+
 trie.o: trie.c.o
 .PHONY : trie.o
 
@@ -199,6 +223,9 @@ help:
 	@echo "... dictionary.o"
 	@echo "... dictionary.i"
 	@echo "... dictionary.s"
+	@echo "... set.o"
+	@echo "... set.i"
+	@echo "... set.s"
 	@echo "... trie.o"
 	@echo "... trie.i"
 	@echo "... trie.s"

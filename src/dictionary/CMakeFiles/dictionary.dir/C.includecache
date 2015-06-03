@@ -32,6 +32,20 @@ stdbool.h
 wchar.h
 -
 
+/home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/set.c
+set.h
+/home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/set.h
+wchar.h
+-
+stdbool.h
+-
+
+/home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/set.h
+wchar.h
+-
+stdbool.h
+-
+
 /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/trie.c
 trie.h
 /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/trie.h
@@ -51,6 +65,8 @@ stdlib.h
 -
 wchar.h
 -
+set.h
+/home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/set.h
 
 /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/word_list.c
 word_list.h

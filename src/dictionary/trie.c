@@ -116,7 +116,7 @@ void printTree(struct Node* n, int k)
 		for (int j = 0; j < 5; j++)
 			printf(" ");
 
-	printf("|>%lc<%i\n", n->key, n->childCount);
+	printf("|>%lc<\n", n->key);
 	
 	for (int i = 0; i < n->childCount; ++i)
 	{
@@ -187,7 +187,6 @@ void delete(struct Tree *t, const wchar_t* word)
 			printf("key ojca: >%lc<\n", last->parent->key);
 			
 
-
 			destrToLeaf(last->parent->children[sonNumber]);//toDelete->children[0]); //Node_destroy(toDelete);
 			//zwolnic sam wezel toDelete!
 			
@@ -252,6 +251,24 @@ void setParents(struct Node* n)
 		n->children[i]->parent = n;
 		setParents(n->children[i]);
 	}	
+}
+
+void usedInNodes(struct Node* n, struct InsertSet* s)
+{
+	if(n->key != '\0')
+		set_add(s, n->key);
+	for (int i = 0; i < n->childCount; ++i)
+		usedInNodes(n->children[i], s);
+}
+
+struct InsertSet* usedInTree(struct Tree* t)
+{
+	struct InsertSet* toReturn =
+		(struct InsertSet*)malloc(sizeof(struct InsertSet));
+	set_init(toReturn);
+
+	usedInNodes(t->root, toReturn);
+	return toReturn;
 }
 
 struct Tree* Tree_load(FILE* stream)

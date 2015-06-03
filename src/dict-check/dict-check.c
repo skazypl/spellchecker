@@ -47,6 +47,9 @@ void parseWord(struct dictionary* dict, wchar_t* line, bool ifDbg, int lineNr)
 	printf("\nlinia: %ls\n", line);
 	int i = 0;
 	int j = 0;
+	if(wcslen(line) == 0)
+		return;
+
 	while(line[i] != '\0')
 	{	
 		if(iswalpha(line[i]))
@@ -136,6 +139,7 @@ int main(int argc, char const *argv[])
 		}
 		dictionary_done(dict);
 		word_list_done(&list);
+		printf("koniec\n");
 
 	}
 
