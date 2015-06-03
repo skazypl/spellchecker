@@ -62,9 +62,9 @@ void parseWord(struct dictionary* dict, wchar_t* line, bool ifDbg, int lineNr)
 			word[j] = '\0';
 			wchar_t* onlyWord = (wchar_t*)malloc((j + 2) * sizeof(wchar_t));
 			wcscpy(onlyWord, word);
-			checkForWord(word, dict, ifDbg, lineNr, i);
-			free(word);
-			word = (wchar_t*)malloc(256 * sizeof(wchar_t));
+			checkForWord(onlyWord, dict, ifDbg, lineNr, i);
+			free(onlyWord);
+			//word = (wchar_t*)malloc(256 * sizeof(wchar_t));
 			while(!iswalpha(line[i]) && line[i] != '\0')
 			{
 				printf("%lc", line[i]);
@@ -136,11 +136,13 @@ int main(int argc, char const *argv[])
 		{
 			lineNr++;
 			parseWord(dict, line, ddebug, lineNr);
+			for (int i = 0; i < 256; ++i)
+				line[i] = '\0';
+
 		}
 		dictionary_done(dict);
 		word_list_done(&list);
-		printf("koniec\n");
-
+		fclose(dictLocation);
 	}
 
 	return 0;
