@@ -343,7 +343,7 @@ struct Tree* Tree_load(FILE* stream)
 
 	//ustalanie parentow
 	setParents(toReturn->root);
-	printTree(toReturn->root, 0);
+	//printTree(toReturn->root, 0);
 
 	return toReturn;
 }

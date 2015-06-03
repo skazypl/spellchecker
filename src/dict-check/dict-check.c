@@ -44,7 +44,6 @@ void parseWord(struct dictionary* dict, wchar_t* line, bool ifDbg, int lineNr)
 {
 	wchar_t* word = (wchar_t*)malloc(256 * sizeof(wchar_t)); //rozsadny rozmiar
 
-	printf("\nlinia: %ls\n", line);
 	int i = 0;
 	int j = 0;
 	if(wcslen(line) == 0)
