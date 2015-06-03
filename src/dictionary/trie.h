@@ -34,6 +34,7 @@
 
 	void add(struct Tree *t, const wchar_t* word);
 	int find(struct Tree *t, const wchar_t* word); //1 - slowo jest w slowniku; 0 - nie ma
+	void delete(struct Tree *t, const wchar_t* word);
 
 	struct Tree* Tree_load(FILE* stream);
 	int Tree_save(struct Tree* t, FILE* stream);
@@ -48,7 +49,7 @@
 
 	*/
 
-	void printTree(struct Node* n, int k);
+	void printTree(struct Node* n, int k); //do debugowania
 
 
 

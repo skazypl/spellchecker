@@ -1,6 +1,7 @@
 
 #include "trie.h"
 #include <string.h>
+#include <assert.h>
 
 /*
 	struct Node
@@ -42,8 +43,20 @@ void Tree_init(struct Tree *t)
 void Node_destroy(struct Node *n)
 {
 	for (int i = 0; i < n->childCount; ++i)
+	{
+		//printf("chcemy zwolnic wezel >%lc<\n", n->children[i]->key);
 		Node_destroy(n->children[i]);
+		//free(n->children[i]);
+	}
 	
+	//printf("zwalniam pamiec node o key >%lc<\n", n->key);
+	free(n);
+}
+
+void destrToLeaf(struct Node *n)
+{
+	if(n->childCount == 1)
+		destrToLeaf(n->children[0]);
 	free(n);
 }
 
@@ -103,7 +116,7 @@ void printTree(struct Node* n, int k)
 		for (int j = 0; j < 5; j++)
 			printf(" ");
 
-	printf("|>%lc<\n", n->key);
+	printf("|>%lc<%i\n", n->key, n->childCount);
 	
 	for (int i = 0; i < n->childCount; ++i)
 	{
@@ -137,6 +150,58 @@ int find(struct Tree* t, const wchar_t* word) //1 - slowo jest w slowniku; 0 - n
 }
 
 
+
+struct Node* findLeaf(struct Node* n, const wchar_t* word)
+{
+
+	for (int i = 0; i < n->childCount; ++i)
+		if( word[0] == n->children[i]->key )
+		{
+			if(word[0] == '\0')
+				return n->children[i];
+			return findLeaf(n->children[i], ++word);
+		}
+
+	return NULL;
+}
+
+
+void delete(struct Tree *t, const wchar_t* word)
+{
+	if(find(t, word) == 1)
+	{
+		printTree(t->root, 0);
+		struct Node *last = findLeaf(t->root, word);
+		if((last != NULL) && (last != t->root))
+		{
+			printf("key liscia: >%lc<\n", last->key);
+			while((last->parent->childCount < 2) && (last->parent != t->root))
+				last = last->parent;
+			
+			int sonNumber = 0;
+
+			while(last->parent->children[sonNumber] != last)
+				sonNumber++;
+			struct Node *toDelete = last->parent->children[sonNumber];
+			printf("toDelete->key: >%lc<\n", toDelete->key);
+			printf("key ojca: >%lc<\n", last->parent->key);
+			
+
+
+			destrToLeaf(last->parent->children[sonNumber]);//toDelete->children[0]); //Node_destroy(toDelete);
+			//zwolnic sam wezel toDelete!
+			
+			//free(last->parent->children[sonNumber]);
+
+			//przesuwamy na miejsce usuwanego noda ostatni z tablicy dzieci
+			last->parent->children[sonNumber] = 
+				last->parent->children[last->parent->childCount - 1];
+			last->parent->childCount--;
+		}
+	}
+	printTree(t->root, 0);
+}
+
 struct Queue
 {
 	int size;
@@ -149,20 +214,12 @@ void Queue_init(struct Queue* q)
 	q->content = NULL;
 }
 
-<<<<<<< HEAD
-void Queue_destroy(struct Queue* q) //czy dobrze? jeszcze nie wiadomo
-{
-	for (int i = 0; i < q->size; ++i)
-	{
-		free(q->content[i]);
-	}
-=======
+
 void Queue_done(struct Queue* q)
 {
 	for (int i = 0; i < q->size; ++i)
 		free(q->content[i]);
 	free(q->content);
->>>>>>> dictLeak
 }
 
 void Queue_push(struct Node* n, struct Queue* q)
@@ -186,6 +243,15 @@ struct Node* Queue_pop(struct Queue* q) //!przed wywolaniem sprawdzac size > 0
 	free(q->content);
 	q->content = newContent;
 	return toReturn;
+}
+
+void setParents(struct Node* n)
+{
+	for (int i = 0; i < n->childCount; ++i)
+	{
+		n->children[i]->parent = n;
+		setParents(n->children[i]);
+	}	
 }
 
 struct Tree* Tree_load(FILE* stream)
@@ -257,6 +323,11 @@ struct Tree* Tree_load(FILE* stream)
 		nodeLineArr = newNodeArr; //5
 	}
 	free(nodeLineArr);
+
+	//ustalanie parentow
+	setParents(toReturn->root);
+	printTree(toReturn->root, 0);
+
 	return toReturn;
 }
 /*
@@ -298,7 +369,6 @@ int Tree_save(struct Tree* t, FILE* stream)
 			Queue_push(n->children[i], Q);
 		}
 	}
-	//free(n);
 	n = Queue_pop(Q);
 	Queue_done(Q);
 	return 0;

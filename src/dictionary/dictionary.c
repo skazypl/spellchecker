@@ -19,6 +19,8 @@
 
 #define _GNU_SOURCE
 
+#define MAX_ALPH_SIZE 50
+
 /**
   Struktura przechowująca słownik.
   Uzywamy drzewa trie
@@ -26,6 +28,7 @@
 struct dictionary
 {
     struct Tree* tree; ///< Drzewo przechowujące słowa w słowniku.
+    struct InsertSet* usedLetters;
 };
 
 /** @name Funkcje pomocnicze
@@ -40,6 +43,53 @@ static void dictionary_free(struct dictionary *dict)
     Tree_destroy(dict->tree);
 }
 
+wchar_t* decapitalize(const wchar_t* word)
+{
+    wchar_t* smallWord =
+        (wchar_t*)malloc((wcslen(word) + 2) * sizeof(wchar_t));
+    wcscpy(smallWord, word);
+    for (int i = 0; i < wcslen(smallWord); ++i)
+    {
+        smallWord[i] = towlower(word[i]);
+    }
+    return smallWord;
+}
+
+struct InsertSet
+{
+    int size;
+    wchar_t array[MAX_ALPH_SIZE];
+};
+
+void set_init(struct InsertSet* s)
+{
+    s->size = 0;
+}
+
+int set_add(struct InsertSet* s, wchar_t wc)
+{
+    if(s->size == MAX_ALPH_SIZE)
+        return 0;
+    bool already = false;
+    for (int i = 0; i < s->size; ++i)
+        if (s->array[i] == wc)
+        {
+            already = true;
+            break;
+        }
+        
+    if(!already)
+    {
+        s->array[s->size] = wc;
+        s->size++;
+    }
+    return 1;
+}
+
+void set_done(struct InsertSet* s)
+{
+}
+
 /**@}*/
 /** @name Elementy interfejsu 
   @{
@@ -49,31 +99,43 @@ struct dictionary * dictionary_new()
     struct dictionary *dict =
         (struct dictionary *) malloc(sizeof(struct dictionary));
     dict->tree = (struct Tree*)malloc(sizeof(struct Tree));
+    dict->usedLetters = (struct InsertSet*)malloc(sizeof(struct InsertSet));
     Tree_init(dict->tree);
+    set_init(dict->usedLetters);  
     return dict;
 }
 
 void dictionary_done(struct dictionary *dict)
 {
     dictionary_free(dict);
+    free(dict->usedLetters);
     free(dict->tree);
     free(dict);
 }
 
 int dictionary_insert(struct dictionary *dict, const wchar_t *word)
 {  
-    if (dictionary_find(dict, word))
+    wchar_t* smallWord = decapitalize(word);
+    if (dictionary_find(dict, smallWord))
     {
+        free(smallWord);
         return 0;
     }
-    add(dict->tree, word);
+    for (int i = 0; i < wcslen(smallWord); ++i) //+1? zAraz ise przekonamy
+        if (set_add(dict->usedLetters, smallWord[i]) == 0)
+            return 0;
+
+    add(dict->tree, smallWord);
+    free(smallWord);
     return 1;
 }
 
 int dictionary_delete(struct dictionary *dict, const wchar_t *word)
 {
-    /// @bug `struct word_list` nie obsługuje operacji usuwania.
-    return 0;
+    wchar_t* smallWord = decapitalize(word);
+    delete(dict->tree, smallWord);
+    free(smallWord);
+    return 1;
 }
 
 bool dictionary_find(const struct dictionary *dict, const wchar_t* word)
@@ -81,13 +143,13 @@ bool dictionary_find(const struct dictionary *dict, const wchar_t* word)
     //wchar_t* lowerWord = (wchar_t*)malloc(sizeof(word) + sizeof(wchar_t));
     //for (int i = 0; i < wcslen(word); ++i)
         //lowerWord[i] = towlower(word[i]);
-
-    if (find(dict->tree, word) == 0)
+    wchar_t* smallWord = decapitalize(word);
+    if (find(dict->tree, smallWord) == 0)
     {
-        //free(lowerWord);
+        free(smallWord);
         return false;
     }
-    //free(lowerWord);
+    free(smallWord);
     return true;
 }
 
@@ -101,12 +163,8 @@ struct dictionary * dictionary_load(FILE* stream)
     struct dictionary *dict =
         (struct dictionary *) malloc(sizeof(struct dictionary));
     dict->tree = Tree_load(stream);
-<<<<<<< HEAD
     if(dict->tree == NULL)
         return NULL;
-    printTree(dict->tree->root, 0);
-=======
->>>>>>> dictLeak
     return dict;
 }
 
@@ -116,8 +174,8 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
 
   
     word_list_init(list);
-    size_t wlen = wcslen(word);
-    //wordUncapital = dekapitalizuj(word);
+    wchar_t* smallWord = decapitalize(word);
+    size_t wlen = wcslen(smallWord);
 
     assert('A' < 'Z');
     assert('Z' < 'a');
@@ -129,24 +187,18 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
 
         //zastepujemy i-ty znak w slowie word na wszystkie inne mniejsze znaki
         
-        for (wchar_t start = 'a'; start <= 'z'; start++)
+        for (int j = 0; j < dict->usedLetters->size; j++)
         {
-            if (start == word[i])
+            wchar_t start = dict->usedLetters->array[j];
+            if (start == smallWord[i])
                 continue;
 
             wchar_t* newWordChange =
                 (wchar_t*)malloc((wlen + 1) * sizeof(wchar_t));
             wcscpy(newWordChange, word);
             newWordChange[i] = start;
-<<<<<<< HEAD
-            //printf("nowe zastapione: >%ls<\n", newWordChange);
             if(dictionary_find(dict, newWordChange))
                 word_list_add(list, newWordChange);
-=======
-            if(dictionary_find(dict, newWordChange))
-                word_list_add(list, newWordChange);
-
->>>>>>> dictLeak
             free(newWordChange);
         }
         
@@ -156,11 +208,11 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
 
         begin = (wchar_t*)malloc((i + 1 + 1) * sizeof(wchar_t));
         //jeden wchar na \0 a drugi na dodawany nowy wchar na koncu
-        wcsncpy(begin, word, i);
+        wcsncpy(begin, smallWord, i);
         begin[i] = '\0';
 
         end = (wchar_t*)malloc((wlen - i + 1) * sizeof(wchar_t));
-        wcsncpy(end, word + i, wlen - i);
+        wcsncpy(end, smallWord + i, wlen - i);
         end[wlen - i] = '\0';
 
         wchar_t* newWordAdd = (wchar_t*)malloc((wlen + 1 + 1) * sizeof(wchar_t));
@@ -170,13 +222,11 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         newWordAdd[i + 1] = '\0';
         wcscat(newWordAdd, end);
         
-        for (wchar_t start = 'a'; start <= 'z'; start++)
+        for (int j = 0; j < dict->usedLetters->size; j++)
         {
-<<<<<<< HEAD
+            wchar_t start = dict->usedLetters->array[j];
             newWordAdd[i] = start;            
-=======
-            newWordAdd[i] = start;   
->>>>>>> dictLeak
+
             if(dictionary_find(dict, newWordAdd))
                 word_list_add(list, newWordAdd);
         }
@@ -185,10 +235,11 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         //i recznie za nieistniejacym znakiem
         if (i == wlen - 1)
         {   
-            for (wchar_t start = 'a'; start <= 'z'; start++)
+            for (int j = 0; j < dict->usedLetters->size; j++)
             {
+                wchar_t start = dict->usedLetters->array[j];
                 newWordAdd = (wchar_t*)malloc((wlen + 1 + 1) * sizeof(wchar_t));
-                wcscpy(newWordAdd, word);
+                wcscpy(newWordAdd, smallWord);
                 newWordAdd[wlen] = start;
                 newWordAdd[wlen + 1] = '\0';
                 if(dictionary_find(dict, newWordAdd))
@@ -201,7 +252,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
 
         free(end);
         end = (wchar_t*)malloc((wlen - i) * sizeof(wchar_t));
-        wcsncpy(end, word + i + 1, wlen - i - 1);
+        wcsncpy(end, smallWord + i + 1, wlen - i - 1);
         end[wlen - i - 1] = '\0';
 
         wchar_t* newWordDel = (wchar_t*)malloc((wlen) * sizeof(wchar_t));
@@ -216,6 +267,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
 
     }
 
+    free(smallWord);
 }
 
 /**@}*/
