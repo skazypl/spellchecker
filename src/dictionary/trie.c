@@ -13,7 +13,7 @@
 		struct Node* parent;
 		struct Node* children[MAX_SONS]; // wolalbym sons
 		//todo: synowie alfabetycznie
-		size_t childCount;
+		short int childCount;
 	};
 
 	struct Tree
@@ -29,6 +29,7 @@ void Node_init(struct Node *n)
 {
 	n->key = 0; //0 == '\0'
 	n->parent = NULL;
+	n->children = NULL;
 	n->childCount = 0;
 };
 
@@ -50,6 +51,7 @@ void Node_destroy(struct Node *n)
 	}
 	
 	//printf("zwalniam pamiec node o key >%lc<\n", n->key);
+	free(n->children);
 	free(n);
 }
 
@@ -77,22 +79,33 @@ void addNode(struct Node *n, const wchar_t* word)
 
 	for (int i = 0; i < n->childCount; ++i)
 	{
-		if( word[0] == n->children[i]->key )
+		if(wcslen(word) != 0)
 		{
-			addNode(n->children[i], ++word);
-			return;
+			if( word[0] == n->children[i]->key )
+			{
+				addNode(n->children[i], ++word);
+				return;
+			}
 		}
 	}
 
 	//jezeli nie znaleziono
 	n->childCount++;
 	struct Node* newNode = (struct Node*)(malloc(sizeof(struct Node)));
-	n->children[n->childCount - 1] = newNode;
 	Node_init(newNode);
+
+	struct Node** newChildren =
+		(struct Node**)(malloc(n->childCount * sizeof(struct Node*)));
+	for (int i = 0; i < n->childCount - 1; ++i)
+		newChildren[i] = n->children[i];
+
+	newChildren[n->childCount - 1] = newNode;
+	free(n->children);
+	n->children = newChildren;
+
 	newNode->parent = n;
 	newNode->key = word[0];
-
-	if(*word != '\0')
+	if(word[0] != '\0')
 	{
 		word++;
 		addNode(newNode, word);
@@ -103,8 +116,11 @@ void addNode(struct Node *n, const wchar_t* word)
 
 void add(struct Tree *t, const wchar_t* word)
 {
+	//if(wcscmp(word, L"Aruwimi") == 0)
+		//printTree(t->root, 0);
 	if(find(t, word) == 0) //?? zmniejsza efektywnosc
 		addNode(t->root, word);
+	//printTree(t->root, 0);
 
 }
 
@@ -125,8 +141,14 @@ void printTree(struct Node* n, int k)
 }
 
 
-int findNode(struct Node* n, const wchar_t* word)
+int findNode(struct Node* n, const wchar_t* word, int prt)
 {
+	//if(wcscmp(word, L"arwena") == 0) prt = 1;
+	if(prt == 1) printTree(n, 0);
+
+	if(wcslen(word) == 0)
+		return 1;
+
 	for (int i = 0; i < n->childCount; ++i)
 	{
 		if(n->children[i]->key == word[0])
@@ -136,7 +158,7 @@ int findNode(struct Node* n, const wchar_t* word)
 			else
 			{
 				word++;
-				return findNode(n->children[i], word);
+				return findNode(n->children[i], word, prt);
 			}
 		}
 	}
@@ -146,7 +168,7 @@ int findNode(struct Node* n, const wchar_t* word)
 
 int find(struct Tree* t, const wchar_t* word) //1 - slowo jest w slowniku; 0 - nie ma
 {
-	return findNode(t->root, word);
+	return findNode(t->root, word, 0);
 }
 
 
@@ -382,6 +404,8 @@ int Tree_save(struct Tree* t, FILE* stream)
 			else
 				fprintf(stream, "%lc%i", n->children[i]->key, n->children[i]->childCount);
 				//patrz konwencja
+
+			//printf("zapisalem >%lc<\n", n->children[i]->key);
 			
 			Queue_push(n->children[i], Q);
 		}

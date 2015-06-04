@@ -10,7 +10,7 @@
 
 //typedef int size_t; //kompilator szwankuje
 
-#define MAX_SONS 26
+#define MAX_SONS 40
 #define LENG(x) (sizeof(x) / sizeof(x[0])) //sprawdzac tylko dla niepustej!
 
 	struct Node
@@ -20,9 +20,9 @@
 
 		wchar_t key;
 		struct Node* parent;
-		struct Node* children[MAX_SONS]; // wolalbym sons
+		struct Node** children; // ZMIANA - tablica dynamiczna
 		//todo: synowie alfabetycznie
-		int childCount;
+		short int childCount;
 	};
 
 	struct Tree

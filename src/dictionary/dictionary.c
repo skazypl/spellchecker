@@ -19,7 +19,7 @@
 
 #define _GNU_SOURCE
 
-#define MAX_ALPH_SIZE 50
+#define MAX_ALPH_SIZE 40
 
 /**
   Struktura przechowująca słownik.
@@ -81,6 +81,8 @@ void dictionary_done(struct dictionary *dict)
 
 int dictionary_insert(struct dictionary *dict, const wchar_t *word)
 {  
+    if(wcslen(word) == 0)
+        return 0;
     wchar_t* smallWord = decapitalize(word);
     if (dictionary_find(dict, smallWord))
     {
@@ -110,6 +112,10 @@ bool dictionary_find(const struct dictionary *dict, const wchar_t* word)
     //for (int i = 0; i < wcslen(word); ++i)
         //lowerWord[i] = towlower(word[i]);
     wchar_t* smallWord = decapitalize(word);
+    for (int i = 0; i < wcslen(smallWord); ++i)
+        if(!iswalpha(smallWord[i]))
+            return false;
+
     if (find(dict->tree, smallWord) == 0)
     {
         free(smallWord);
