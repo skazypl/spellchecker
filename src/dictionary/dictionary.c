@@ -19,7 +19,6 @@
 
 #define _GNU_SOURCE
 
-#define MAX_ALPH_SIZE 40
 
 /**
   Struktura przechowująca słownik.
@@ -141,12 +140,54 @@ struct dictionary * dictionary_load(FILE* stream)
     return dict;
 }
 
+void swap(wchar_t** array, int a, int b)
+{
+    //printf("tera jest: \n %ity el to %ls\n%ity el to%ls\n", a, array[a], b, array[b]);
+    wchar_t* aWord = array[a];
+    wchar_t* bWord = array[b];
+    array[a] = bWord;
+    array[b] = aWord;
+    //printf("a na kuniec jest: \n %ity el to %ls\n%ity el to%ls\n", a, array[a], b, array[b]);
+}
+
+void alphaInsertSort(wchar_t** array, int size)
+{
+ /*   printf("najpierw jest taka kolejnosc:\n");
+    for (int i = 0; i < size; ++i)
+        printf("%ls ", array[i]);
+    printf("\n");*/
+
+    for (int i = 0; i < size; ++i)
+    {
+        for (int j = 0; j < size - i; ++j)
+        {
+            wchar_t* iWord = array[i];
+            wchar_t* i_jWord = array[i + j];
+
+            if(wcscoll(iWord, i_jWord) > 0)
+            //jezeli ktorys element jest wczesniejszy od badanego itego
+            {
+                //printf(">%ls< jest starszy od >%ls<\n", iWord, i_jWord);
+                swap(array, i, i+j);
+            }
+        }
+    }
+/*    printf("uwaga koniec sorta, mamy tak o:\n");
+    for (int i = 0; i < size; ++i)
+        printf("%ls ", array[i]);
+    printf("\n");*/
+}
+
+
+
 void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         struct word_list *list)
 {
 
-  
-    word_list_init(list);
+    struct word_list newListObj;
+    struct word_list* newList = &newListObj;
+    word_list_init(newList);
+
     wchar_t* smallWord = decapitalize(word);
     size_t wlen = wcslen(smallWord);
 
@@ -155,7 +196,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
     assert('a' < 'z');
 
     if(dictionary_find(dict, word))
-        word_list_add(list, word);
+        word_list_add(newList, word);
 
     for (size_t i = 0; i < wlen; ++i)
     {
@@ -174,7 +215,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
             wcscpy(newWordChange, smallWord);
             newWordChange[i] = start;
             if(dictionary_find(dict, newWordChange))
-                word_list_add(list, newWordChange);
+                word_list_add(newList, newWordChange);
             free(newWordChange);
         }
         
@@ -204,7 +245,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
             newWordAdd[i] = start;            
 
             if(dictionary_find(dict, newWordAdd))
-                word_list_add(list, newWordAdd);
+                word_list_add(newList, newWordAdd);
         }
         free(newWordAdd);
 
@@ -219,7 +260,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
                 newWordAdd[wlen] = start;
                 newWordAdd[wlen + 1] = '\0';
                 if(dictionary_find(dict, newWordAdd))
-                    word_list_add(list, newWordAdd);
+                    word_list_add(newList, newWordAdd);
                 free(newWordAdd);
             }
         }
@@ -235,7 +276,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         wcscpy(newWordDel, begin);
         wcscat(newWordDel, end);
         if(dictionary_find(dict, newWordDel))
-            word_list_add(list, newWordDel);
+            word_list_add(newList, newWordDel);
 
         free(newWordDel);
         free(begin);
@@ -244,6 +285,18 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
     }
 
     free(smallWord);
+
+    wchar_t* newArray[newList->size];
+    for (int i = 0; i < newList->size; ++i)
+        newArray[i] = newList->array[i];
+
+    alphaInsertSort(newArray, newList->size);
+
+    word_list_init(list);    
+    for (int i = 0; i < newList->size; ++i)
+        word_list_add(list, newArray[i]);
+
+    //free(newList);
 }
 
 /**@}*/

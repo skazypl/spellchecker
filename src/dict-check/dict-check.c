@@ -26,12 +26,16 @@ void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int w, int
 				struct word_list list;
 				word_list_init(&list);
 				dictionary_hints(dict, word, &list);
-				fwprintf(stderr, L"%i, %i %ls:", w, z - wcslen(word) + 1,
+				fwprintf(stderr, L"%i,%i %ls: ", w, z - wcslen(word) + 1, //spacja dla bakalarskiego
 					word);
 
 				const wchar_t * const *a = word_list_get(&list);
 				for (size_t i = 0; i < word_list_size(&list); ++i)
-                    fwprintf(stderr, L" %ls", a[i]);
+				{
+                    fwprintf(stderr, L"%ls", a[i]);
+                    if(i != word_list_size(&list))
+                    	fwprintf(stderr, L" ");
+                }
                 
                 fwprintf(stderr, L"\n");
 				word_list_done(&list);
@@ -130,11 +134,25 @@ int main(int argc, char const *argv[])
 		struct dictionary* dict = dictionary_load(dictLocation);
 
 		wchar_t line[256];
+		for (int i = 0; i < 256; ++i)
+				line[i] = '\0';
+
 		int lineNr = 0;
 		while(fgetws(line, sizeof(line), stdin))
 		{
 			lineNr++;
-			parseWord(dict, line, ddebug, lineNr);
+			int length = 0;
+			int i = -1;
+			while(line[i++] != '\0')
+				length++;
+			i--;
+
+			wchar_t onlyLine[length + 1];
+			for (int i = 0; i < length; ++i)
+				onlyLine[i] = line[i];
+			onlyLine[length] = '\0';
+
+			parseWord(dict, onlyLine, ddebug, lineNr);
 			for (int i = 0; i < 256; ++i)
 				line[i] = '\0';
 

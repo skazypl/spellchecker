@@ -146,8 +146,8 @@ int findNode(struct Node* n, const wchar_t* word, int prt)
 	//if(wcscmp(word, L"arwena") == 0) prt = 1;
 	if(prt == 1) printTree(n, 0);
 
-	if(wcslen(word) == 0)
-		return 1;
+	//if(wcslen(word) == 0)
+	//	return 1;
 
 	for (int i = 0; i < n->childCount; ++i)
 	{
@@ -209,7 +209,7 @@ void delete(struct Tree *t, const wchar_t* word)
 			printf("key ojca: >%lc<\n", last->parent->key);
 			
 
-			destrToLeaf(last->parent->children[sonNumber]);//toDelete->children[0]); //Node_destroy(toDelete);
+			destrToLeaf(last->parent->children[sonNumber]);//toDelete->children[0]);
 			//zwolnic sam wezel toDelete!
 			
 			//free(last->parent->children[sonNumber]);
@@ -223,7 +223,7 @@ void delete(struct Tree *t, const wchar_t* word)
 	printTree(t->root, 0);
 }
 
-struct Queue
+/*struct Queue
 {
 	int size;
 	struct Node* *content; //tablica
@@ -245,7 +245,8 @@ void Queue_done(struct Queue* q)
 
 void Queue_push(struct Node* n, struct Queue* q)
 {
-	struct Node** newContent = (struct Node**)malloc((q->size + 1) * sizeof(struct Node*));
+	struct Node** newContent = 
+		(struct Node**)malloc((q->size + 1) * sizeof(struct Node*));
 	for (int i = 0; i < q->size; ++i)
 		newContent[i] = q->content[i];
 	newContent[q->size] = n;
@@ -257,12 +258,96 @@ void Queue_push(struct Node* n, struct Queue* q)
 struct Node* Queue_pop(struct Queue* q) //!przed wywolaniem sprawdzac size > 0
 {
 	struct Node* toReturn = q->content[0];
-	struct Node** newContent = (struct Node**)malloc(q->size * sizeof(struct Node*));
+	struct Node** newContent = 
+		(struct Node**)malloc(q->size * sizeof(struct Node*));
 	for (int i = 1; i < q->size; ++i)
 		newContent[i-1] = q->content[i];
 	q->size--;
 	free(q->content);
 	q->content = newContent;
+	return toReturn;
+}*/
+
+
+struct List
+{
+	struct List* next;
+	struct List* prev;
+	struct Node* elem;
+};
+
+void list_init(struct List* l)
+{
+	l->next = NULL;
+	l->prev = NULL;
+	l->elem = NULL;
+}	
+
+
+struct Queue
+{
+	int size;
+	struct List* first;
+	struct List* last;
+	
+	//struct Node* *content; //tablica
+};
+
+void Queue_init(struct Queue* q)
+{
+	//printf("init\n");
+	q->size = 0;
+	q->first = (struct List*)malloc(sizeof(struct List));
+	q->last = q->first;
+}
+
+
+void Queue_done(struct Queue* q)
+{
+	//printf("done\n");
+	struct List* actual = q->first;
+	while(q->first != NULL)
+	{
+		q->first = q->first->next;
+		free(actual);
+		actual = q->first;
+	}
+}
+
+void Queue_push(struct Node* n, struct Queue* q)
+{
+	//printf("queue size: %i\n", q->size);
+	struct List* newLast = (struct List*)malloc(sizeof(struct List));
+	newLast->elem = n;	
+	newLast->prev = q->last;
+	q->last->next = newLast;
+	q->last = q->last->next;
+	newLast->next = NULL;
+
+	if(q->size == 0)
+		q->first = q->last;
+
+	q->size++;
+}
+
+struct Node* Queue_pop(struct Queue* q) //!przed wywolaniem sprawdzac size > 0
+{
+	struct Node* toReturn = q->first->elem;
+	struct List* toDelete = q->first;
+	q->first = q->first->next;
+	free(toDelete);
+
+	q->size--;
+	return toReturn;
+}
+
+
+int treeSize(struct Node* n)
+{
+	int toReturn = 1;
+	for (int i = 0; i < n->childCount; ++i)
+		toReturn += treeSize(n->children[i]);
+
 	return toReturn;
 }
 
@@ -295,10 +380,11 @@ struct InsertSet* usedInTree(struct Tree* t)
 
 struct Tree* Tree_load(FILE* stream)
 {
+	int liczbaNodow = 1; // root
 	wchar_t buf;
 	int numb;
 	struct Tree* toReturn = (struct Tree*)(malloc(sizeof(struct Tree)));
-	int oldSum; //suma liczby dzieci z tablicy z poprzedniego kroku petli
+	int oldSum;//suma liczby dzieci z tablicy z poprzedniego kroku petli
 	if (fscanf(stream, "%i", &oldSum) == EOF) 
 	//najpierw wczytujemy ilu synow ma root
 		return NULL;
@@ -310,7 +396,7 @@ struct Tree* Tree_load(FILE* stream)
 
 	struct Node** nodeLineArr = 
 		(struct Node**)malloc(sizeof(struct Node*));
-	nodeLineArr[0] = toReturn->root;
+		nodeLineArr[0] = toReturn->root;
 
 	//czym jest nodeLineArr przy kazdorazowym wejsciu do ponizszej petli?
 	//jest tablica wskaznikow do nodow z poprzedniego kroku - nizszej glebokosci
@@ -336,6 +422,7 @@ struct Tree* Tree_load(FILE* stream)
 			}
 
 			struct Node* newNode = (struct Node*)(malloc(sizeof(struct Node)));
+			liczbaNodow++;
 			if(buf == L'!')
 			{
 				newNode->key = 0; // '\0'
@@ -352,8 +439,13 @@ struct Tree* Tree_load(FILE* stream)
 		int index = 0;
 		for (int i = 0; i < oldSum; ++i)
 		{
+			nodeLineArr[i]->children = (struct Node**)
+				malloc(nodeLineArr[i]->childCount * sizeof(struct Node*));
+
 			for (int j = 0; j < nodeLineArr[i]->childCount; ++j)
+			{
 				nodeLineArr[i]->children[j] = newNodeArr[index + j];
+			}
 			
 			index += nodeLineArr[i]->childCount;
 		}//4
@@ -367,6 +459,7 @@ struct Tree* Tree_load(FILE* stream)
 	setParents(toReturn->root);
 	//printTree(toReturn->root, 0);
 
+	//printTree(toReturn->root, 0);
 	return toReturn;
 }
 /*
@@ -386,6 +479,8 @@ algo:
 
 int Tree_save(struct Tree* t, FILE* stream)
 {
+	int liczbaNodow = 1; // root
+	//printf("liczba nodow: %i\n", treeSize(t->root));
 	fprintf(stream, "%i", t->root->childCount);
 
 	struct Queue nodeQueue;
@@ -399,6 +494,7 @@ int Tree_save(struct Tree* t, FILE* stream)
 		n = Queue_pop(Q);
 		for (int i = 0; i < n->childCount; ++i)
 		{
+			liczbaNodow++;
 			if(n->children[i]->key == '\0')
 				fprintf(stream, "!0");
 			else
@@ -409,9 +505,11 @@ int Tree_save(struct Tree* t, FILE* stream)
 			
 			Queue_push(n->children[i], Q);
 		}
+		
 	}
-	n = Queue_pop(Q);
 	Queue_done(Q);
+	//printf("liczba nodow: %i\n", liczbaNodow);
+	//printTree(t->root, 0);
 	return 0;
 }
 
