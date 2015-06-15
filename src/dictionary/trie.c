@@ -23,8 +23,6 @@
 
 */
 
-//todo: dodawanie .parent, np przy _load() - moze pomoc w implementacji delete()
-
 void Node_init(struct Node *n)
 {
 	n->key = 0; //0 == '\0'
@@ -45,12 +43,9 @@ void Node_destroy(struct Node *n)
 {
 	for (int i = 0; i < n->childCount; ++i)
 	{
-		//printf("chcemy zwolnic wezel >%lc<\n", n->children[i]->key);
 		Node_destroy(n->children[i]);
-		//free(n->children[i]);
 	}
 	
-	//printf("zwalniam pamiec node o key >%lc<\n", n->key);
 	free(n->children);
 	free(n);
 }
@@ -196,7 +191,7 @@ void delete(struct Tree *t, const wchar_t* word)
 		struct Node *last = findLeaf(t->root, word);
 		if((last != NULL) && (last != t->root))
 		{
-			printf("key liscia: >%lc<\n", last->key);
+			//printf("key liscia: >%lc<\n", last->key);
 			while((last->parent->childCount < 2) && (last->parent != t->root))
 				last = last->parent;
 			
@@ -205,69 +200,24 @@ void delete(struct Tree *t, const wchar_t* word)
 			while(last->parent->children[sonNumber] != last)
 				sonNumber++;
 			struct Node *toDelete = last->parent->children[sonNumber];
-			printf("toDelete->key: >%lc<\n", toDelete->key);
-			printf("key ojca: >%lc<\n", last->parent->key);
+			//printf("toDelete->key: >%lc<\n", toDelete->key);
+			//printf("key ojca: >%lc<\n", last->parent->key);
 			
-
-			destrToLeaf(last->parent->children[sonNumber]);//toDelete->children[0]);
-			//zwolnic sam wezel toDelete!
+			struct Node *lastParent = last->parent;
+			Node_destroy(last->parent->children[sonNumber]);
+			//zwolnic sam wezel toDelete - destrToLeaf to zrobi!
 			
 			//free(last->parent->children[sonNumber]);
 
 			//przesuwamy na miejsce usuwanego noda ostatni z tablicy dzieci
-			last->parent->children[sonNumber] = 
-				last->parent->children[last->parent->childCount - 1];
-			last->parent->childCount--;
+			if(sonNumber != lastParent->childCount - 1)
+				lastParent->children[sonNumber] = 
+					lastParent->children[lastParent->childCount - 1];
+			lastParent->childCount--;
 		}
 	}
-	printTree(t->root, 0);
+	//printTree(t->root, 0); //dbg
 }
-
-/*struct Queue
-{
-	int size;
-	struct Node* *content; //tablica
-};
-
-void Queue_init(struct Queue* q)
-{
-	q->size = 0;
-	q->content = NULL;
-}
-
-
-void Queue_done(struct Queue* q)
-{
-	for (int i = 0; i < q->size; ++i)
-		free(q->content[i]);
-	free(q->content);
-}
-
-void Queue_push(struct Node* n, struct Queue* q)
-{
-	struct Node** newContent = 
-		(struct Node**)malloc((q->size + 1) * sizeof(struct Node*));
-	for (int i = 0; i < q->size; ++i)
-		newContent[i] = q->content[i];
-	newContent[q->size] = n;
-	q->size++;
-	free(q->content);
-	q->content = newContent;
-}
-
-struct Node* Queue_pop(struct Queue* q) //!przed wywolaniem sprawdzac size > 0
-{
-	struct Node* toReturn = q->content[0];
-	struct Node** newContent = 
-		(struct Node**)malloc(q->size * sizeof(struct Node*));
-	for (int i = 1; i < q->size; ++i)
-		newContent[i-1] = q->content[i];
-	q->size--;
-	free(q->content);
-	q->content = newContent;
-	return toReturn;
-}*/
-
 
 struct List
 {

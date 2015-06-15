@@ -25,6 +25,10 @@ void word_list_done(struct word_list *list)
 
 int word_list_add(struct word_list *list, const wchar_t *word)
 {
+  for (int i = 0; i < list->size; ++i)
+    if(wcscmp(list->array[i], word) == 0)
+      return 0;
+
     if (list->size >= WORD_LIST_MAX_WORDS)
         return 0;
     size_t len = wcslen(word) + 1;

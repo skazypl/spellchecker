@@ -142,12 +142,10 @@ struct dictionary * dictionary_load(FILE* stream)
 
 void swap(wchar_t** array, int a, int b)
 {
-    //printf("tera jest: \n %ity el to %ls\n%ity el to%ls\n", a, array[a], b, array[b]);
     wchar_t* aWord = array[a];
     wchar_t* bWord = array[b];
     array[a] = bWord;
     array[b] = aWord;
-    //printf("a na kuniec jest: \n %ity el to %ls\n%ity el to%ls\n", a, array[a], b, array[b]);
 }
 
 void alphaInsertSort(wchar_t** array, int size)
@@ -232,7 +230,8 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         wcsncpy(end, smallWord + i, wlen - i);
         end[wlen - i] = '\0';
 
-        wchar_t* newWordAdd = (wchar_t*)malloc((wlen + 1 + 1) * sizeof(wchar_t));
+        wchar_t* newWordAdd =
+            (wchar_t*)malloc((wlen + 1 + 1) * sizeof(wchar_t));
 
         wcscpy(newWordAdd, begin);
         newWordAdd[i] = 'a'; //dowolna litera, wazna inicjalizacja
@@ -255,7 +254,8 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
             for (int j = 0; j < dict->usedLetters->size; j++)
             {
                 wchar_t start = dict->usedLetters->array[j];
-                newWordAdd = (wchar_t*)malloc((wlen + 1 + 1) * sizeof(wchar_t));
+                newWordAdd =
+                    (wchar_t*)malloc((wlen + 1 + 1) * sizeof(wchar_t));
                 wcscpy(newWordAdd, smallWord);
                 newWordAdd[wlen] = start;
                 newWordAdd[wlen + 1] = '\0';

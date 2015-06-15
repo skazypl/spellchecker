@@ -6,7 +6,7 @@
 #include <wctype.h>
 #include <errno.h>
 
-const int MAX_WORD_SIZE = 32; //rozsadnie
+const int MAX_WORD_SIZE = 64; //rozsadnie
 
 void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int w, int z)
 //zakladamy ze na wejsciu jest slowo w sensie samych liter z jezyka pl

@@ -1,3 +1,10 @@
+/** @file
+	Implementacja drzewa trie do przechowywania słownika.
+
+	@ingroup dictionary
+	@author Jarosław Socha <js347267@students.mimuw.edu.pl>
+	*/
+
 #ifndef TRIE_H
 #define TRIE_H
 
@@ -8,52 +15,102 @@
 #include <wchar.h>
 #include "set.h"
 
-//typedef int size_t; //kompilator szwankuje
-
 #define MAX_SONS 40
-#define LENG(x) (sizeof(x) / sizeof(x[0])) //sprawdzac tylko dla niepustej!
+#define LENG(x) (sizeof(x) / sizeof(x[0])) //nieuzywane
 
-	struct Node
-	{
-		//int ifWord; //1 - slowo; 0 - nie
-		//lepsza konwencja: pusty wezel tzn '\0'
-
-		wchar_t key;
-		struct Node* parent;
-		struct Node** children; // ZMIANA - tablica dynamiczna
-		//todo: synowie alfabetycznie
-		short int childCount;
-	};
-
-	struct Tree
-	{
-		struct Node* root;
-	};
-
-	void Tree_init(struct Tree *t);
-	void Tree_destroy(struct Tree *t);
-
-	void add(struct Tree *t, const wchar_t* word);
-	int find(struct Tree *t, const wchar_t* word); //1 - slowo jest w slowniku; 0 - nie ma
-	void delete(struct Tree *t, const wchar_t* word);
-
-	struct InsertSet* usedInTree(struct Tree* t);
-	struct Tree* Tree_load(FILE* stream);
-	int Tree_save(struct Tree* t, FILE* stream);
-	/*
-	konwencja przechowywania drzewa na dysku: ciag par
-	
-	<wchar_t - klucz node'a><int - liczba potomkow>
-	
-	dla liscia: "!0"
-
-	mozna czytac za pomoca scanfa i "%c%i"
-
+/**
+	Struktura pojedynczego węzła w drzewie.
 	*/
 
-	void printTree(struct Node* n, int k); //do debugowania
+struct Node
+{
+	wchar_t key;
+	struct Node* parent;
+	struct Node** children; ///< Synowie nie są ułożeni alfabetycznie.
+	short int childCount;
+};
+
+/**
+	Struktura pełnego drzewa, zawierająca tylko wskaźnik do typu węzłowego.
+	*/
+
+struct Tree
+{
+	struct Node* root;
+};
+
+/**
+	Inicjalizacja drzewa.
+	Drzewo niszczy się za pomocą Tree_destroy().
+	@param[in, out] t Drzewo.
+	*/
+
+void Tree_init(struct Tree *t);
+
+/**
+	Destrukcja drzewa.
+	Zwalnia całą zaalokowaną pamięć.
+	@param[in] t Drzewo.
+	*/
+
+void Tree_destroy(struct Tree *t);
+
+/**
+	Dodaje słowo do drzewa.	
+	@param[in, out] t Drzewo.
+	@param[in] word Słowo wstawiane do drzewa.
+	*/
+
+void add(struct Tree *t, const wchar_t* word);
+
+/**
+	Sprawdza czy podane słowo jest już w drzewie.
+	@param[in, out] t Drzewo.
+	@param[in] word Poszukiwane słowo.
+	@return 1 jeśli słowo jest w drzewie, 0 jeśli nie ma.
+	*/
+
+int find(struct Tree *t, const wchar_t* word);
+
+/**
+	Usuwa słowo ze słownika.
+	@param[in, out] t Drzewo.
+	@param[in] word Usuwane słowo.
+*/
+void delete(struct Tree *t, const wchar_t* word);
+
+/**
+	Zwraca zbiór typu InsertSet (z nagłówka set) 
+	zawierający litery użyte w drzewie.
+	@param[in] t Drzewo.
+	@return Zbiór użytych liter w drzewie.
+*/
+struct InsertSet* usedInTree(struct Tree* t);
+
+/**
+	Ładuje ze strumienia plikowy zapis drzewa i zwraca do tego drzewa wskaźnik.
+	@param[in] stream Plik z zapisanym drzewem.
+	@return Drzewo wczytane z pliku.
+*/
+struct Tree* Tree_load(FILE* stream);
+
+/**
+	Zapisuje drzewo do pliku.
+
+	konwencja przechowywania drzewa na dysku: ciąg par
+	<wchar_t - klucz node'a><int - liczba potomków>
+	dla liscia: "!0".
+
+	@param[in] t Drzewo.
+	@param[in] stream Plik docelowy.
+	@return 1 jeśli udało się zapisać, 0 wpp.
+*/
+int Tree_save(struct Tree* t, FILE* stream);
 
 
+/**
+	Funkcja tylko do debugowania - wypisuje drzewo na ekran.
+*/
+void printTree(struct Node* n, int k);
 
-
-#endif
+#endif /* TRIE_H */
