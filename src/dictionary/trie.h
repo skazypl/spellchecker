@@ -76,7 +76,7 @@ int find(struct Tree *t, const wchar_t* word);
 	Usuwa słowo ze słownika.
 	@param[in, out] t Drzewo.
 	@param[in] word Usuwane słowo.
-*/
+	*/
 void delete(struct Tree *t, const wchar_t* word);
 
 /**
@@ -84,14 +84,14 @@ void delete(struct Tree *t, const wchar_t* word);
 	zawierający litery użyte w drzewie.
 	@param[in] t Drzewo.
 	@return Zbiór użytych liter w drzewie.
-*/
+	*/
 struct InsertSet* usedInTree(struct Tree* t);
 
 /**
 	Ładuje ze strumienia plikowy zapis drzewa i zwraca do tego drzewa wskaźnik.
 	@param[in] stream Plik z zapisanym drzewem.
 	@return Drzewo wczytane z pliku.
-*/
+	*/
 struct Tree* Tree_load(FILE* stream);
 
 /**
@@ -104,13 +104,13 @@ struct Tree* Tree_load(FILE* stream);
 	@param[in] t Drzewo.
 	@param[in] stream Plik docelowy.
 	@return 1 jeśli udało się zapisać, 0 wpp.
-*/
+	*/
 int Tree_save(struct Tree* t, FILE* stream);
 
 
 /**
 	Funkcja tylko do debugowania - wypisuje drzewo na ekran.
-*/
+	*/
 void printTree(struct Node* n, int k);
 
 #endif /* TRIE_H */
