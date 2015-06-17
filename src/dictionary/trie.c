@@ -3,25 +3,9 @@
 #include <string.h>
 #include <assert.h>
 
-/*
-	struct Node
-	{
-		//int ifWord; //1 - slowo; 0 - nie
-		//lepsza konwencja: pusty wezel tzn '\0'
-
-		char key;
-		struct Node* parent;
-		struct Node* children[MAX_SONS]; // wolalbym sons
-		//todo: synowie alfabetycznie
-		short int childCount;
-	};
-
-	struct Tree
-	{
-		Node* root;
-	};
-
-*/
+/** @name Funkcje pomocnicze.
+   @{
+ */
 
 void Node_init(struct Node *n)
 {
@@ -30,14 +14,6 @@ void Node_init(struct Node *n)
 	n->children = NULL;
 	n->childCount = 0;
 };
-
-/// root bedzie wezlem atrapa - nie bedziemy przechowywac w nim stringa
-void Tree_init(struct Tree *t)
-{
-	t->root = (struct Node*)malloc(sizeof(struct Node));
-	Node_init(t->root);
-}
-
 
 void Node_destroy(struct Node *n)
 {
@@ -57,21 +33,9 @@ void destrToLeaf(struct Node *n)
 	free(n);
 }
 
-void Tree_destroy(struct Tree *t)
-{
-	if(t->root != NULL)
-		Node_destroy(t->root);
-}
-
 
 void addNode(struct Node *n, const wchar_t* word)
 {
-	//todo: co zakladamy wchodzac do wezla?
-	//1. ze nie jest null
-
-	//todo2: podwojnie dodaje pusty wezel przy wstawianiu 
-	//dwa razy tego samego slowa - usunac usterke
-
 	for (int i = 0; i < n->childCount; ++i)
 	{
 		if(wcslen(word) != 0)
@@ -109,40 +73,9 @@ void addNode(struct Node *n, const wchar_t* word)
 }
 
 
-void add(struct Tree *t, const wchar_t* word)
-{
-	//if(wcscmp(word, L"Aruwimi") == 0)
-		//printTree(t->root, 0);
-	if(find(t, word) == 0) //?? zmniejsza efektywnosc
-		addNode(t->root, word);
-	//printTree(t->root, 0);
-
-}
-
-
-//debug
-void printTree(struct Node* n, int k)
-{
-	for (int i = 0; i < k; ++i)
-		for (int j = 0; j < 5; j++)
-			printf(" ");
-
-	printf("|>%lc<\n", n->key);
-	
-	for (int i = 0; i < n->childCount; ++i)
-	{
-		printTree(n->children[i], k+1);
-	}
-}
-
-
 int findNode(struct Node* n, const wchar_t* word, int prt)
 {
-	//if(wcscmp(word, L"arwena") == 0) prt = 1;
 	if(prt == 1) printTree(n, 0);
-
-	//if(wcslen(word) == 0)
-	//	return 1;
 
 	for (int i = 0; i < n->childCount; ++i)
 	{
@@ -161,16 +94,8 @@ int findNode(struct Node* n, const wchar_t* word, int prt)
 }
 
 
-int find(struct Tree* t, const wchar_t* word) //1 - slowo jest w slowniku; 0 - nie ma
-{
-	return findNode(t->root, word, 0);
-}
-
-
-
 struct Node* findLeaf(struct Node* n, const wchar_t* word)
 {
-
 	for (int i = 0; i < n->childCount; ++i)
 		if( word[0] == n->children[i]->key )
 		{
@@ -182,6 +107,56 @@ struct Node* findLeaf(struct Node* n, const wchar_t* word)
 	return NULL;
 }
 
+///@}
+
+/** @name Funkcje do debugowania.
+   @{
+ */
+
+void printTree(struct Node* n, int k)
+{
+	for (int i = 0; i < k; ++i)
+		for (int j = 0; j < 5; j++)
+			printf(" ");
+
+	printf("|>%lc<\n", n->key);
+	
+	for (int i = 0; i < n->childCount; ++i)
+	{
+		printTree(n->children[i], k+1);
+	}
+}
+
+/**@}*/
+
+
+/** @name Elementy interfejsu 
+   @{
+ */
+
+void Tree_init(struct Tree *t)
+{
+	t->root = (struct Node*)malloc(sizeof(struct Node));
+	Node_init(t->root);
+}
+
+void Tree_destroy(struct Tree *t)
+{
+	if(t->root != NULL)
+		Node_destroy(t->root);
+}
+
+void add(struct Tree *t, const wchar_t* word)
+{
+	if(find(t, word) == 0)
+		addNode(t->root, word);
+}
+
+int find(struct Tree* t, const wchar_t* word)
+{
+	return findNode(t->root, word, 0);
+}
+
 
 void delete(struct Tree *t, const wchar_t* word)
 {
@@ -191,7 +166,6 @@ void delete(struct Tree *t, const wchar_t* word)
 		struct Node *last = findLeaf(t->root, word);
 		if((last != NULL) && (last != t->root))
 		{
-			//printf("key liscia: >%lc<\n", last->key);
 			while((last->parent->childCount < 2) && (last->parent != t->root))
 				last = last->parent;
 			
@@ -200,8 +174,6 @@ void delete(struct Tree *t, const wchar_t* word)
 			while(last->parent->children[sonNumber] != last)
 				sonNumber++;
 			struct Node *toDelete = last->parent->children[sonNumber];
-			//printf("toDelete->key: >%lc<\n", toDelete->key);
-			//printf("key ojca: >%lc<\n", last->parent->key);
 			
 			struct Node *lastParent = last->parent;
 			Node_destroy(last->parent->children[sonNumber]);
@@ -216,14 +188,26 @@ void delete(struct Tree *t, const wchar_t* word)
 			lastParent->childCount--;
 		}
 	}
-	//printTree(t->root, 0); //dbg
 }
 
+///@}
+
+
+/** @name Struktura listy.
+   @{
+ */
+
+
+/**
+	Struktura listy dwukierunkowej, przydatna przy implementacji kolejki.
+	Zawiera wskaźniki do ogonów z obu swoich stron (być może NULLi), oraz,
+	jako przechowywany element, wskaźnik do obiektu typu Node.
+	*/
 struct List
 {
-	struct List* next;
-	struct List* prev;
-	struct Node* elem;
+	struct List* next; ///< Lista poprzedzajaca.
+	struct List* prev; ///< Lista następująca.
+	struct Node* elem; ///< Element listy.
 };
 
 void list_init(struct List* l)
@@ -233,19 +217,27 @@ void list_init(struct List* l)
 	l->elem = NULL;
 }	
 
+//@}
+
+/** @name Struktura kolejki.
+   @{
+ */
+
+/**
+	Struktura kolejki przechowywującej elementy typu Node.
+	Zawiera standardowe metody kolejki - konstruktor, destruktor, zdjęcie z
+	początku i dodanie na koniec elementu.
+	*/
 
 struct Queue
 {
-	int size;
-	struct List* first;
-	struct List* last;
-	
-	//struct Node* *content; //tablica
+	int size; ///< Rozmiar kolejki.
+	struct List* first; ///< Początek kolejki.
+	struct List* last; ///< Koniec kolejki.
 };
 
 void Queue_init(struct Queue* q)
 {
-	//printf("init\n");
 	q->size = 0;
 	q->first = (struct List*)malloc(sizeof(struct List));
 	q->last = q->first;
@@ -254,7 +246,6 @@ void Queue_init(struct Queue* q)
 
 void Queue_done(struct Queue* q)
 {
-	//printf("done\n");
 	struct List* actual = q->first;
 	while(q->first != NULL)
 	{
@@ -266,7 +257,6 @@ void Queue_done(struct Queue* q)
 
 void Queue_push(struct Node* n, struct Queue* q)
 {
-	//printf("queue size: %i\n", q->size);
 	struct List* newLast = (struct List*)malloc(sizeof(struct List));
 	newLast->elem = n;	
 	newLast->prev = q->last;
@@ -280,7 +270,7 @@ void Queue_push(struct Node* n, struct Queue* q)
 	q->size++;
 }
 
-struct Node* Queue_pop(struct Queue* q) //!przed wywolaniem sprawdzac size > 0
+struct Node* Queue_pop(struct Queue* q)
 {
 	struct Node* toReturn = q->first->elem;
 	struct List* toDelete = q->first;
@@ -291,6 +281,11 @@ struct Node* Queue_pop(struct Queue* q) //!przed wywolaniem sprawdzac size > 0
 	return toReturn;
 }
 
+///@}
+
+/** @name Funkcje pomocnicze do zapisywania i wczytywania.
+   @{
+ */
 
 int treeSize(struct Node* n)
 {
@@ -328,13 +323,33 @@ struct InsertSet* usedInTree(struct Tree* t)
 	return toReturn;
 }
 
+///@}
+
+/** @name Elementy interfejsu 
+   @{
+ */
+
+/*
+
+algorytm czytania z pliku:
+1. sumuj dzieci rzeczy z aktualnej array i =: SumKids
+2. alloc nowe_t[Sum]
+3. for(0 < i < Sum)
+       czytaj next char i int
+       dodaj nowy wezel
+       dowiaz do nowe_t[i]
+4. lec po stare_t[] i dodawaj im synow z nowe_t[]
+5.stara_t := nowe_t
+
+*/
+
 struct Tree* Tree_load(FILE* stream)
 {
 	int liczbaNodow = 1; // root
 	wchar_t buf;
 	int numb;
 	struct Tree* toReturn = (struct Tree*)(malloc(sizeof(struct Tree)));
-	int oldSum;//suma liczby dzieci z tablicy z poprzedniego kroku petli
+	int oldSum; //suma liczby dzieci z tablicy z poprzedniego kroku petli
 	if (fscanf(stream, "%i", &oldSum) == EOF) 
 	//najpierw wczytujemy ilu synow ma root
 		return NULL;
@@ -348,7 +363,7 @@ struct Tree* Tree_load(FILE* stream)
 		(struct Node**)malloc(sizeof(struct Node*));
 		nodeLineArr[0] = toReturn->root;
 
-	//czym jest nodeLineArr przy kazdorazowym wejsciu do ponizszej petli?
+	//czym jest nodeLineArr przy kazdorazowym wejsciu do ponizszej petli - 
 	//jest tablica wskaznikow do nodow z poprzedniego kroku - nizszej glebokosci
 	//przy 1 wejsciu jest tylko zlozona z roota
 	while (sumChild != 0)
@@ -405,32 +420,16 @@ struct Tree* Tree_load(FILE* stream)
 	}
 	free(nodeLineArr);
 
-	//ustalanie parentow
 	setParents(toReturn->root);
-	//printTree(toReturn->root, 0);
-
-	//printTree(toReturn->root, 0);
 	return toReturn;
 }
-/*
 
-algo:
-1. sumuj dzieci rzeczy z aktualnej array i =: SumKids
-2. alloc nowe_t[Sum]
-3. for(0 < i < Sum)
-       czytaj next char i int
-       dodaj nowy wezel
-       dowiaz do nowe_t[i]
-4. lec po stare_t[] i dodawaj im synow z nowe_t[]
-5.stara_t := nowe_t
 
-*/
 
 
 int Tree_save(struct Tree* t, FILE* stream)
 {
 	int liczbaNodow = 1; // root
-	//printf("liczba nodow: %i\n", treeSize(t->root));
 	fprintf(stream, "%i", t->root->childCount);
 
 	struct Queue nodeQueue;
@@ -450,18 +449,14 @@ int Tree_save(struct Tree* t, FILE* stream)
 			else
 				fprintf(stream, "%lc%i", n->children[i]->key, n->children[i]->childCount);
 				//patrz konwencja
-
-			//printf("zapisalem >%lc<\n", n->children[i]->key);
 			
 			Queue_push(n->children[i], Q);
 		}
 		
 	}
 	Queue_done(Q);
-	//printf("liczba nodow: %i\n", liczbaNodow);
-	//printTree(t->root, 0);
+
 	return 0;
 }
 
-
-
+///}@

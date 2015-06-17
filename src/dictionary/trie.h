@@ -15,8 +15,8 @@
 #include <wchar.h>
 #include "set.h"
 
-#define MAX_SONS 40
-#define LENG(x) (sizeof(x) / sizeof(x[0])) //nieuzywane
+#define MAX_SONS 40 ///< Maksymalna zakładana liczba synów liścia.
+///< Nie przekroczy rozmiaru alfabetu.
 
 /**
 	Struktura pojedynczego węzła w drzewie.
@@ -24,10 +24,11 @@
 
 struct Node
 {
-	wchar_t key;
-	struct Node* parent;
-	struct Node** children; ///< Synowie nie są ułożeni alfabetycznie.
-	short int childCount;
+	wchar_t key; ///< Klucz identyfikujący węzeł. Dla liści znak pusty tzn \0.
+	struct Node* parent; ///< Wskaźnik do ojca danego węzła. NULL dla roota.
+	struct Node** children; /**< Tablica wskaźników do synów typu Node.
+	Synowie nie są ułożeni alfabetycznie.*/
+	short int childCount; ///< Liczba synów węzła.
 };
 
 /**
@@ -36,7 +37,9 @@ struct Node
 
 struct Tree
 {
-	struct Node* root;
+	struct Node* root; /**< Wskaźnik do korzenia drzewa typu węzłowego Node.
+	Węzeł atrapa - nie przechowywujemy w nim klucza.
+	*/
 };
 
 /**

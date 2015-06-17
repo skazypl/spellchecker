@@ -6,12 +6,22 @@
 #include <wctype.h>
 #include <errno.h>
 
-const int MAX_WORD_SIZE = 64; //rozsadnie
+const int MAX_WORD_SIZE = 64; ///< Rozsądnie maksymalna zakładana długość słowa.
 
-void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int w, int z)
+/**
+	Sprawdza czy w argumentowanym słowniku jest zadane słowo w określonym 
+	wierszu	i pozycji.
+	@param[in] word Szukane słowo.
+	@param[in] dict Rozważany słownik.
+	@param[in] ifDbg Opcja zależna od -v w wywołaniu programu.
+	@param[in] w Numer wiersza słowa.
+	@param[in] z Numer znaku w wierszu, od którego zaczyna się słowo.
+	*/
+
+void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int w, 
+	int z)
 //zakladamy ze na wejsciu jest slowo w sensie samych liter z jezyka pl
 {
-	//printf("word do checkowania: >%ls<\n", word);
 	if(word[0] != '\0')
 	{
 		if(dictionary_find(dict, word))
@@ -26,7 +36,7 @@ void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int w, int
 				struct word_list list;
 				word_list_init(&list);
 				dictionary_hints(dict, word, &list);
-				fwprintf(stderr, L"%i,%i %ls: ", w, z - wcslen(word) + 1, //spacja dla bakalarskiego
+				fwprintf(stderr, L"%i,%i %ls: ", w, z - wcslen(word) + 1,
 					word);
 
 				const wchar_t * const *a = word_list_get(&list);
@@ -43,6 +53,15 @@ void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int w, int
 		}
 	}
 }
+
+/**
+	Parsuje kolejne słowo z linii, tzn spójny ciąg znaków z danego alfabetu, 
+	i wywołuje na nim funkcję checkForWord.
+	@param[in] dict Słownik.
+	@param[in] line Linia.
+	@param[in] ifDbg Opcja zależna od -v w wywołaniu programu.
+	@param[in] lineNr Numer parsowanej linii.
+*/
 
 void parseWord(struct dictionary* dict, wchar_t* line, bool ifDbg, int lineNr)
 {
@@ -67,7 +86,7 @@ void parseWord(struct dictionary* dict, wchar_t* line, bool ifDbg, int lineNr)
 			wcscpy(onlyWord, word);
 			checkForWord(onlyWord, dict, ifDbg, lineNr, i);
 			free(onlyWord);
-			//word = (wchar_t*)malloc(256 * sizeof(wchar_t));
+
 			while(!iswalpha(line[i]) && line[i] != '\0')
 			{
 				printf("%lc", line[i]);
@@ -80,14 +99,13 @@ void parseWord(struct dictionary* dict, wchar_t* line, bool ifDbg, int lineNr)
 
 		i++;	
 	}
-	//word[i] = '\0';
-	//checkForWord(word, dict, ifDbg, lineNr, i);
 	free(word);
 }
 
-
-
-
+/**
+	Funkcja main.
+	Główna funkcja programu.
+*/
 
 int main(int argc, char const *argv[])
 {

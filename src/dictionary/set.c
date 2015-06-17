@@ -1,5 +1,9 @@
 #include "set.h"
 
+/** @name Elementy interfejsu 
+   @{
+ */
+
 void set_init(struct InsertSet* s)
 {
     s->size = 0;
@@ -28,3 +32,5 @@ int set_add(struct InsertSet* s, wchar_t wc)
 void set_done(struct InsertSet* s)
 {
 }
+
+///@}

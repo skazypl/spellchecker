@@ -27,7 +27,7 @@
 struct dictionary
 {
     struct Tree* tree; ///< Drzewo przechowujące słowa w słowniku.
-    struct InsertSet* usedLetters;
+    struct InsertSet* usedLetters; ///< Zbiór wszystkich liter ze słownika.
 };
 
 /** @name Funkcje pomocnicze
@@ -42,6 +42,12 @@ static void dictionary_free(struct dictionary *dict)
     Tree_destroy(dict->tree);
 }
 
+/**
+    Zamiana wszystkich wielkich liter w słowie na małe.
+    @param[in] word Słowo z małymi i być może wielkimi literami.
+    @return Słowo złożone tylko z małych liter.
+    */
+
 wchar_t* decapitalize(const wchar_t* word)
 {
     wchar_t* smallWord =
@@ -54,6 +60,44 @@ wchar_t* decapitalize(const wchar_t* word)
     return smallWord;
 }
 
+/**
+    Zamienia miejscami w tablicy wchar-ów dwa elementy o zadanych indeksach. 
+    @param[in] a, b Indeksy zamienianych elementów.
+    @param[in, out] array Tablica.
+    */
+
+void swap(wchar_t** array, int a, int b)
+{
+    wchar_t* aWord = array[a];
+    wchar_t* bWord = array[b];
+    array[a] = bWord;
+    array[b] = aWord;
+}
+
+
+/**
+    Sortuje w kwardatowym czasie słowa z tablicy w kolejności alfabetycznej.
+    @param[in, out] array Tablica.
+    @param[in] size Rozmiar tablicy.
+    */
+
+void alphaInsertSort(wchar_t** array, int size)
+{
+    for (int i = 0; i < size; ++i)
+    {
+        for (int j = 0; j < size - i; ++j)
+        {
+            wchar_t* iWord = array[i];
+            wchar_t* i_jWord = array[i + j];
+
+            if(wcscoll(iWord, i_jWord) > 0)
+            //jezeli ktorys element jest wczesniejszy od badanego itego
+            {
+                swap(array, i, i+j);
+            }
+        }
+    }
+}
 
 /**@}*/
 /** @name Elementy interfejsu 
@@ -88,7 +132,7 @@ int dictionary_insert(struct dictionary *dict, const wchar_t *word)
         free(smallWord);
         return 0;
     }
-    for (int i = 0; i < wcslen(smallWord); ++i) //+1? zAraz ise przekonamy
+    for (int i = 0; i < wcslen(smallWord); ++i)
         if (set_add(dict->usedLetters, smallWord[i]) == 0)
             return 0;
 
@@ -107,9 +151,6 @@ int dictionary_delete(struct dictionary *dict, const wchar_t *word)
 
 bool dictionary_find(const struct dictionary *dict, const wchar_t* word)
 {
-    //wchar_t* lowerWord = (wchar_t*)malloc(sizeof(word) + sizeof(wchar_t));
-    //for (int i = 0; i < wcslen(word); ++i)
-        //lowerWord[i] = towlower(word[i]);
     wchar_t* smallWord = decapitalize(word);
     for (int i = 0; i < wcslen(smallWord); ++i)
         if(!iswalpha(smallWord[i]))
@@ -140,48 +181,12 @@ struct dictionary * dictionary_load(FILE* stream)
     return dict;
 }
 
-void swap(wchar_t** array, int a, int b)
-{
-    wchar_t* aWord = array[a];
-    wchar_t* bWord = array[b];
-    array[a] = bWord;
-    array[b] = aWord;
-}
-
-void alphaInsertSort(wchar_t** array, int size)
-{
- /*   printf("najpierw jest taka kolejnosc:\n");
-    for (int i = 0; i < size; ++i)
-        printf("%ls ", array[i]);
-    printf("\n");*/
-
-    for (int i = 0; i < size; ++i)
-    {
-        for (int j = 0; j < size - i; ++j)
-        {
-            wchar_t* iWord = array[i];
-            wchar_t* i_jWord = array[i + j];
-
-            if(wcscoll(iWord, i_jWord) > 0)
-            //jezeli ktorys element jest wczesniejszy od badanego itego
-            {
-                //printf(">%ls< jest starszy od >%ls<\n", iWord, i_jWord);
-                swap(array, i, i+j);
-            }
-        }
-    }
-/*    printf("uwaga koniec sorta, mamy tak o:\n");
-    for (int i = 0; i < size; ++i)
-        printf("%ls ", array[i]);
-    printf("\n");*/
-}
 
 
 
 void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         struct word_list *list)
 {
-
     struct word_list newListObj;
     struct word_list* newList = &newListObj;
     word_list_init(newList);
@@ -234,7 +239,8 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
             (wchar_t*)malloc((wlen + 1 + 1) * sizeof(wchar_t));
 
         wcscpy(newWordAdd, begin);
-        newWordAdd[i] = 'a'; //dowolna litera, wazna inicjalizacja
+        newWordAdd[i] = 'a'; // dowolna litera, wazna inicjalizacja. 
+        /// @todo Usunąć.
         newWordAdd[i + 1] = '\0';
         wcscat(newWordAdd, end);
         
@@ -295,8 +301,6 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
     word_list_init(list);    
     for (int i = 0; i < newList->size; ++i)
         word_list_add(list, newArray[i]);
-
-    //free(newList);
 }
 
 /**@}*/
