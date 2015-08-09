@@ -257,17 +257,30 @@ void Queue_done(struct Queue* q)
 
 void Queue_push(struct Node* n, struct Queue* q)
 {
-	struct List* newLast = (struct List*)malloc(sizeof(struct List));
-	newLast->elem = n;	
+	fprintf(stderr, "# size : %i\n", q->size );
+	struct List* newLast;
+	if(newLast = (struct List*)malloc(sizeof(struct List)))
+		fprintf(stderr, "zaakolowano\n");
+
+		fprintf(stderr, "1\n" );
+	newLast->elem = n;
+		fprintf(stderr, "2\n" );
 	newLast->prev = q->last;
+		fprintf(stderr, "3\n" );
 	q->last->next = newLast;
+		fprintf(stderr, "4\n" );
 	q->last = q->last->next;
+		fprintf(stderr, "5\n" );
 	newLast->next = NULL;
+		fprintf(stderr, "6\n" );
 
 	if(q->size == 0)
 		q->first = q->last;
+		
+		fprintf(stderr, "7\n" );	
 
 	q->size++;
+		fprintf(stderr, "8 }\n" );
 }
 
 struct Node* Queue_pop(struct Queue* q)
@@ -436,24 +449,39 @@ int Tree_save(struct Tree* t, FILE* stream)
 	struct Queue* Q = &nodeQueue;
 	Queue_init(Q);
 	struct Node* n;
-
+	printf("lecimy z drzewaem\n");
 	Queue_push(t->root, Q);
 	while(Q->size > 0)
 	{
+		fprintf(stderr, ":: petla\n" );
 		n = Queue_pop(Q);
+		fprintf(stderr, "bump >%lc<\n", n->key); //dbg
 		for (int i = 0; i < n->childCount; ++i)
 		{
+				if(n->key == L's') fprintf(stderr, "petl 1\n");
 			liczbaNodow++;
+				if(n->key == L's') fprintf(stderr, "petl 2\n");
 			if(n->children[i]->key == '\0')
 				fprintf(stream, "!0");
 			else
-				fprintf(stream, "%lc%i", n->children[i]->key, n->children[i]->childCount);
+				fprintf(stream, "%lc\n%i", n->children[i]->key, 
+					n->children[i]->childCount);
 				//patrz konwencja
 			
+				if(n->key == L's') 
+				{
+					fprintf(stderr, "petl 3 >%lc< rozm: \n",
+					 n->children[i]->key);
+					fprintf(stderr, "stil\n");
+				}
+
 			Queue_push(n->children[i], Q);
+				if(n->key == L's') fprintf(stderr, "petl 4\n");
 		}
+		fprintf(stderr, "doszlo ::\n" );
 		
 	}
+	fprintf(stderr, "koniec kolejki\n");
 	Queue_done(Q);
 
 	return 0;
