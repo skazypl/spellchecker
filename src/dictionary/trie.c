@@ -377,7 +377,7 @@ struct Tree* Tree_load(FILE* stream)
 		nodeLineArr[0] = toReturn->root;
 
 	//czym jest nodeLineArr przy kazdorazowym wejsciu do ponizszej petli - 
-	//jest tablica wskaznikow do nodow z poprzedniego kroku - nizszej glebokosci
+	//jest tablica wskaznikow do nodow z poprzedniego kroku - nizszej glebokosc
 	//przy 1 wejsciu jest tylko zlozona z roota
 	while (sumChild != 0)
 	{
@@ -485,6 +485,56 @@ int Tree_save(struct Tree* t, FILE* stream)
 	Queue_done(Q);
 
 	return 0;
+}
+
+/*
+algorytm wczytywania:
+
+*/
+
+
+struct Tree* Tree_load_DFS(FILE* stream)
+{
+	int liczbaNodow = 1; // root
+	wchar_t buf;
+	int numb;
+	struct Tree* toReturn = (struct Tree*)(malloc(sizeof(struct Tree)));
+	Tree_init(toReturn);
+	int oldSum; //suma liczby dzieci z tablicy z poprzedniego kroku petli
+	if (fscanf(stream, "%i", &oldSum) == EOF) 
+	//najpierw wczytujemy ilu synow ma root
+		return NULL;
+
+	
+
+	return toReturn;
+
+
+}
+
+void writeDFS(struct Node* n, FILE* stream)
+{
+	if (n->childCount == 0)
+		fprintf(stream, "!\n0");
+	else
+		fprintf(stream, "%lc\n%i", n->key, n->childCount);
+
+	for (int i = 0; i < n->childCount; ++i)
+	{
+		writeDFS(n->children[i], stream);
+	}
+
+}
+
+int Tree_save_DFS(struct Tree* t, FILE* stream)
+{
+	fprintf(stream, "%i", t->root->childCount);
+
+	for (int i = 0; i < t->root->childCount; ++i)
+	{
+		writeDFS(t->root->children[i], stream);
+	}
+	return 0; //jeszcze ma zwracac <0 jak cos sie nie powiedzie - TODO
 }
 
 ///}@

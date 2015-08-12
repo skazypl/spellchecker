@@ -125,16 +125,24 @@ void dictionary_done(struct dictionary *dict)
 int dictionary_insert(struct dictionary *dict, const wchar_t *word)
 {  
     if(wcslen(word) == 0)
+    {
+        fprintf(stderr, "zerowe slowo %ls\n", word);
         return 0;
+    }
     wchar_t* smallWord = decapitalize(word);
     if (dictionary_find(dict, smallWord))
     {
+        fprintf(stderr, "znalazlem w dict slowo >%ls<\n", smallWord);
         free(smallWord);
         return 0;
     }
     for (int i = 0; i < wcslen(smallWord); ++i)
-        if (set_add(dict->usedLetters, smallWord[i]) == 0)
+        if (set_add(dict->usedLetters, smallWord[i]) == 0) 
+        //jesli nie ma takiej litery
+        {
+            fprintf(stderr, "nie ma litery >%lc<\n", smallWord[i]);
             return 0;
+        }
 
     add(dict->tree, smallWord);
     free(smallWord);
@@ -167,14 +175,14 @@ bool dictionary_find(const struct dictionary *dict, const wchar_t* word)
 
 int dictionary_save(const struct dictionary *dict, FILE* stream)
 {
-  return Tree_save(dict->tree, stream);
+  return Tree_save_DFS(dict->tree, stream);
 }
 
 struct dictionary * dictionary_load(FILE* stream)
 {
     struct dictionary *dict =
         (struct dictionary *) malloc(sizeof(struct dictionary));
-    dict->tree = Tree_load(stream);
+    dict->tree = Tree_load_DFS(stream);
     if(dict->tree == NULL)
         return NULL;
     dict->usedLetters = usedInTree(dict->tree);

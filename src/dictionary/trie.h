@@ -91,7 +91,7 @@ void delete(struct Tree *t, const wchar_t* word);
 struct InsertSet* usedInTree(struct Tree* t);
 
 /**
-	Ładuje ze strumienia plikowy zapis drzewa i zwraca do tego drzewa wskaźnik.
+	Ładuje ze strumienia plikowy zapis drzewa i zwraca wskaźnik do korzenia.
 	@param[in] stream Plik z zapisanym drzewem.
 	@return Drzewo wczytane z pliku.
 	*/
@@ -109,6 +109,11 @@ struct Tree* Tree_load(FILE* stream);
 	@return 1 jeśli udało się zapisać, 0 wpp.
 	*/
 int Tree_save(struct Tree* t, FILE* stream);
+
+
+struct Tree* Tree_load_DFS(FILE* stream);
+
+int Tree_save_DFS(struct Tree* t, FILE* stream);
 
 
 /**

@@ -123,7 +123,7 @@ static int dict_command(struct dictionary **dict, enum Command c)
     }
     if (!make_lowercase(word))
     {
-        //fprintf(stderr, "Invalid word '%ls'\n", word);
+        fprintf(stderr, "Invalid word '%ls'\n", word);
         return ignored();
     }
     switch (c)
