@@ -17,7 +17,7 @@
 /**
   Maksymalna liczba słów przechowywana w liście słów.
   */
-#define WORD_LIST_MAX_WORDS 32
+#define WORD_LIST_MAX_WORDS 132
 
 
 /**

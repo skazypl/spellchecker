@@ -79,8 +79,9 @@ int find(struct Tree *t, const wchar_t* word);
 	Usuwa słowo ze słownika.
 	@param[in, out] t Drzewo.
 	@param[in] word Usuwane słowo.
+	@return 1 jeśli udało się usunąć słowo, 0 jeśli nie.
 	*/
-void delete(struct Tree *t, const wchar_t* word);
+int delete(struct Tree *t, const wchar_t* word);
 
 /**
 	Zwraca zbiór typu InsertSet (z nagłówka set) 

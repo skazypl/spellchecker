@@ -116,6 +116,15 @@ struct dictionary * dictionary_new()
 
 void dictionary_done(struct dictionary *dict)
 {
+/*
+    printf("dzieci roota:\n");
+    for (int i = 0; i < dict->tree->root->childCount; ++i)
+    {
+        printf(">%lc< ", dict->tree->root->children[i]->key);
+    }
+    printf("\n");
+    */
+
     dictionary_free(dict);
     free(dict->usedLetters);
     free(dict->tree);
@@ -126,13 +135,13 @@ int dictionary_insert(struct dictionary *dict, const wchar_t *word)
 {  
     if(wcslen(word) == 0)
     {
-        fprintf(stderr, "zerowe slowo %ls\n", word);
+        //fprintf(stderr, "zerowe slowo %ls\n", word);
         return 0;
     }
     wchar_t* smallWord = decapitalize(word);
     if (dictionary_find(dict, smallWord))
     {
-        fprintf(stderr, "znalazlem w dict slowo >%ls<\n", smallWord);
+        //fprintf(stderr, "znalazlem w dict slowo >%ls<\n", smallWord);
         free(smallWord);
         return 0;
     }
@@ -140,7 +149,7 @@ int dictionary_insert(struct dictionary *dict, const wchar_t *word)
         if (set_add(dict->usedLetters, smallWord[i]) == 0) 
         //jesli nie ma takiej litery
         {
-            fprintf(stderr, "nie ma litery >%lc<\n", smallWord[i]);
+            //fprintf(stderr, "nie ma litery >%lc<\n", smallWord[i]);
             return 0;
         }
 
@@ -152,9 +161,9 @@ int dictionary_insert(struct dictionary *dict, const wchar_t *word)
 int dictionary_delete(struct dictionary *dict, const wchar_t *word)
 {
     wchar_t* smallWord = decapitalize(word);
-    delete(dict->tree, smallWord);
+    int toReturn = delete(dict->tree, smallWord);
     free(smallWord);
-    return 1;
+    return toReturn;
 }
 
 bool dictionary_find(const struct dictionary *dict, const wchar_t* word)
@@ -289,6 +298,9 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         wchar_t* newWordDel = (wchar_t*)malloc((wlen) * sizeof(wchar_t));
         wcscpy(newWordDel, begin);
         wcscat(newWordDel, end);
+        //printf("podp do >%ls<: >%ls<\n", smallWord, newWordDel);
+        //if(dictionary_find(dict, newWordDel)) printf("znalazlem >%ls<\n", newWordDel);
+
         if(dictionary_find(dict, newWordDel))
             word_list_add(newList, newWordDel);
 
