@@ -13,7 +13,7 @@ void Node_init(struct Node *n)
 	n->parent = NULL;
 	n->children = NULL;
 	n->childCount = 0;
-};
+}
 
 struct Node* createNode(int childCount, wchar_t key, struct Node* parent)
 {
@@ -53,10 +53,18 @@ void destrToLeaf(struct Node *n)
 	free(n);
 }
 
+int nodeComp(const void* a, const void* b)
+{
+	struct Node* a_ = *(struct Node**)a;
+	struct Node* b_ = *(struct Node**)b;
+	if(a_->key < b_->key) return -1;
+	else if(a_->key == b_->key) return 0;
+	else return 1;
+}
 
 void addNode(struct Node *n, const wchar_t* word)
 {
-	for (int i = 0; i < n->childCount; ++i)
+	for (int i = 0; i < n->childCount; ++i) //zamienimy na binsercz
 	{
 		if(wcslen(word) != 0)
 		{
@@ -79,6 +87,9 @@ void addNode(struct Node *n, const wchar_t* word)
 		newChildren[i] = n->children[i];
 
 	newChildren[n->childCount - 1] = newNode;
+	//sort newChildren ===========================TODO===============
+	qsort(newChildren, n->childcount, sizeof(struct Node*), nodeComp);
+
 	free(n->children);
 	n->children = newChildren;
 
@@ -97,7 +108,7 @@ int findNode(struct Node* n, const wchar_t* word, int prt)
 {
 	if(prt == 1) printTree(n, 0);
 
-	for (int i = 0; i < n->childCount; ++i)
+	for (int i = 0; i < n->childCount; ++i) //zamienimy na binsercz
 	{
 		if(n->children[i]->key == word[0])
 		{
@@ -193,19 +204,18 @@ int delete(struct Tree *t, const wchar_t* word)
 
 			while(last->parent->children[sonNumber] != last)
 				sonNumber++;
-			struct Node *toDelete = last->parent->children[sonNumber];
+			struct Node* toDelete = last->parent->children[sonNumber];
 			
 			struct Node *lastParent = last->parent;
-			Node_destroy(last->parent->children[sonNumber]);
+			Node_destroy(toDelete);
 			//zwolnic sam wezel toDelete - destrToLeaf to zrobi!
 			
-			//free(last->parent->children[sonNumber]);
-
 			//przesuwamy na miejsce usuwanego noda ostatni z tablicy dzieci
 			if(sonNumber != lastParent->childCount - 1)
 				lastParent->children[sonNumber] = 
 					lastParent->children[lastParent->childCount - 1];
 			lastParent->childCount--;
+			//sort lastParent->children =======================TODO=========
 		}
 	}
 	else
@@ -262,83 +272,6 @@ void list_destroy(struct List* l)
 
 //@}
 
-/** @name Struktura kolejki.
-   @{
- */
-
-/**
-	Struktura kolejki przechowywującej elementy typu Node.
-	Zawiera standardowe metody kolejki - konstruktor, destruktor, zdjęcie z
-	początku i dodanie na koniec elementu.
-	*/
-
-struct Queue
-{
-	int size; ///< Rozmiar kolejki.
-	struct List* first; ///< Początek kolejki.
-	struct List* last; ///< Koniec kolejki.
-};
-
-void Queue_init(struct Queue* q)
-{
-	q->size = 0;
-	q->first = (struct List*)malloc(sizeof(struct List));
-	q->last = q->first;
-}
-
-
-void Queue_done(struct Queue* q)
-{
-	struct List* actual = q->first;
-	while(q->first != NULL)
-	{
-		q->first = q->first->next;
-		free(actual);
-		actual = q->first;
-	}
-}
-
-void Queue_push(struct Node* n, struct Queue* q)
-{
-	fprintf(stderr, "# size : %i\n", q->size );
-	struct List* newLast;
-	if(newLast = (struct List*)malloc(sizeof(struct List)))
-		fprintf(stderr, "zaakolowano\n");
-
-		fprintf(stderr, "1\n" );
-	newLast->elem = n;
-		fprintf(stderr, "2\n" );
-	newLast->prev = q->last;
-		fprintf(stderr, "3\n" );
-	q->last->next = newLast;
-		fprintf(stderr, "4\n" );
-	q->last = q->last->next;
-		fprintf(stderr, "5\n" );
-	newLast->next = NULL;
-		fprintf(stderr, "6\n" );
-
-	if(q->size == 0)
-		q->first = q->last;
-		
-		fprintf(stderr, "7\n" );	
-
-	q->size++;
-		fprintf(stderr, "8 }\n" );
-}
-
-struct Node* Queue_pop(struct Queue* q)
-{
-	struct Node* toReturn = q->first->elem;
-	struct List* toDelete = q->first;
-	q->first = q->first->next;
-	free(toDelete);
-
-	q->size--;
-	return toReturn;
-}
-
-///@}
-
 /** @name Funkcje pomocnicze do zapisywania i wczytywania.
    @{
  */
@@ -386,153 +319,9 @@ struct InsertSet* usedInTree(struct Tree* t)
    @{
  */
 
-/*
-
-algorytm czytania z pliku:
-1. sumuj dzieci rzeczy z aktualnej array i =: SumKids
-2. alloc nowe_t[Sum]
-3. for(0 < i < Sum)
-       czytaj next char i int
-       dodaj nowy wezel
-       dowiaz do nowe_t[i]
-4. lec po stare_t[] i dodawaj im synow z nowe_t[]
-5.stara_t := nowe_t
-
-*/
-
-struct Tree* Tree_load(FILE* stream)
-{
-	int liczbaNodow = 1; // root
-	wchar_t buf;
-	int numb;
-	struct Tree* toReturn = (struct Tree*)(malloc(sizeof(struct Tree)));
-	int oldSum; //suma liczby dzieci z tablicy z poprzedniego kroku petli
-	if (fscanf(stream, "%i", &oldSum) == EOF) 
-	//najpierw wczytujemy ilu synow ma root
-		return NULL;
-
-	int sumChild = 1;
-	toReturn->root = (struct Node*)(malloc(sizeof(struct Node)));
-	toReturn->root->childCount = oldSum;
-	toReturn->root->key = 0; //'\0'
-
-	struct Node** nodeLineArr = 
-		(struct Node**)malloc(sizeof(struct Node*));
-		nodeLineArr[0] = toReturn->root;
-
-	//czym jest nodeLineArr przy kazdorazowym wejsciu do ponizszej petli - 
-	//jest tablica wskaznikow do nodow z poprzedniego kroku - nizszej glebokosc
-	//przy 1 wejsciu jest tylko zlozona z roota
-	while (sumChild != 0)
-	{
-		oldSum = sumChild;
-		sumChild = 0;
-		for (int i = 0; i < oldSum; ++i)
-			sumChild +=	nodeLineArr[i]->childCount;
-		//1
-		struct Node** newNodeArr = 
-			(struct Node**)malloc(sumChild * sizeof(struct Node**)); //2
-
-
-		for (int i = 0; i < sumChild; ++i)
-		{
-			if(fscanf(stream, "%lc %i", &buf, &numb) == EOF)
-			{
-				printf("ERROR: bledny plik\n");
-				free(toReturn);
-				return NULL;
-			}
-
-			struct Node* newNode = (struct Node*)(malloc(sizeof(struct Node)));
-			liczbaNodow++;
-			if(buf == L'!')
-			{
-				newNode->key = 0; // '\0'
-				newNode->childCount = 0;
-			}
-			else
-			{
-				newNode->key = buf;
-				newNode->childCount = numb;
-			}
-			newNodeArr[i] = newNode;
-		}//3
-
-		int index = 0;
-		for (int i = 0; i < oldSum; ++i)
-		{
-			nodeLineArr[i]->children = (struct Node**)
-				malloc(nodeLineArr[i]->childCount * sizeof(struct Node*));
-
-			for (int j = 0; j < nodeLineArr[i]->childCount; ++j)
-			{
-				nodeLineArr[i]->children[j] = newNodeArr[index + j];
-			}
-			
-			index += nodeLineArr[i]->childCount;
-		}//4
-
-		free(nodeLineArr);
-		nodeLineArr = newNodeArr; //5
-	}
-	free(nodeLineArr);
-
-	setParents(toReturn->root);
-	return toReturn;
-}
-
-
-
-
-int Tree_save(struct Tree* t, FILE* stream)
-{
-	int liczbaNodow = 1; // root
-	fprintf(stream, "%i", t->root->childCount);
-
-	struct Queue nodeQueue;
-	struct Queue* Q = &nodeQueue;
-	Queue_init(Q);
-	struct Node* n;
-	printf("lecimy z drzewaem\n");
-	Queue_push(t->root, Q);
-	while(Q->size > 0)
-	{
-		fprintf(stderr, ":: petla\n" );
-		n = Queue_pop(Q);
-		fprintf(stderr, "bump >%lc<\n", n->key); //dbg
-		for (int i = 0; i < n->childCount; ++i)
-		{
-				if(n->key == L's') fprintf(stderr, "petl 1\n");
-			liczbaNodow++;
-				if(n->key == L's') fprintf(stderr, "petl 2\n");
-			if(n->children[i]->key == '\0')
-				fprintf(stream, "!0");
-			else
-				fprintf(stream, "%lc\n%i", n->children[i]->key, 
-					n->children[i]->childCount);
-				//patrz konwencja
-			
-				if(n->key == L's') 
-				{
-					fprintf(stderr, "petl 3 >%lc< rozm: \n",
-					 n->children[i]->key);
-					fprintf(stderr, "stil\n");
-				}
-
-			Queue_push(n->children[i], Q);
-				if(n->key == L's') fprintf(stderr, "petl 4\n");
-		}
-		fprintf(stderr, "doszlo ::\n" );
-		
-	}
-	fprintf(stderr, "koniec kolejki\n");
-	Queue_done(Q);
-
-	return 0;
-}
 
 /*
-algorytm wczytywania:
+algorytm wczytywania: DFS
 
 */
 
@@ -580,10 +369,6 @@ int firstFree(struct Node* n)
 
 struct Tree* Tree_load_DFS(FILE* stream)
 {
-	//printf("$ load dfs\n");
-	int liczbaNodow = 1; // root
-	wchar_t buf;
-	int numb;
 	struct Tree* toReturn = (struct Tree*)(malloc(sizeof(struct Tree)));
 	Tree_init(toReturn);
 	int scanChildNum; //suma liczby dzieci z tablicy z poprzedniego kroku petli
@@ -601,8 +386,8 @@ struct Tree* Tree_load_DFS(FILE* stream)
 	struct Node* actual = toReturn->root; //todo: dodac tablice dzieci roota scanChNr
 
 	struct List* listTillRoot = (struct List*)malloc(sizeof(struct List));
-	//printf("test 1.5\n");
 	list_init(listTillRoot);
+	free(listTillRoot); //na razie tutaj, przyda sie jak bedzie error handling
 
 	//printf("test 2\n");
 
@@ -617,12 +402,8 @@ struct Tree* Tree_load_DFS(FILE* stream)
 				error = 1; //lub zwyczajnie koniec pliku 
 						//funkcja wyzej zdaje sie wyczerpywac mozliwe errory
 			*/
-			//printf("EOF\n");
 			break;
 		}
-		//printf("drugi if: key = >%lc<, count = %i\n", key, count);
-		//printf("key = >%lc< count = %i\n", key, count);
-		//if(key == L'\n') printf("zepsute, count = %i\n", count);
 
 		if(key == L'!')
 		{
@@ -632,12 +413,7 @@ struct Tree* Tree_load_DFS(FILE* stream)
 				if(hasFree(actual) == 1)
 					break;
 				actual = actual->parent;
-
 			}
-			/*
-			if(actual == NULL) { printf("jestesmy w KORZENIU\n"); }
-			else printf("jestesmy w >%lc<\n", actual->key);
-			*/
 		}
 		else
 		{
@@ -646,9 +422,7 @@ struct Tree* Tree_load_DFS(FILE* stream)
 			actual->children[freePlace] = createNode(count, key, actual);
 			//firstFree nie bedzie -1 bo dbamy o to w petli
 			actual = actual->children[freePlace];
-			//printf("mamy node >%lc<\n", actual->key);
 		}
-		//printf("nast obieg while\n");
 	}
 
 	if (error)
@@ -656,18 +430,7 @@ struct Tree* Tree_load_DFS(FILE* stream)
 		//zwolnic pamiec itd, zwrocic null
 	}
 
-	/*
-	printf("dzieci roota:\n");
-	for (int i = 0; i < toReturn->root->childCount; ++i)
-	{
-		printf(">%lc< ", toReturn->root->children[i]->key);
-	}
-	printf("\n");
-	*/
-
 	return toReturn;
-
-
 }
 
 void writeDFS(struct Node* n, FILE* stream)
