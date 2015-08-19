@@ -62,8 +62,33 @@ int nodeComp(const void* a, const void* b)
 	else return 1;
 }
 
+//zwraca indeks tablicy arr, ktorego element jest rowny patt, -1 jesli nie ma
+int binSearch(struct Node* arr[], int size, wchar_t patt)
+{
+	if(size < 1)
+		return -1;
+
+	int beg = 0;
+	int end = size - 1;
+	while(beg < end)
+	{
+		int mid = (beg + end) / 2;
+		if(arr[mid]->key == patt)
+			return mid;
+
+		if(arr[mid]->key < patt)
+			beg = mid + 1;
+		else
+			end = mid;
+	}
+	if(arr[beg]->key == patt)
+		return beg;
+	return -1;
+} 
+
 void addNode(struct Node *n, const wchar_t* word)
 {
+	/*
 	for (int i = 0; i < n->childCount; ++i) //zamienimy na binsercz
 	{
 		if(wcslen(word) != 0)
@@ -73,6 +98,16 @@ void addNode(struct Node *n, const wchar_t* word)
 				addNode(n->children[i], ++word);
 				return;
 			}
+		}
+	}
+	*/
+	if(wcslen(word) != 0)
+	{
+		int ind = binSearch(n->children, n->childCount, word[0]);
+		if(ind != -1)
+		{
+			addNode(n->children[ind], ++word);
+			return;
 		}
 	}
 
@@ -88,13 +123,28 @@ void addNode(struct Node *n, const wchar_t* word)
 
 	newChildren[n->childCount - 1] = newNode;
 	//sort newChildren ===========================TODO===============
-	qsort(newChildren, n->childcount, sizeof(struct Node*), nodeComp);
 
+	
 	free(n->children);
 	n->children = newChildren;
 
 	newNode->parent = n;
 	newNode->key = word[0];
+
+	qsort(n->children, n->childCount, sizeof(struct Node*), nodeComp);
+
+	/*
+	if(n->childCount > 1)
+	{
+		printf("wypiszmy:\n");
+		for (int i = 0; i < n->childCount; ++i)
+		{
+			printf(">%lc< ", n->children[i]->key);
+		}
+		printf("powinno byc posortowane\n");
+	}
+	*/
+	
 	if(word[0] != '\0')
 	{
 		word++;
@@ -216,6 +266,8 @@ int delete(struct Tree *t, const wchar_t* word)
 					lastParent->children[lastParent->childCount - 1];
 			lastParent->childCount--;
 			//sort lastParent->children =======================TODO=========
+			qsort(lastParent->children, lastParent->childCount, 
+				sizeof(struct Node*), nodeComp);
 		}
 	}
 	else
