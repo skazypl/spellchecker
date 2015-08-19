@@ -88,19 +88,6 @@ int binSearch(struct Node* arr[], int size, wchar_t patt)
 
 void addNode(struct Node *n, const wchar_t* word)
 {
-	/*
-	for (int i = 0; i < n->childCount; ++i) //zamienimy na binsercz
-	{
-		if(wcslen(word) != 0)
-		{
-			if( word[0] == n->children[i]->key )
-			{
-				addNode(n->children[i], ++word);
-				return;
-			}
-		}
-	}
-	*/
 	if(wcslen(word) != 0)
 	{
 		int ind = binSearch(n->children, n->childCount, word[0]);
@@ -121,10 +108,7 @@ void addNode(struct Node *n, const wchar_t* word)
 	for (int i = 0; i < n->childCount - 1; ++i)
 		newChildren[i] = n->children[i];
 
-	newChildren[n->childCount - 1] = newNode;
-	//sort newChildren ===========================TODO===============
-
-	
+	newChildren[n->childCount - 1] = newNode;	
 	free(n->children);
 	n->children = newChildren;
 
@@ -133,18 +117,6 @@ void addNode(struct Node *n, const wchar_t* word)
 
 	qsort(n->children, n->childCount, sizeof(struct Node*), nodeComp);
 
-	/*
-	if(n->childCount > 1)
-	{
-		printf("wypiszmy:\n");
-		for (int i = 0; i < n->childCount; ++i)
-		{
-			printf(">%lc< ", n->children[i]->key);
-		}
-		printf("powinno byc posortowane\n");
-	}
-	*/
-	
 	if(word[0] != '\0')
 	{
 		word++;
@@ -158,32 +130,31 @@ int findNode(struct Node* n, const wchar_t* word, int prt)
 {
 	if(prt == 1) printTree(n, 0);
 
-	for (int i = 0; i < n->childCount; ++i) //zamienimy na binsercz
+	int ind = binSearch(n->children, n->childCount, word[0]);
+	if(ind != -1)
 	{
-		if(n->children[i]->key == word[0])
+		if(word[0] == L'\0')
+			return 1;
+		else
 		{
-			if(word[0] == '\0')
-				return 1;
-			else
-			{
-				word++;
-				return findNode(n->children[i], word, prt);
-			}
+			word++;
+			return findNode(n->children[ind], word, prt);
 		}
 	}
+
 	return 0;
 }
 
 
 struct Node* findLeaf(struct Node* n, const wchar_t* word)
 {
-	for (int i = 0; i < n->childCount; ++i)
-		if( word[0] == n->children[i]->key )
-		{
-			if(word[0] == '\0')
-				return n->children[i];
-			return findLeaf(n->children[i], ++word);
-		}
+	int ind = binSearch(n->children, n->childCount, word[0]);
+	if(ind != -1)
+	{
+		if(word[0] == L'\0')
+			return n->children[ind];
+		return findLeaf(n->children[ind], ++word);
+	}
 
 	return NULL;
 }
@@ -265,15 +236,15 @@ int delete(struct Tree *t, const wchar_t* word)
 				lastParent->children[sonNumber] = 
 					lastParent->children[lastParent->childCount - 1];
 			lastParent->childCount--;
-			//sort lastParent->children =======================TODO=========
+
 			qsort(lastParent->children, lastParent->childCount, 
 				sizeof(struct Node*), nodeComp);
 		}
+		return 1;
 	}
 	else
 		return 0;
 
-	return 1;
 }
 
 ///@}
@@ -428,8 +399,6 @@ struct Tree* Tree_load_DFS(FILE* stream)
 	//najpierw wczytujemy ilu synow ma root
 		return NULL;
 
-	//printf("test 1\n");
-
 	wchar_t key;
 	int count;
 	int error = 0;
@@ -440,8 +409,6 @@ struct Tree* Tree_load_DFS(FILE* stream)
 	struct List* listTillRoot = (struct List*)malloc(sizeof(struct List));
 	list_init(listTillRoot);
 	free(listTillRoot); //na razie tutaj, przyda sie jak bedzie error handling
-
-	//printf("test 2\n");
 
 	while(true)
 	{
@@ -485,29 +452,39 @@ struct Tree* Tree_load_DFS(FILE* stream)
 	return toReturn;
 }
 
-void writeDFS(struct Node* n, FILE* stream)
+int writeDFS(struct Node* n, FILE* stream)
 {
+	int err = 0;
 	if (n->childCount == 0)
-		fprintf(stream, "\n0!");
+		err = fprintf(stream, "\n0!");
+	
 	else
-		fprintf(stream, "\n%i%lc", n->childCount, n->key);
+		err = fprintf(stream, "\n%i%lc", n->childCount, n->key);
 
+	if(err < 0)
+		return err;
+
+	int toReturn = 0;
 	for (int i = 0; i < n->childCount; ++i)
 	{
-		writeDFS(n->children[i], stream);
+		toReturn += writeDFS(n->children[i], stream);
 	}
+	return toReturn; //powinna byc suma zer w przypadku sukcesu
 
 }
 
 int Tree_save_DFS(struct Tree* t, FILE* stream)
 {
-	fprintf(stream, "%i", t->root->childCount);
+	int test = fprintf(stream, "%i", t->root->childCount);
+	if(test < 0)
+		return test;
 
+	test = 0;
 	for (int i = 0; i < t->root->childCount; ++i)
 	{
-		writeDFS(t->root->children[i], stream);
+		test += writeDFS(t->root->children[i], stream);
 	}
-	return 0; //jeszcze ma zwracac <0 jak cos sie nie powiedzie - TODO
+	return test;
 }
 
 ///}@

@@ -66,6 +66,7 @@ void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int w,
 void parseWord(struct dictionary* dict, wchar_t* line, bool ifDbg, int lineNr)
 {
 	wchar_t* word = (wchar_t*)malloc(256 * sizeof(wchar_t)); //rozsadny rozmiar
+	//todo - const!
 
 	int i = 0;
 	int j = 0;
