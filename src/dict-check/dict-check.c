@@ -43,7 +43,8 @@ void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int w,
 				for (size_t i = 0; i < word_list_size(&list); ++i)
 				{
                     fwprintf(stderr, L"%ls", a[i]);
-                    if((i != word_list_size(&list)) && (word_list_size(&list) != 1))
+                    if((i != word_list_size(&list)) &&
+                    	(word_list_size(&list) != 1))
                     	fwprintf(stderr, L" ");
                 }
                 
