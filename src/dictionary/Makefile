@@ -70,6 +70,16 @@ rebuild_cache:
 rebuild_cache/fast: rebuild_cache
 .PHONY : rebuild_cache/fast
 
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+.PHONY : test/fast
+
 # The main all target
 all: cmake_check_build_system
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(CMAKE_COMMAND) -E cmake_progress_start /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/CMakeFiles /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/CMakeFiles/progress.marks
@@ -114,6 +124,20 @@ dictionary: dictionary/CMakeFiles/dictionary.dir/rule
 dictionary/fast:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/build
 .PHONY : dictionary/fast
+
+# Convenience name for target.
+dictionary/CMakeFiles/word_list_test.dir/rule:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f CMakeFiles/Makefile2 dictionary/CMakeFiles/word_list_test.dir/rule
+.PHONY : dictionary/CMakeFiles/word_list_test.dir/rule
+
+# Convenience name for target.
+word_list_test: dictionary/CMakeFiles/word_list_test.dir/rule
+.PHONY : word_list_test
+
+# fast build rule for target.
+word_list_test/fast:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/word_list_test.dir/build.make dictionary/CMakeFiles/word_list_test.dir/build
+.PHONY : word_list_test/fast
 
 dictionary.o: dictionary.c.o
 .PHONY : dictionary.o
@@ -193,6 +217,7 @@ word_list.o: word_list.c.o
 # target to build an object file
 word_list.c.o:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/word_list.c.o
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/word_list_test.dir/build.make dictionary/CMakeFiles/word_list_test.dir/word_list.c.o
 .PHONY : word_list.c.o
 
 word_list.i: word_list.c.i
@@ -201,6 +226,7 @@ word_list.i: word_list.c.i
 # target to preprocess a source file
 word_list.c.i:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/word_list.c.i
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/word_list_test.dir/build.make dictionary/CMakeFiles/word_list_test.dir/word_list.c.i
 .PHONY : word_list.c.i
 
 word_list.s: word_list.c.s
@@ -209,7 +235,32 @@ word_list.s: word_list.c.s
 # target to generate assembly for a file
 word_list.c.s:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/word_list.c.s
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/word_list_test.dir/build.make dictionary/CMakeFiles/word_list_test.dir/word_list.c.s
 .PHONY : word_list.c.s
+
+word_list_test.o: word_list_test.c.o
+.PHONY : word_list_test.o
+
+# target to build an object file
+word_list_test.c.o:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/word_list_test.dir/build.make dictionary/CMakeFiles/word_list_test.dir/word_list_test.c.o
+.PHONY : word_list_test.c.o
+
+word_list_test.i: word_list_test.c.i
+.PHONY : word_list_test.i
+
+# target to preprocess a source file
+word_list_test.c.i:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/word_list_test.dir/build.make dictionary/CMakeFiles/word_list_test.dir/word_list_test.c.i
+.PHONY : word_list_test.c.i
+
+word_list_test.s: word_list_test.c.s
+.PHONY : word_list_test.s
+
+# target to generate assembly for a file
+word_list_test.c.s:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/word_list_test.dir/build.make dictionary/CMakeFiles/word_list_test.dir/word_list_test.c.s
+.PHONY : word_list_test.c.s
 
 # Help Target
 help:
@@ -219,7 +270,9 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... word_list_test"
 	@echo "... dictionary"
+	@echo "... test"
 	@echo "... dictionary.o"
 	@echo "... dictionary.i"
 	@echo "... dictionary.s"
@@ -232,6 +285,9 @@ help:
 	@echo "... word_list.o"
 	@echo "... word_list.i"
 	@echo "... word_list.s"
+	@echo "... word_list_test.o"
+	@echo "... word_list_test.i"
+	@echo "... word_list_test.s"
 .PHONY : help
 
 

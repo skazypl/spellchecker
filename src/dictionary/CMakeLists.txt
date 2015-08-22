@@ -3,7 +3,6 @@
 
 add_library (dictionary dictionary.c word_list.c trie.c set.c)
 
-
 if (CMOCKA)
     # dodajemy plik wykonywalny z testem    
     add_executable (word_list_test word_list.c word_list_test.c)
