@@ -12,4 +12,26 @@ if (CMOCKA)
 
     # wreszcie deklarujemy, że to test
     add_test (word_list_unit_test word_list_test)
+
+    add_executable (set_test set.c set_test.c)
+    target_link_libraries (set_test ${CMOCKA})
+    add_test (set_unit_test set_test)    
+
+    add_executable (trie_test trie.c set.c trie_test.c)
+    target_link_libraries (trie_test ${CMOCKA})
+    add_test (trie_unit_test trie_test)
+
+    add_executable (trie_io_test trie.c set.c trie_io_test.c)
+    set_target_properties (trie_io_test
+        PROPERTIES 
+        COMPILE_DEFINITIONS 
+        UNIT_TESTING=1)
+    target_link_libraries (trie_io_test ${CMOCKA})
+    add_test (trie_io_unit_test trie_io_test)
+
+    add_executable (dictionary_test dictionary.c trie.c set.c word_list.c dictionary_test.c)
+    target_link_libraries (dictionary_test ${CMOCKA})
+    add_test (dictionary_unit_test dictionary_test)    
+
+
 endif (CMOCKA)

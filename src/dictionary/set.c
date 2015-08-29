@@ -1,3 +1,11 @@
+/** @file
+    Implementacja zbioru elementów typu wchar_h
+    używanych potem do proponowania podpowiedzi.
+
+    @ingroup dictionary
+    @author Jarosław Socha <js347267@students.mimuw.edu.pl>
+    */
+
 #include "set.h"
 
 /** @name Elementy interfejsu 

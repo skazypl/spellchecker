@@ -1,3 +1,15 @@
+/** @defgroup dict-check Moduł dict-check
+	Klient do sprawdzania tekstu z wejścia na występowanie poszczególnych
+	słów w słowniku.
+	Korzysta z biblioteki @ref dictionary.
+  */
+/** @file
+    Główny plik modułu dict-editor
+    @ingroup dict-check
+	@author Jarosław Socha <js347267@students.mimuw.edu.pl>
+
+  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <dictionary.h>

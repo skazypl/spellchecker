@@ -6,7 +6,6 @@
   @author Jakub Pawlewicz <pan@mimuw.edu.pl>
   @copyright Uniwerstet Warszawski
   @date 2015-05-11
-  @todo Napisać efektywną implementację.
  */
 
 #include "trie.h"
@@ -198,9 +197,6 @@ struct dictionary * dictionary_load(FILE* stream)
     return dict;
 }
 
-
-
-
 void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         struct word_list *list)
 {
@@ -256,8 +252,8 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
             (wchar_t*)malloc((wlen + 1 + 1) * sizeof(wchar_t));
 
         wcscpy(newWordAdd, begin);
-        newWordAdd[i] = 'a'; // dowolna litera, wazna inicjalizacja. 
-        /// @todo Usunąć.
+        newWordAdd[i] = 1; // dowolna litera, wazna inicjalizacja. 
+        ///<  @todo Usunąć lub obejść.
         newWordAdd[i + 1] = '\0';
         wcscat(newWordAdd, end);
         

@@ -1,5 +1,5 @@
 /** @file
-	Interfejs zbioru z możliwością dodawania elementów.
+	Interfejs zbioru z możliwością dodawania elementów typu wchar_t.
 
     @ingroup dictionary
     @author Jarosław Socha <js347267@students.mimuw.edu.pl>
@@ -35,7 +35,11 @@ void set_init(struct InsertSet* s);
 /**
 	Dodaje element do zbioru.
 	@param[in, out] s Zbiór.
-	@param[in] wc Litera dodawana do zbioru.	
+	@param[in] wc Litera dodawana do zbioru.
+	@return 1 jeśli udało się wstawić, 0 wpp.
+	@remark Nie trzeba trzymać zbioru posortowanego - tam gdzie go 
+	przekazujemy, i tak trzeba używać wszystkich jego elementów 
+	(w dictionary_hints).
 	*/
 
 int set_add(struct InsertSet* s, wchar_t wc);

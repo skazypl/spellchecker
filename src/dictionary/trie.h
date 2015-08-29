@@ -1,5 +1,5 @@
 /** @file
-	Implementacja drzewa trie do przechowywania słownika.
+	Interfejs drzewa trie do przechowywania słownika.
 
 	@ingroup dictionary
 	@author Jarosław Socha <js347267@students.mimuw.edu.pl>
@@ -62,9 +62,10 @@ void Tree_destroy(struct Tree *t);
 	Dodaje słowo do drzewa.	
 	@param[in, out] t Drzewo.
 	@param[in] word Słowo wstawiane do drzewa.
+	@return 1 jeśli udało się wstawić, 0 wpp.
 	*/
 
-void add(struct Tree *t, const wchar_t* word);
+int add(struct Tree *t, const wchar_t* word);
 
 /**
 	Sprawdza czy podane słowo jest już w drzewie.
@@ -96,7 +97,7 @@ struct InsertSet* usedInTree(struct Tree* t);
 	@param[in] stream Plik z zapisanym drzewem.
 	@return Drzewo wczytane z pliku.
 	*/
-struct Tree* Tree_load(FILE* stream);
+struct Tree* Tree_load_DFS(FILE* stream);
 
 /**
 	Zapisuje drzewo do pliku.
@@ -107,14 +108,21 @@ struct Tree* Tree_load(FILE* stream);
 
 	@param[in] t Drzewo.
 	@param[in] stream Plik docelowy.
-	@return 1 jeśli udało się zapisać, 0 wpp.
+	@return 0 jeśli udało się zapisać, <0 wpp.
 	*/
-int Tree_save(struct Tree* t, FILE* stream);
-
-
-struct Tree* Tree_load_DFS(FILE* stream);
-
 int Tree_save_DFS(struct Tree* t, FILE* stream);
+
+/**
+	Zwraca liczbę węzłów w drzewie.
+
+	Należy pamiętać, że drzewo zawiera puste węzły jako liście oraz
+	że root jest pustym węzłem.
+
+	@param[in] t Drzewo.
+	@return Liczba węzłów w drzewie.
+	*/
+
+int Tree_size(struct Tree* t);
 
 
 /**

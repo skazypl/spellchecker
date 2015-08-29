@@ -1,19 +1,40 @@
+/** @file
+	Implementacja drzewa trie do przechowywania słownika.
+
+	@ingroup dictionary
+	@author Jarosław Socha <js347267@students.mimuw.edu.pl>
+	*/
 
 #include "trie.h"
 #include <string.h>
 #include <assert.h>
+#include "io_mock.h"
 
 /** @name Funkcje pomocnicze.
    @{
  */
 
+/**
+	Inicjalizacja węzła po jego utworzeniu.
+	@param[in, out] n Węzeł drzewa.
+   */
+
 void Node_init(struct Node *n)
 {
-	n->key = 0; //0 == '\0'
+	n->key = L'\0'; //0 == '\0'
 	n->parent = NULL;
 	n->children = NULL;
 	n->childCount = 0;
 }
+
+/**
+	Tworzy węzeł o przekazanych przez argument kluczu, liczbie dzieci i rodzicu.
+	@param[in] childCount Liczba dzieci i rozmiar tablicy dzieci do zaalokownia.
+	@param[in] key Klucz typu wchar_t nowego węzła.
+	@param[in] parent Wskaźnik do węzła rodzica.
+	@return Wskaźnik do stworzonego węzła.
+
+	*/
 
 struct Node* createNode(int childCount, wchar_t key, struct Node* parent)
 {
@@ -35,6 +56,13 @@ struct Node* createNode(int childCount, wchar_t key, struct Node* parent)
 	return toReturn;
 }
 
+/**
+	Niszczy (rekurencyjnie) węzeł i wszystkie węzły potomne.
+	Zwalnia całą zaalokowaną pamięć, w tym tę przeznaczoną na węzeł.
+	@param[in] n Wskaźnik do węzła.
+	*/
+
+
 void Node_destroy(struct Node *n)
 {
 	for (int i = 0; i < n->childCount; ++i)
@@ -46,12 +74,25 @@ void Node_destroy(struct Node *n)
 	free(n);
 }
 
+/**
+	
+	*/
+
 void destrToLeaf(struct Node *n)
 {
 	if(n->childCount == 1)
 		destrToLeaf(n->children[0]);
 	free(n);
 }
+
+/**
+	Komparator na dwóch węzłach drzewa.
+	Komparator ocenia relację < na podstawie ich wartości key.
+	@param[in] a, b Wskaźniki do węzłów.
+	@return 0 jeśli węzły mają identyczne klucze, 1 jeśli większy jest klucz
+	pierwszego argumentu, -1 jeśli drugiego.
+
+	*/
 
 int nodeComp(const void* a, const void* b)
 {
@@ -62,7 +103,17 @@ int nodeComp(const void* a, const void* b)
 	else return 1;
 }
 
-//zwraca indeks tablicy arr, ktorego element jest rowny patt, -1 jesli nie ma
+/**
+	Wyszukiwanie binarne węzła o zadanym kluczu w zadanej argumentem tablicy.
+	Tablica jest z założenia posortowana rosnąco 
+	(w sensie komparatora @ref nodeComp).
+	@param [in] arr[] Tablica
+	@param [in] size Rozmiar przeszukiwanej tablicy.
+	@param [in] patt Klucz, którego pociadacza poszukujemy.
+	@return indeks tablicy, ktorego element jest rowny poszukiwanemu,
+	-1 jesli nie ma takiego.
+	*/
+
 int binSearch(struct Node* arr[], int size, wchar_t patt)
 {
 	if(size < 1)
@@ -86,15 +137,25 @@ int binSearch(struct Node* arr[], int size, wchar_t patt)
 	return -1;
 } 
 
-void addNode(struct Node *n, const wchar_t* word)
+/**
+	Dodaje węzeł jako potomka węzła przekazanego przez argument.
+	Następnie wywołuje się rekurencyjnie obcinając pierwszy znak ze słowa 
+	word, dopóki nie jest ono puste.
+
+	@param[in] n Wskaźnik na węzeł.
+	@param[in] word Pozostałe słowo wstawiane znak po znaku.
+	@return 1 w przypadku sukcesu.
+	@todo przerobić na void lub dodać inne zwracane wartości.
+	*/
+
+int addNode(struct Node *n, const wchar_t* word)
 {
 	if(wcslen(word) != 0)
 	{
 		int ind = binSearch(n->children, n->childCount, word[0]);
 		if(ind != -1)
 		{
-			addNode(n->children[ind], ++word);
-			return;
+			return addNode(n->children[ind], ++word);
 		}
 	}
 
@@ -117,19 +178,28 @@ void addNode(struct Node *n, const wchar_t* word)
 
 	qsort(n->children, n->childCount, sizeof(struct Node*), nodeComp);
 
-	if(word[0] != '\0')
+	if(wcslen(word) != 0)
 	{
 		word++;
-		addNode(newNode, word);
+		return addNode(newNode, word);
 	}
-
+	else
+		return 1;
 }
 
+/**
+	Sprawdza czy istnieje w drzewie ścieżka w dół argumentowanego węzła,
+	która układa się w słowo z argumentu - zatem czy słowo jest w drzewie
+	ukorzenionym w zadanym węźle.
 
-int findNode(struct Node* n, const wchar_t* word, int prt)
+	@param[in] n Wskaźnik na węzeł.
+	@param[in] word Słowo.
+	@return 0 jeśli słowa nie ma w drzewie ukorzenionym w węźle, 1 jeśli jest.
+	*/
+
+
+int findNode(struct Node* n, const wchar_t* word)
 {
-	if(prt == 1) printTree(n, 0);
-
 	int ind = binSearch(n->children, n->childCount, word[0]);
 	if(ind != -1)
 	{
@@ -138,13 +208,19 @@ int findNode(struct Node* n, const wchar_t* word, int prt)
 		else
 		{
 			word++;
-			return findNode(n->children[ind], word, prt);
+			return findNode(n->children[ind], word);
 		}
 	}
 
 	return 0;
 }
 
+/**
+	Zwraca wskaźnik do liścia zadanego słowa, jeśli to znajduje się w słowniku.
+	@param[in] n Wskaźnik na węzeł.
+	@param[in] word słowo.
+	@return Wskaźnik na liść jeśli słowo jest w słowniku, NULL wpp.
+	*/
 
 struct Node* findLeaf(struct Node* n, const wchar_t* word)
 {
@@ -157,6 +233,22 @@ struct Node* findLeaf(struct Node* n, const wchar_t* word)
 	}
 
 	return NULL;
+}
+
+/**
+	Rekurencyjnie zwraca rozmiar poddrzewa danego węzła.
+	@param[in] n Wskaźnik na węzeł.
+	@return Rozmiar poddrzewa rozpiętego przez n.
+	*/
+
+int NodeSize(struct Node* n)
+
+{
+	int toReturn = 1;
+	for (int i = 0; i < n->childCount; ++i)
+		toReturn += NodeSize(n->children[i]);
+
+	return toReturn;
 }
 
 ///@}
@@ -198,15 +290,18 @@ void Tree_destroy(struct Tree *t)
 		Node_destroy(t->root);
 }
 
-void add(struct Tree *t, const wchar_t* word)
+int add(struct Tree *t, const wchar_t* word)
 {
+	if(wcslen(word) == 0)
+		return 0;
 	if(find(t, word) == 0)
-		addNode(t->root, word);
+		return addNode(t->root, word);
+	return 0;
 }
 
 int find(struct Tree* t, const wchar_t* word)
 {
-	return findNode(t->root, word, 0);
+	return findNode(t->root, word);
 }
 
 
@@ -247,67 +342,26 @@ int delete(struct Tree *t, const wchar_t* word)
 
 }
 
+int Tree_size(struct Tree* t)
+{
+	if(t == NULL)
+		return 0;
+
+	return NodeSize(t->root);
+}
+
 ///@}
 
 
-/** @name Struktura listy.
-   @{
- */
-
-
-/**
-	Struktura listy dwukierunkowej, przydatna przy implementacji kolejki.
-	Zawiera wskaźniki do ogonów z obu swoich stron (być może NULLi), oraz,
-	jako przechowywany element, wskaźnik do obiektu typu Node.
-	*/
-struct List
-{
-	struct List* next; ///< Lista poprzedzajaca.
-	struct List* prev; ///< Lista następująca.
-	struct Node* elem; ///< Element listy.
-};
-
-void list_init(struct List* l)
-{
-	l->next = NULL;
-	l->prev = NULL;
-	l->elem = NULL;
-}
-
-struct List* list_add(struct Node* n, struct List* l)
-{
-	struct List* toReturn = (struct List*)malloc(sizeof(struct List));
-	toReturn->elem = n;
-	toReturn->next = l;
-	return toReturn;
-}
-
-void list_destroy(struct List* l)
-{
-	struct List* toDelete;
-	while(l != NULL)
-	{
-		toDelete = l;
-		l = l->next;
-		free(toDelete);
-	}
-}
-
-//@}
 
 /** @name Funkcje pomocnicze do zapisywania i wczytywania.
    @{
  */
 
-int treeSize(struct Node* n)
-
-{
-	int toReturn = 1;
-	for (int i = 0; i < n->childCount; ++i)
-		toReturn += treeSize(n->children[i]);
-
-	return toReturn;
-}
+/**
+	Ustawia relację <dziecko, rodzic> dla węzłów z tablicy dzieci danego węzła.
+	@param[in] n Wskaźnik na węzeł.
+	*/
 
 void setParents(struct Node* n)
 {
@@ -318,6 +372,13 @@ void setParents(struct Node* n)
 	}	
 }
 
+/**
+	Dodaje do zbioru (bez powtórzeń) wszystkie znaki z kluczy dzieci zadanego
+	węzła.
+	@param[in] n Wskaźnik na węzeł.
+	@param[in, out] s Wskaźnik na zbiór.	
+	*/
+
 void usedInNodes(struct Node* n, struct InsertSet* s)
 {
 	if(n->key != '\0')
@@ -325,6 +386,13 @@ void usedInNodes(struct Node* n, struct InsertSet* s)
 	for (int i = 0; i < n->childCount; ++i)
 		usedInNodes(n->children[i], s);
 }
+
+/**
+	Zwraca zbiór wszystkich znaków użytych w drzewie.
+	@param[in] t Wskaźnik na drzewo.
+	@return wskaźnik na zbiór typu InsertSet zawierający wszystkie znaki z 
+	kluczy węzłów drzewa.
+	*/
 
 struct InsertSet* usedInTree(struct Tree* t)
 {
@@ -336,49 +404,13 @@ struct InsertSet* usedInTree(struct Tree* t)
 	return toReturn;
 }
 
-///@}
 
-/** @name Elementy interfejsu 
-   @{
- */
-
-
-/*
-algorytm wczytywania: DFS
-
-*/
-
-
-int FreeTillRoot(struct List* l) 
-//sprawdza czy wierzcholki z listy az do roota wlacznie nie ma wolnych krawedzi
-//lista przechowuje sciezke od pewnego node'a do roota
-{
-	while(l != NULL)
-	{
-		struct Node* n = l->elem;
-
-		for (int i = 0; i < n->childCount; ++i)
-		{
-			if(n->children[i] == NULL)
-				return 0;
-		}
-
-		l = l->next;
-	}
-	return 1;
-}
-
-int hasFree(struct Node* n)
-//zakladamy ze node ma zainicjalizowaną tablicę
-//moze mozna zintegrowac te funkcje z firstFree ???
-{
-	for (int i = 0; i < n->childCount; ++i)
-	{
-		if(n->children[i] == NULL)
-			return 1;
-	}
-	return 0;
-}
+/**
+	Zwraca indeks na jeszcze nieuzupełnione miejsce na syna w zaalokowanej 
+	tablicy children[] węzła z argumentu.
+	@param[in] n Wskaźnik na węzeł.
+	@return Indeks węzła w tablicy (@f$\geq 0@f$) jeśli istnieje, -1 wpp.
+	*/
 
 int firstFree(struct Node* n)
 {
@@ -390,25 +422,30 @@ int firstFree(struct Node* n)
 	return -1;
 }
 
+///@}
+
+/** @name Elementy interfejsu 
+   @{
+ */
+
+
+
 struct Tree* Tree_load_DFS(FILE* stream)
 {
 	struct Tree* toReturn = (struct Tree*)(malloc(sizeof(struct Tree)));
 	Tree_init(toReturn);
-	int scanChildNum; //suma liczby dzieci z tablicy z poprzedniego kroku petli
-	if (fscanf(stream, "%i", &scanChildNum) == EOF) 
+	int scanChildNum; 
+	wchar_t key;
+	int count;
+
+	if (fscanf(stream, "%i%lc", &scanChildNum, &key) == EOF) 
 	//najpierw wczytujemy ilu synow ma root
 		return NULL;
 
-	wchar_t key;
-	int count;
 	int error = 0;
 	free(toReturn->root); //tymczasowo bo bez sensu
 	toReturn->root = createNode(scanChildNum, L'\0', NULL);
-	struct Node* actual = toReturn->root; //todo: dodac tablice dzieci roota scanChNr
-
-	struct List* listTillRoot = (struct List*)malloc(sizeof(struct List));
-	list_init(listTillRoot);
-	free(listTillRoot); //na razie tutaj, przyda sie jak bedzie error handling
+	struct Node* actual = toReturn->root; 
 
 	while(true)
 	{
@@ -416,6 +453,8 @@ struct Tree* Tree_load_DFS(FILE* stream)
 		{
 			/*
 			TODO -> Dodać error handling
+			zrobilbym checkTreeIntegrity() ktora sprawdza czy ost syn zadnego
+			noda nie jest nullem i jezeli to nieprawda to ustawia error = 1
 
 			if(FreeTillRoot(listTillRoot) == 0)
 				error = 1; //lub zwyczajnie koniec pliku 
@@ -429,7 +468,7 @@ struct Tree* Tree_load_DFS(FILE* stream)
 			actual->children[firstFree(actual)] = createNode(count, L'\0', actual); // >\0<? spr
 			while(actual != NULL)
 			{
-				if(hasFree(actual) == 1)
+				if(firstFree(actual) != -1)
 					break;
 				actual = actual->parent;
 			}
@@ -456,13 +495,16 @@ int writeDFS(struct Node* n, FILE* stream)
 {
 	int err = 0;
 	if (n->childCount == 0)
-		err = fprintf(stream, "\n0!");
-	
+		err = fprintf(stream, "\n%i%lc", 0, L'!');
 	else
-		err = fprintf(stream, "\n%i%lc", n->childCount, n->key);
+		err = fprintf(stream, "\n%i%lc", n->childCount, 
+			(n->key == L'\0') ? L'\n' : n->key);
 
 	if(err < 0)
 		return err;
+
+	if (n->childCount == 0)
+		return 0;
 
 	int toReturn = 0;
 	for (int i = 0; i < n->childCount; ++i)
@@ -475,16 +517,7 @@ int writeDFS(struct Node* n, FILE* stream)
 
 int Tree_save_DFS(struct Tree* t, FILE* stream)
 {
-	int test = fprintf(stream, "%i", t->root->childCount);
-	if(test < 0)
-		return test;
-
-	test = 0;
-	for (int i = 0; i < t->root->childCount; ++i)
-	{
-		test += writeDFS(t->root->children[i], stream);
-	}
-	return test;
+	return writeDFS(t->root, stream);
 }
 
 ///}@
