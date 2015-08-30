@@ -192,7 +192,10 @@ struct dictionary * dictionary_load(FILE* stream)
         (struct dictionary *) malloc(sizeof(struct dictionary));
     dict->tree = Tree_load_DFS(stream);
     if(dict->tree == NULL)
+    {
+        free(dict);
         return NULL;
+    }
     dict->usedLetters = usedInTree(dict->tree);
     return dict;
 }

@@ -15,7 +15,7 @@
 #include <wchar.h>
 #include "set.h"
 
-#define MAX_SONS 50 ///< Maksymalna zakładana liczba synów liścia.
+#define MAX_CHILD 50 ///< Maksymalna zakładana liczba synów liścia.
 ///< Nie przekroczy rozmiaru alfabetu.
 
 /**

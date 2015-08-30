@@ -169,6 +169,21 @@ static void addNode_test(void** state) {
     //struct Node* m = createNode(1, 'i', NULL);
 }
 
+static int trie_setup(void** state) {
+    struct Node* n = malloc(sizeof(struct Node));
+    Node_init(n);
+    addNode(n, kind);
+    addNode(n, kinder);
+    addNode(n, kiss);
+    *state = n;
+    return 0;
+}
+
+static int trie_teardown(void** state) {
+    struct Node* n = *state;
+    Node_destroy(n);
+    return 0;
+}
 
 static void findNode_test(void** state) {
     struct Node* m = malloc(sizeof(struct Node));
@@ -197,8 +212,53 @@ static void findNode_test(void** state) {
 }
 
 static void findLeaf_test(void** state) {
+    struct Node* n = *state;
+    struct Node* leaf = findLeaf(n, kind);
+    struct Node* temp = n;
+    temp = temp->children[0]; // k
+    temp = temp->children[0]; // i
+    temp = temp->children[0]; // n
+    temp = temp->children[0]; // d
+    temp = temp->children[0]; // \0
+    assert_int_equal(leaf, temp);
+
+    leaf = findLeaf(n, kinder);
+    temp = n;
+    temp = temp->children[0]; // k
+    temp = temp->children[0]; // i
+    temp = temp->children[0]; // n
+    temp = temp->children[0]; // d
+    temp = temp->children[1]; // e
+    temp = temp->children[0]; // r
+    temp = temp->children[0]; // \0
+    assert_int_equal(leaf, temp);
+
+    leaf = findLeaf(n, kiss);
+    temp = n;
+    temp = temp->children[0]; // k
+    temp = temp->children[0]; // i
+    temp = temp->children[1]; // s
+    temp = temp->children[0]; // s
+    temp = temp->children[0]; // \0
+    assert_int_equal(leaf, temp);
+    
 }
 
+
+static void NodeSize_test(void** state) {
+    struct Node* n = *state;
+    assert_int_equal(NodeSize(n), 12);
+
+    struct Node* m = createNode(0, 0, NULL);
+    assert_int_equal(NodeSize(m), 1);
+
+    assert_int_equal(NodeSize(NULL), 0);
+}
+
+
+static void setParents_test(void** state) {
+    
+}
 
 #define run_trie_test(x) cmocka_unit_test_setup_teardown(x, trie_setup, \
     trie_teardown)
@@ -211,9 +271,8 @@ int main(void) {
         cmocka_unit_test(binSearch_test),
         cmocka_unit_test(addNode_test),
         cmocka_unit_test(findNode_test),
-        //cmocka_unit_test(buffer_test),
-        //cmocka_unit_test(trie_destroy_test),
-        //run_trie_test(trie_add_test),
+        run_trie_test(findLeaf_test),
+        run_trie_test(NodeSize_test),
         //run_trie_test(trie_find_test),
         //run_trie_test(trie_delete_test)
 

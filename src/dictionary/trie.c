@@ -32,12 +32,15 @@ void Node_init(struct Node *n)
 	@param[in] childCount Liczba dzieci i rozmiar tablicy dzieci do zaalokownia.
 	@param[in] key Klucz typu wchar_t nowego węzła.
 	@param[in] parent Wskaźnik do węzła rodzica.
-	@return Wskaźnik do stworzonego węzła.
+	@return Wskaźnik do stworzonego węzła, NULL gdy nie udało się stworzyć.
 
 	*/
 
 struct Node* createNode(int childCount, wchar_t key, struct Node* parent)
 {
+	if((childCount < 0) || (childCount > MAX_CHILD))
+		return NULL;
+
 	struct Node* toReturn = (struct Node*)malloc(sizeof(struct Node));
 	Node_init(toReturn);
 
@@ -65,13 +68,14 @@ struct Node* createNode(int childCount, wchar_t key, struct Node* parent)
 
 void Node_destroy(struct Node *n)
 {
-	for (int i = 0; i < n->childCount; ++i)
-	{
-		Node_destroy(n->children[i]);
+	if(n != NULL)
+	{	
+		for (int i = 0; i < n->childCount; ++i)
+			Node_destroy(n->children[i]);
+		
+		free(n->children);
+		free(n);
 	}
-	
-	free(n->children);
-	free(n);
 }
 
 /**
@@ -110,8 +114,8 @@ int nodeComp(const void* a, const void* b)
 	@param [in] arr[] Tablica
 	@param [in] size Rozmiar przeszukiwanej tablicy.
 	@param [in] patt Klucz, którego pociadacza poszukujemy.
-	@return indeks tablicy, ktorego element jest rowny poszukiwanemu,
-	-1 jesli nie ma takiego.
+	@return indeks tablicy, ktorego element jest rowny poszukiwanemu, -1 jeśli
+	nie ma takiego.
 	*/
 
 int binSearch(struct Node* arr[], int size, wchar_t patt)
@@ -159,7 +163,7 @@ int addNode(struct Node *n, const wchar_t* word)
 		}
 	}
 
-	//jezeli nie znaleziono
+	//jezeli nie znaleziono lub wstawiamy puste slowo (wiec lisc)
 	n->childCount++;
 	struct Node* newNode = (struct Node*)(malloc(sizeof(struct Node)));
 	Node_init(newNode);
@@ -191,6 +195,9 @@ int addNode(struct Node *n, const wchar_t* word)
 	Sprawdza czy istnieje w drzewie ścieżka w dół argumentowanego węzła,
 	która układa się w słowo z argumentu - zatem czy słowo jest w drzewie
 	ukorzenionym w zadanym węźle.
+
+	Nie należy mylić z wyszukiwaniem prefiksu - słowo z argumentu kończy się
+	znakiem \0, więc funkcja zwróci 1 wtw gdy słowo jest w słowniku.
 
 	@param[in] n Wskaźnik na węzeł.
 	@param[in] word Słowo.
@@ -244,6 +251,9 @@ struct Node* findLeaf(struct Node* n, const wchar_t* word)
 int NodeSize(struct Node* n)
 
 {
+	if(n == NULL)
+		return 0;
+	
 	int toReturn = 1;
 	for (int i = 0; i < n->childCount; ++i)
 		toReturn += NodeSize(n->children[i]);
@@ -355,8 +365,8 @@ int Tree_size(struct Tree* t)
 
 
 /** @name Funkcje pomocnicze do zapisywania i wczytywania.
-   @{
- */
+   	@{
+	*/
 
 /**
 	Ustawia relację <dziecko, rodzic> dla węzłów z tablicy dzieci danego węzła.
@@ -422,6 +432,20 @@ int firstFree(struct Node* n)
 	return -1;
 }
 
+
+int checkNodeIntegrity(struct Node* n)
+{
+	if(firstFree(n) != -1)
+		return -1;
+
+	for (int i = 0; i < n->childCount; ++i)
+	{
+		if(checkNodeIntegrity(n->children[i]) == -1)
+			return -1;
+	}
+	return 0;
+}
+
 ///@}
 
 /** @name Elementy interfejsu 
@@ -434,17 +458,17 @@ struct Tree* Tree_load_DFS(FILE* stream)
 {
 	struct Tree* toReturn = (struct Tree*)(malloc(sizeof(struct Tree)));
 	Tree_init(toReturn);
-	int scanChildNum; 
+	int rootChildNumb; 
 	wchar_t key;
 	int count;
 
-	if (fscanf(stream, "%i%lc", &scanChildNum, &key) == EOF) 
+	if (fscanf(stream, "%i%lc", &rootChildNumb, &key) == EOF) 
 	//najpierw wczytujemy ilu synow ma root
 		return NULL;
 
 	int error = 0;
 	free(toReturn->root); //tymczasowo bo bez sensu
-	toReturn->root = createNode(scanChildNum, L'\0', NULL);
+	toReturn->root = createNode(rootChildNumb, L'\0', NULL);
 	struct Node* actual = toReturn->root; 
 
 	while(true)
@@ -460,9 +484,12 @@ struct Tree* Tree_load_DFS(FILE* stream)
 				error = 1; //lub zwyczajnie koniec pliku 
 						//funkcja wyzej zdaje sie wyczerpywac mozliwe errory
 			*/
+			if(checkNodeIntegrity(toReturn->root) != 0)
+			{
+				error = 1;
+			}
 			break;
 		}
-
 		if(key == L'!')
 		{
 			actual->children[firstFree(actual)] = createNode(count, L'\0', actual); // >\0<? spr
@@ -485,6 +512,9 @@ struct Tree* Tree_load_DFS(FILE* stream)
 
 	if (error)
 	{
+		Tree_destroy(toReturn);
+		free(toReturn);
+		return NULL;
 		//zwolnic pamiec itd, zwrocic null
 	}
 

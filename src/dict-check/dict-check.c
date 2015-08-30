@@ -164,32 +164,38 @@ int main(int argc, char const *argv[])
 		struct word_list list;
 		word_list_init(&list);
 		struct dictionary* dict = dictionary_load(dictLocation);
-
-		wchar_t line[256];
-		for (int i = 0; i < 256; ++i)
-				line[i] = '\0';
-
-		int lineNr = 0;
-		while(fgetws(line, sizeof(line), stdin))
+		if(dict == NULL)
 		{
-			lineNr++;
-			int length = 0;
-			int i = -1;
-			while(line[i++] != '\0')
-				length++;
-			i--;
-
-			wchar_t onlyLine[length + 1];
-			for (int i = 0; i < length; ++i)
-				onlyLine[i] = line[i];
-			onlyLine[length] = '\0';
-
-			parseWord(dict, onlyLine, ddebug, lineNr);
-			for (int i = 0; i < 256; ++i)
-				line[i] = '\0';
-
+			printf("Blad w otwieraniu slownika!\n");
 		}
-		dictionary_done(dict);
+		else
+		{
+			wchar_t line[256];
+			for (int i = 0; i < 256; ++i)
+					line[i] = '\0';
+
+			int lineNr = 0;
+			while(fgetws(line, sizeof(line), stdin))
+			{
+				lineNr++;
+				int length = 0;
+				int i = -1;
+				while(line[i++] != '\0')
+					length++;
+				i--;
+
+				wchar_t onlyLine[length + 1];
+				for (int i = 0; i < length; ++i)
+					onlyLine[i] = line[i];
+				onlyLine[length] = '\0';
+
+				parseWord(dict, onlyLine, ddebug, lineNr);
+				for (int i = 0; i < 256; ++i)
+					line[i] = '\0';
+
+			}
+			dictionary_done(dict);
+		}
 		word_list_done(&list);
 		fclose(dictLocation);
 	}

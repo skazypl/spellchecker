@@ -154,6 +154,20 @@ set_test/fast:
 .PHONY : set_test/fast
 
 # Convenience name for target.
+dictionary/CMakeFiles/trie_impl_test.dir/rule:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f CMakeFiles/Makefile2 dictionary/CMakeFiles/trie_impl_test.dir/rule
+.PHONY : dictionary/CMakeFiles/trie_impl_test.dir/rule
+
+# Convenience name for target.
+trie_impl_test: dictionary/CMakeFiles/trie_impl_test.dir/rule
+.PHONY : trie_impl_test
+
+# fast build rule for target.
+trie_impl_test/fast:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_impl_test.dir/build.make dictionary/CMakeFiles/trie_impl_test.dir/build
+.PHONY : trie_impl_test/fast
+
+# Convenience name for target.
 dictionary/CMakeFiles/trie_io_test.dir/rule:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f CMakeFiles/Makefile2 dictionary/CMakeFiles/trie_io_test.dir/rule
 .PHONY : dictionary/CMakeFiles/trie_io_test.dir/rule
@@ -254,6 +268,7 @@ set.c.o:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/set.c.o
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_test.dir/build.make dictionary/CMakeFiles/dictionary_test.dir/set.c.o
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/set_test.dir/build.make dictionary/CMakeFiles/set_test.dir/set.c.o
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_impl_test.dir/build.make dictionary/CMakeFiles/trie_impl_test.dir/set.c.o
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_io_test.dir/build.make dictionary/CMakeFiles/trie_io_test.dir/set.c.o
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_test.dir/build.make dictionary/CMakeFiles/trie_test.dir/set.c.o
 .PHONY : set.c.o
@@ -266,6 +281,7 @@ set.c.i:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/set.c.i
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_test.dir/build.make dictionary/CMakeFiles/dictionary_test.dir/set.c.i
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/set_test.dir/build.make dictionary/CMakeFiles/set_test.dir/set.c.i
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_impl_test.dir/build.make dictionary/CMakeFiles/trie_impl_test.dir/set.c.i
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_io_test.dir/build.make dictionary/CMakeFiles/trie_io_test.dir/set.c.i
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_test.dir/build.make dictionary/CMakeFiles/trie_test.dir/set.c.i
 .PHONY : set.c.i
@@ -278,6 +294,7 @@ set.c.s:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/set.c.s
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_test.dir/build.make dictionary/CMakeFiles/dictionary_test.dir/set.c.s
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/set_test.dir/build.make dictionary/CMakeFiles/set_test.dir/set.c.s
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_impl_test.dir/build.make dictionary/CMakeFiles/trie_impl_test.dir/set.c.s
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_io_test.dir/build.make dictionary/CMakeFiles/trie_io_test.dir/set.c.s
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_test.dir/build.make dictionary/CMakeFiles/trie_test.dir/set.c.s
 .PHONY : set.c.s
@@ -338,6 +355,30 @@ trie.c.s:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_io_test.dir/build.make dictionary/CMakeFiles/trie_io_test.dir/trie.c.s
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_test.dir/build.make dictionary/CMakeFiles/trie_test.dir/trie.c.s
 .PHONY : trie.c.s
+
+trie_impl_test.o: trie_impl_test.c.o
+.PHONY : trie_impl_test.o
+
+# target to build an object file
+trie_impl_test.c.o:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_impl_test.dir/build.make dictionary/CMakeFiles/trie_impl_test.dir/trie_impl_test.c.o
+.PHONY : trie_impl_test.c.o
+
+trie_impl_test.i: trie_impl_test.c.i
+.PHONY : trie_impl_test.i
+
+# target to preprocess a source file
+trie_impl_test.c.i:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_impl_test.dir/build.make dictionary/CMakeFiles/trie_impl_test.dir/trie_impl_test.c.i
+.PHONY : trie_impl_test.c.i
+
+trie_impl_test.s: trie_impl_test.c.s
+.PHONY : trie_impl_test.s
+
+# target to generate assembly for a file
+trie_impl_test.c.s:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_impl_test.dir/build.make dictionary/CMakeFiles/trie_impl_test.dir/trie_impl_test.c.s
+.PHONY : trie_impl_test.c.s
 
 trie_io_test.o: trie_io_test.c.o
 .PHONY : trie_io_test.o
@@ -449,6 +490,7 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... trie_impl_test"
 	@echo "... dictionary_test"
 	@echo "... word_list_test"
 	@echo "... trie_test"
@@ -471,6 +513,9 @@ help:
 	@echo "... trie.o"
 	@echo "... trie.i"
 	@echo "... trie.s"
+	@echo "... trie_impl_test.o"
+	@echo "... trie_impl_test.i"
+	@echo "... trie_impl_test.s"
 	@echo "... trie_io_test.o"
 	@echo "... trie_io_test.i"
 	@echo "... trie_io_test.s"

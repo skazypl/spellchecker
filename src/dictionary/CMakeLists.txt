@@ -21,6 +21,10 @@ if (CMOCKA)
     target_link_libraries (trie_test ${CMOCKA})
     add_test (trie_unit_test trie_test)
 
+    add_executable (trie_impl_test set.c trie_impl_test.c)
+    target_link_libraries (trie_impl_test ${CMOCKA})
+    add_test (trie_impl_unit_test trie_impl_test)    
+
     add_executable (trie_io_test trie.c set.c trie_io_test.c)
     set_target_properties (trie_io_test
         PROPERTIES 
