@@ -18,7 +18,7 @@
 #include <wctype.h>
 #include <errno.h>
 
-const int MAX_WORD_SIZE = 64; ///< Rozsądnie maksymalna zakładana długość słowa.
+const int MAX_LINE_SIZE = 1024; ///< Rozsądnie maksymalna zakładana długość słowa.
 
 /**
 	Sprawdza czy w argumentowanym słowniku jest zadane słowo w określonym 
@@ -34,7 +34,8 @@ void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int w,
 	int z)
 //zakladamy ze na wejsciu jest slowo w sensie samych liter z jezyka pl
 {
-	if(word[0] != '\0')
+	//printf(">%ls<\n", word);
+	if(wcslen(word) > 0)//if(word[0] != '\0')
 	{
 		if(dictionary_find(dict, word))
 		{
@@ -78,7 +79,8 @@ void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int w,
 
 void parseWord(struct dictionary* dict, wchar_t* line, bool ifDbg, int lineNr)
 {
-	wchar_t* word = (wchar_t*)malloc(256 * sizeof(wchar_t)); //rozsadny rozmiar
+	wchar_t* word = (wchar_t*)malloc(MAX_LINE_SIZE * sizeof(wchar_t));
+	//rozsadny rozmiar
 	//todo - const!
 
 	int i = 0;
@@ -92,26 +94,31 @@ void parseWord(struct dictionary* dict, wchar_t* line, bool ifDbg, int lineNr)
 		{
 			word[j] = line[i];
 			j++;
+			i++;
 		}	
 		else
 		{
 			word[j] = '\0';
-			wchar_t* onlyWord = (wchar_t*)malloc((j + 2) * sizeof(wchar_t));
+			wchar_t* onlyWord = (wchar_t*)malloc((j + 1) * sizeof(wchar_t));
+			/// ^ moze j+1? todo wazne!
+			// for (int k = 0; word[k] >= 0; k++)
+			// {
+			// 	onlyWord[k] = word[k];
+			// 	if(word[k] == 0)
+			// 		break;
+			// }
+
 			wcscpy(onlyWord, word);
 			checkForWord(onlyWord, dict, ifDbg, lineNr, i);
 			free(onlyWord);
 
-			while(!iswalpha(line[i]) && line[i] != '\0')
+			while(!iswalpha(line[i]) && (line[i] != L'\0'))
 			{
 				printf("%lc", line[i]);
 				i++;
 			}
-			if (line[i] != '\0')
-				i--;
 			j = 0;
 		}
-
-		i++;	
 	}
 	free(word);
 }
@@ -161,8 +168,7 @@ int main(int argc, char const *argv[])
 
 	if (parseInput)
 	{
-		struct word_list list;
-		word_list_init(&list);
+		//struct word_list list;
 		struct dictionary* dict = dictionary_load(dictLocation);
 		if(dict == NULL)
 		{
@@ -170,33 +176,37 @@ int main(int argc, char const *argv[])
 		}
 		else
 		{
-			wchar_t line[256];
-			for (int i = 0; i < 256; ++i)
-					line[i] = '\0';
+			wchar_t* line = malloc(sizeof(wchar_t) * MAX_LINE_SIZE);
+			for (int i = 0; i < MAX_LINE_SIZE; ++i)
+					line[i] = L'\0';
 
 			int lineNr = 0;
-			while(fgetws(line, sizeof(line), stdin))
+			while(fgetws(line, MAX_LINE_SIZE, stdin))
 			{
 				lineNr++;
 				int length = 0;
-				int i = -1;
-				while(line[i++] != '\0')
+				int j = 0;
+				while(line[j] != L'\0')
+				{
 					length++;
-				i--;
+					j++;
+				}
 
-				wchar_t onlyLine[length + 1];
+				wchar_t* onlyLine = malloc((length + 2) * sizeof(wchar_t));
 				for (int i = 0; i < length; ++i)
 					onlyLine[i] = line[i];
-				onlyLine[length] = '\0';
+
+				onlyLine[length] = L'\0';
 
 				parseWord(dict, onlyLine, ddebug, lineNr);
-				for (int i = 0; i < 256; ++i)
-					line[i] = '\0';
+
+				for (int i = 0; i < MAX_LINE_SIZE; ++i)
+					line[i] = L'\0';
 
 			}
 			dictionary_done(dict);
+			free(line);
 		}
-		word_list_done(&list);
 		fclose(dictLocation);
 	}
 

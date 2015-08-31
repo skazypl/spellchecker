@@ -16,28 +16,46 @@
 void word_list_init(struct word_list *list)
 {
     list->size = 0;
-    list->buffer_size = 0;
+    list->buffer_size = 1;
+    list->array = malloc(sizeof(wchar_t*));
+    //list->bufferSize = 0;
 }
 
 void word_list_done(struct word_list *list)
 {
+	for (int i = 0; i < list->size; ++i)
+		free(list->array[i]);
+	free(list->array);
+	list->array = NULL;
+	//free(list);
 }
 
 int word_list_add(struct word_list *list, const wchar_t *word)
 {
-  for (int i = 0; i < list->size; ++i)
-    if(wcscmp(list->array[i], word) == 0)
-      return 0;
+	if(word == NULL)
+		return 0;
 
-    if (list->size >= WORD_LIST_MAX_WORDS)
-        return 0;
-    size_t len = wcslen(word) + 1;
-    if (list->buffer_size + len > WORD_LIST_SUM)
-        return 0;
-    wchar_t *pos = list->buffer + list->buffer_size;
-    list->array[list->size++] = pos;
-    wcscpy(pos, word);
-    list->buffer_size += len;
+	++(list->size);
+	if(list->size > list->buffer_size)
+	{	
+		wchar_t **newArray = 
+			malloc(sizeof(wchar_t*) * list->buffer_size * 2);
+		//memcpy(newArray, list->array, sizeof(wchar_t) * list->buffer_size);
+		for (int i = 0; i < list->buffer_size; ++i)
+			newArray[i] = list->array[i];
+		for (int i = list->buffer_size; i < 2 * list->buffer_size; ++i)
+			newArray[i] = NULL;
+		
+		list->buffer_size *= 2;
+		free(list->array);
+		list->array = newArray;
+	}
+	wchar_t* wordCopy = malloc((wcslen(word) + 1) * sizeof(wchar_t));
+	wcscpy(wordCopy, word);
+	list->array[list->size - 1] = wordCopy;
+	//list->bufferSize += (wcslen(word) + 1);
+
+    
     return 1;
 }
 

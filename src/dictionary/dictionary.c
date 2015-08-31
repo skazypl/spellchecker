@@ -317,9 +317,17 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
 
     alphaInsertSort(newArray, newList->size);
 
-    word_list_init(list);    
+    word_list_init(list);  
     for (int i = 0; i < newList->size; ++i)
-        word_list_add(list, newArray[i]);
+    {
+        if(i == 0)
+            word_list_add(list, newArray[i]);
+        else
+            if(wcscmp(newArray[i], newArray[i-1]) != 0)
+                word_list_add(list, newArray[i]);
+    }
+    word_list_done(newList);
+    
 }
 
 /**@}*/
