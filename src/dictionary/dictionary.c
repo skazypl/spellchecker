@@ -75,27 +75,15 @@ void swap(wchar_t** array, int a, int b)
 
 
 /**
-    Sortuje w kwardatowym czasie słowa z tablicy w kolejności alfabetycznej.
-    @param[in, out] array Tablica.
-    @param[in] size Rozmiar tablicy.
+    Komparator dla qsorta w zastępstwie alphaInsertSorta
+    @param[in] a, b Wskaźniki na wide stringi.
+    @return Wynik funkcji wcscoll - dobra funkcja dla komparatora.
     */
-
-void alphaInsertSort(wchar_t** array, int size)
+int wcharComp (const void * a, const void * b)
 {
-    for (int i = 0; i < size; ++i)
-    {
-        for (int j = 0; j < size - i; ++j)
-        {
-            wchar_t* iWord = array[i];
-            wchar_t* i_jWord = array[i + j];
-
-            if(wcscoll(iWord, i_jWord) > 0)
-            //jezeli ktorys element jest wczesniejszy od badanego itego
-            {
-                swap(array, i, i+j);
-            }
-        }
-    }
+    const wchar_t* a_ = *(const wchar_t**)a;
+    const wchar_t* b_ = *(const wchar_t**)b;
+    return wcscoll(a_, b_);
 }
 
 /**@}*/
@@ -199,6 +187,7 @@ struct dictionary * dictionary_load(FILE* stream)
     dict->usedLetters = usedInTree(dict->tree);
     return dict;
 }
+
 
 void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         struct word_list *list)
@@ -315,7 +304,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
     for (int i = 0; i < newList->size; ++i)
         newArray[i] = newList->array[i];
 
-    alphaInsertSort(newArray, newList->size);
+    qsort(newArray, newList->size, sizeof(wchar_t*), wcharComp);
 
     word_list_init(list);  
     for (int i = 0; i < newList->size; ++i)
@@ -327,7 +316,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
                 word_list_add(list, newArray[i]);
     }
     word_list_done(newList);
-    
+
 }
 
 /**@}*/

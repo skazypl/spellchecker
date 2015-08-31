@@ -18,7 +18,6 @@ void word_list_init(struct word_list *list)
     list->size = 0;
     list->buffer_size = 1;
     list->array = malloc(sizeof(wchar_t*));
-    //list->bufferSize = 0;
 }
 
 void word_list_done(struct word_list *list)

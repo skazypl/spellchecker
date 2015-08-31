@@ -249,7 +249,7 @@ static void dict_hints_test(void **state) {
     assert_int_equal(wcscmp(array[0],  L"aa"), 0);
     assert_int_equal(wcscmp(array[1],  L"c"), 0);
     assert_int_equal(wcscmp(array[2],  L"cab"), 0);
-    word_list_done(l);   
+    word_list_done(l);
 
     dictionary_hints(d, L"a", l);
     assert_int_equal(word_list_size(l), 4);
@@ -258,7 +258,7 @@ static void dict_hints_test(void **state) {
     assert_int_equal(wcscmp(array[1],  L"ab"), 0);
     assert_int_equal(wcscmp(array[2],  L"b"), 0);
     assert_int_equal(wcscmp(array[3],  L"c"), 0);
-    word_list_done(l); 
+    word_list_done(l);
 }
 
 #define run_dict_test(x) cmocka_unit_test_setup_teardown(x, dict_setup, \

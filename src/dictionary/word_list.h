@@ -83,11 +83,6 @@ size_t word_list_size(const struct word_list *list)
 static inline
 const wchar_t * const * word_list_get(const struct word_list *list)
 {
-    // const wchar_t** retArray = 
-    //     malloc(sizeof(wchar_t*) * list->buffer_size);   
-    // for (int i = 0; i < list->buffer_size; ++i)
-    //     retArray[i] = list->array[i];
-
     return (const wchar_t**) list->array;
 }
 
