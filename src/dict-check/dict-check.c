@@ -47,7 +47,6 @@ void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int w,
 			if(ifDbg)
 			{
 				struct word_list list;
-				word_list_init(&list);
 				dictionary_hints(dict, word, &list);
 				fwprintf(stderr, L"%i,%i %ls: ", w, z - wcslen(word) + 1,
 					word);
@@ -178,7 +177,7 @@ int main(int argc, char const *argv[])
 		{
 			wchar_t* line = malloc(sizeof(wchar_t) * MAX_LINE_SIZE);
 			for (int i = 0; i < MAX_LINE_SIZE; ++i)
-					line[i] = L'\0';
+					line[i] = L'\0'; //zeruj inaczej. po co w ogole ten malloc?
 
 			int lineNr = 0;
 			while(fgetws(line, MAX_LINE_SIZE, stdin))
@@ -202,6 +201,8 @@ int main(int argc, char const *argv[])
 
 				for (int i = 0; i < MAX_LINE_SIZE; ++i)
 					line[i] = L'\0';
+
+				free(onlyLine);
 
 			}
 			dictionary_done(dict);

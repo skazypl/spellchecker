@@ -19,15 +19,25 @@ wctype.h
 -
 stdlib.h
 -
+string.h
+-
 assert.h
+-
+sys/types.h
+-
+sys/stat.h
+-
+unistd.h
+-
+dirent.h
 -
 
 /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/dictionary.h
-trie.h
-/home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/trie.h
 word_list.h
 /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/word_list.h
 stdbool.h
+-
+stdio.h
 -
 wchar.h
 -

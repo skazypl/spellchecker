@@ -23,34 +23,14 @@ errno.h
 -
 
 dictionary/dictionary.h
-trie.h
-dictionary/trie.h
 word_list.h
 dictionary/word_list.h
 stdbool.h
 -
-wchar.h
--
-
-dictionary/set.h
-wchar.h
--
-stdbool.h
--
-
-dictionary/trie.h
-stdint.h
--
 stdio.h
 -
-stddef.h
--
-stdlib.h
--
 wchar.h
 -
-set.h
-dictionary/set.h
 
 dictionary/word_list.h
 wchar.h

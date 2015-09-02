@@ -4,6 +4,4 @@
 dict-check/CMakeFiles/dict-check.dir/dict-check.c.o
  /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dict-check/dict-check.c
  dictionary/dictionary.h
- dictionary/set.h
- dictionary/trie.h
  dictionary/word_list.h

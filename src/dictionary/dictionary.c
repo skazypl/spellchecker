@@ -14,7 +14,12 @@
 #include <stdio.h>
 #include <wctype.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
 
 #define _GNU_SOURCE
 
@@ -197,7 +202,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
     {
         wchar_t *begin, *end;
 
-        //zastepujemy i-ty znak w slowie word na wszystkie inne mniejsze znaki
+        //zastepujemy ity znak w slowie word na wszystkie inne mniejsze znaki
         
         for (int j = 0; j < dict->usedLetters->size; j++)
         {
@@ -302,5 +307,132 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
     }
     word_list_done(newList);
 }
+
+
+void addLang(char** buffer, const char* lang, int* lastZero)
+{
+    int langLeng = strlen(lang);
+    for (int i = 0; i < langLeng; ++i)
+        (*buffer)[i + *lastZero + 1] = lang[i];
+
+    *lastZero += (langLeng + 1);
+
+    
+
+}
+
+
+int dictionary_lang_list(char **list, size_t *list_len)
+{
+    struct stat st = {0};
+    const char* dirPath = "dict_database/";
+
+    if(stat(dirPath, &st) == -1)
+    {
+        return -1;
+    }
+    else
+    {
+        DIR* d = opendir(dirPath);
+        struct dirent* dir;
+        *list_len = 0;
+        if(d)
+        {
+            *list = NULL;//calloc(sizeof(char) , 50); //usunac
+            while((dir = readdir(d)) != NULL)
+            {
+                if(strcmp(dir->d_name, ".") != 0 && 
+                    (strcmp(dir->d_name, "..") != 0))
+                    *list_len += (strlen(dir->d_name) + 1);
+            }
+            *list = (char*)calloc(sizeof(char), *list_len);
+            rewinddir(d);
+            int lastZero = -1;
+            while((dir = readdir(d)) != NULL)
+            {
+                if(strcmp(dir->d_name, ".") != 0 && 
+                    (strcmp(dir->d_name, "..") != 0))
+                {
+                    addLang(list, dir->d_name, &lastZero);
+                }
+            }
+
+            closedir(d);
+        }
+    }
+    for (int i = 0; i < *list_len; ++i)
+    {
+    }
+    return 0;
+}
+
+
+struct dictionary * dictionary_load_lang(const char *lang)
+{
+    const char* dirPath = "dict_database/"; // nie wiem czy nie ./
+    char* langPath = 
+        calloc(sizeof(char), (strlen(dirPath) + strlen(lang) + 1));
+    strcat(langPath, dirPath);
+    strcat(langPath, lang);
+
+    struct stat st = {0};
+    if(stat(langPath, &st) != -1)
+    {
+        FILE* stream = fopen(langPath, "r");
+        if(stream == NULL)
+        {
+            free(langPath);
+            return NULL;
+        }
+        struct dictionary* toReturn;
+        if((toReturn = dictionary_load(stream)) == NULL)
+        {
+            fclose(stream);
+            free(langPath);
+            return NULL;
+        }
+        fclose(stream);
+        free(langPath);
+        return toReturn;
+    }
+
+    free(langPath);
+    return NULL;
+}
+
+
+int dictionary_save_lang(const struct dictionary *dict, const char *lang)
+{
+    struct stat st = {0};
+    const char* dirPath = "dict_database/";
+    char* langPath = 
+        calloc(sizeof(char), (strlen(dirPath) + strlen(lang) + 1));
+    strcat(langPath, dirPath);
+    strcat(langPath, lang);
+
+    mkdir(dirPath, S_IRWXU);
+    if(stat(dirPath, &st) == -1)
+    {
+        free(langPath);
+        return -1;
+    }    
+    
+    FILE* stream = fopen(langPath, "w");
+    if(stream == NULL)
+    {
+        free(langPath);
+        return -1;
+    }
+    if(dictionary_save(dict, stream) != 0)
+    {
+        fclose(stream);
+        free(langPath);
+        return -1;
+    }
+    fclose(stream);
+    free(langPath);
+    return 0;
+}
+    
 
 /**@}*/

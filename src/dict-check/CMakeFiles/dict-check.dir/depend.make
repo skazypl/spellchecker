@@ -3,7 +3,5 @@
 
 dict-check/CMakeFiles/dict-check.dir/dict-check.c.o: dict-check/dict-check.c
 dict-check/CMakeFiles/dict-check.dir/dict-check.c.o: dictionary/dictionary.h
-dict-check/CMakeFiles/dict-check.dir/dict-check.c.o: dictionary/set.h
-dict-check/CMakeFiles/dict-check.dir/dict-check.c.o: dictionary/trie.h
 dict-check/CMakeFiles/dict-check.dir/dict-check.c.o: dictionary/word_list.h
 

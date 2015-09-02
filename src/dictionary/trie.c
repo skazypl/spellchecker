@@ -492,7 +492,8 @@ struct Tree* Tree_load_DFS(FILE* stream)
 		}
 		if(key == L'!')
 		{
-			actual->children[firstFree(actual)] = createNode(count, L'\0', actual); // >\0<? spr
+			actual->children[firstFree(actual)] =
+				createNode(count, L'\0', actual); // >\0<? spr
 			while(actual != NULL)
 			{
 				if(firstFree(actual) != -1)
