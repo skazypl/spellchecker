@@ -10,11 +10,8 @@
 
 #include "trie.h"
 #include "dictionary.h"
-<<<<<<< HEAD
 #include "word_list.h"
-=======
 #include "conf.h"
->>>>>>> origin/gtk
 #include <stdio.h>
 #include <wctype.h>
 #include <stdlib.h>
@@ -136,7 +133,7 @@ int dictionary_insert(struct dictionary *dict, const wchar_t *word)
             return 0;
         
 
-    add(dict->tree, smallWord);
+    Tree_add(dict->tree, smallWord);
     free(smallWord);
     return 1;
 }
@@ -144,7 +141,7 @@ int dictionary_insert(struct dictionary *dict, const wchar_t *word)
 int dictionary_delete(struct dictionary *dict, const wchar_t *word)
 {
     wchar_t* smallWord = decapitalize(word);
-    int toReturn = delete(dict->tree, smallWord);
+    int toReturn = Tree_delete(dict->tree, smallWord);
     free(smallWord);
     return toReturn;
 }
@@ -156,7 +153,7 @@ bool dictionary_find(const struct dictionary *dict, const wchar_t* word)
         if(!iswalpha(smallWord[i]))
             return false;
 
-    if (find(dict->tree, smallWord) == 0)
+    if (Tree_find(dict->tree, smallWord) == 0)
     {
         free(smallWord);
         return false;

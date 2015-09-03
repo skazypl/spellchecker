@@ -13,6 +13,8 @@ dictionary.h
 /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/dictionary.h
 word_list.h
 /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/word_list.h
+conf.h
+/home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/conf.h
 stdio.h
 -
 wctype.h
@@ -91,4 +93,6 @@ wchar.h
 -
 stdlib.h
 -
+
+conf.h
 

@@ -6,6 +6,7 @@ dictionary/CMakeFiles/dictionary.dir/dictionary.c.o: dictionary/dictionary.h
 dictionary/CMakeFiles/dictionary.dir/dictionary.c.o: dictionary/set.h
 dictionary/CMakeFiles/dictionary.dir/dictionary.c.o: dictionary/trie.h
 dictionary/CMakeFiles/dictionary.dir/dictionary.c.o: dictionary/word_list.h
+dictionary/CMakeFiles/dictionary.dir/dictionary.c.o: conf.h
 
 dictionary/CMakeFiles/dictionary.dir/set.c.o: dictionary/set.c
 dictionary/CMakeFiles/dictionary.dir/set.c.o: dictionary/set.h

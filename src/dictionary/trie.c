@@ -300,24 +300,24 @@ void Tree_destroy(struct Tree *t)
 		Node_destroy(t->root);
 }
 
-int add(struct Tree *t, const wchar_t* word)
+int Tree_add(struct Tree *t, const wchar_t* word)
 {
 	if(wcslen(word) == 0)
 		return 0;
-	if(find(t, word) == 0)
+	if(Tree_find(t, word) == 0)
 		return addNode(t->root, word);
 	return 0;
 }
 
-int find(struct Tree* t, const wchar_t* word)
+int Tree_find(struct Tree* t, const wchar_t* word)
 {
 	return findNode(t->root, word);
 }
 
 
-int delete(struct Tree *t, const wchar_t* word)
+int Tree_delete(struct Tree *t, const wchar_t* word)
 {
-	if(find(t, word) == 1)
+	if(Tree_find(t, word) == 1)
 	{
 		//printTree(t->root, 0);
 		struct Node *last = findLeaf(t->root, word);

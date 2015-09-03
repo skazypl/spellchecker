@@ -109,8 +109,8 @@ static void dict_find_test(void **state) {
         L"verylongwordnotintreewithpolishcharsxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxqwertyuiopąęćńźżół";
     
     assert_int_equal(dictionary_find(d, veryLong), 0);
-    //assert_int_equal(add(t, veryLong), 1);
-    //assert_int_equal(find(t, veryLong), 1);
+    //assert_int_equal(Tree_add(t, veryLong), 1);
+    //assert_int_equal(Tree_find(t, veryLong), 1);
 
 }
 

@@ -7,6 +7,7 @@ dictionary/CMakeFiles/dictionary.dir/dictionary.c.o
  /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/set.h
  /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/trie.h
  /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/word_list.h
+ conf.h
 dictionary/CMakeFiles/dictionary.dir/set.c.o
  /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/set.c
  /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/set.h

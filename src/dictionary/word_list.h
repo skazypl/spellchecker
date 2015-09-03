@@ -83,7 +83,7 @@ size_t word_list_size(const struct word_list *list)
 static inline
 const wchar_t * const * word_list_get(const struct word_list *list)
 {
-    return (const wchar_t**) list->array;
+    return (const wchar_t **) list->array;
 }
 
 #endif /* __WORD_LIST_H__ */

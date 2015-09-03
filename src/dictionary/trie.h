@@ -65,7 +65,7 @@ void Tree_destroy(struct Tree *t);
 	@return 1 jeśli udało się wstawić, 0 wpp.
 	*/
 
-int add(struct Tree *t, const wchar_t* word);
+int Tree_add(struct Tree *t, const wchar_t* word);
 
 /**
 	Sprawdza czy podane słowo jest już w drzewie.
@@ -74,7 +74,7 @@ int add(struct Tree *t, const wchar_t* word);
 	@return 1 jeśli słowo jest w drzewie, 0 jeśli nie ma.
 	*/
 
-int find(struct Tree *t, const wchar_t* word);
+int Tree_find(struct Tree *t, const wchar_t* word);
 
 /**
 	Usuwa słowo ze słownika.
@@ -82,7 +82,7 @@ int find(struct Tree *t, const wchar_t* word);
 	@param[in] word Usuwane słowo.
 	@return 1 jeśli udało się usunąć słowo, 0 jeśli nie.
 	*/
-int delete(struct Tree *t, const wchar_t* word);
+int Tree_delete(struct Tree *t, const wchar_t* word);
 
 /**
 	Zwraca zbiór typu InsertSet (z nagłówka set) 

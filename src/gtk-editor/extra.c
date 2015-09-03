@@ -5,6 +5,7 @@
 #include <string.h>
 #include "editor.h"
 #include "word_list.h"
+#include "dictionary.h"
 
 void show_about () {
   GtkWidget *dialog = gtk_about_dialog_new();
@@ -46,11 +47,37 @@ void show_help (void) {
 //
 // Oczywiście do zastąpienia prawdziwymi funkcjami
 
-struct dictionary {
+struct old_dictionary {
   int foo;
-} dict; 
+} old_dict;
 
-gboolean dictionary_find(const struct dictionary *dict, const wchar_t* word) {
+struct dictionary* dict = NULL; //chyba nie tutaj
+
+void update_actual_dict(FILE* stream)
+{
+  GtkWidget *dialog;
+
+  if(dict != NULL)
+  {
+    dictionary_done(dict);
+    free(dict);
+  }
+
+  dict = dictionary_load(stream);
+
+  if(dict == NULL)
+  {
+    dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
+                                    GTK_BUTTONS_OK,
+                                    "Błąd ładowania słownika z pliku!");
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+    return;
+  }
+  //na koniec funkcji, dict jest NULLem albo wskaznikiem na poprawny slownik
+}
+
+gboolean old_dictionary_find(const struct dictionary *dict, const wchar_t* word) {
   // Parametr przekazany, wracamy do UTF-8
   char *uword = g_ucs4_to_utf8((gunichar *)word, -1, NULL, NULL, NULL);
   gboolean result; 
@@ -60,7 +87,7 @@ gboolean dictionary_find(const struct dictionary *dict, const wchar_t* word) {
   return result;
 }
 
-void dictionary_hints (const struct dictionary *dict, const wchar_t* word,
+void old_dictionary_hints (const struct dictionary *dict, const wchar_t* word,
                        struct word_list *list) {
   char *hints[] = {"broda", "środa", "uroda"};
   int i;
@@ -104,9 +131,22 @@ static void WhatCheck (GtkMenuItem *item, gpointer data) {
 
   // Zamieniamy na wide char (no prawie)
   wword = g_utf8_to_ucs4_fast(word, -1, NULL);
+  FILE* f = fopen("slownik.dict", "r");
+  if(!f)
+  {
+    dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
+                                    GTK_BUTTONS_OK,
+                                    "Nie da się otworzyć pliku słownika!\n Sprawdź, czy plik istnieje"
+                                    );
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+    return;
+  }
+
+  update_actual_dict(f);
 
   // Sprawdzamy
-  if (dictionary_find(&dict, (wchar_t *)wword)) {
+  if (dictionary_find(dict, (wchar_t *)wword)) {
     dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
                                     "Wszystko w porządku,\nśpij spokojnie");
     gtk_dialog_run(GTK_DIALOG(dialog));
@@ -119,7 +159,7 @@ static void WhatCheck (GtkMenuItem *item, gpointer data) {
     int i;
     wchar_t **words;
 
-    dictionary_hints(&dict, (wchar_t *)wword, &hints);
+    dictionary_hints(dict, (wchar_t *)wword, &hints);
     words = word_list_get(&hints);
     dialog = gtk_dialog_new_with_buttons("Korekta", NULL, 0, 
                                          GTK_STOCK_OK,
