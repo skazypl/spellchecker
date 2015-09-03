@@ -18,7 +18,7 @@
 #include <wctype.h>
 #include <errno.h>
 
-const int MAX_LINE_SIZE = 1024; ///< Rozsądnie maksymalna zakładana długość słowa.
+const int MAX_LINE_SIZE = 1024; ///< Rozsądnie maks zakładana długość linii.
 
 /**
 	Sprawdza czy w argumentowanym słowniku jest zadane słowo w określonym 

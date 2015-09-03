@@ -10,7 +10,11 @@
 
 #include "trie.h"
 #include "dictionary.h"
+<<<<<<< HEAD
 #include "word_list.h"
+=======
+#include "conf.h"
+>>>>>>> origin/gtk
 #include <stdio.h>
 #include <wctype.h>
 #include <stdlib.h>
