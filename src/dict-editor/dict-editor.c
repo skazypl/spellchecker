@@ -8,7 +8,6 @@
     @author Jakub Pawlewicz <pan@mimuw.edu.pl>
     @date 2015-05-11
     @copyright Uniwersytet Warszawski
-    @todo Poprawić proste parsowanie na porządniejsze.
   */
 
 #include "dictionary.h"
@@ -16,6 +15,7 @@
 #include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <argz.h>
 #include <string.h>
 #include <wctype.h>
 
@@ -25,7 +25,7 @@
 #define xstr(x)         str(x)
 
 
-/** Dostępne polecenia. 
+/** Dostępne polecenia.
     Odpowiadające komendy w tablicy @ref commands
  */
 enum Command {
@@ -35,12 +35,15 @@ enum Command {
     HINTS,
     SAVE,
     LOAD,
+    DICT_SAVE,
+    DICT_LOAD,
     QUIT,
+    DICT_LANG,
     CLEAR,
     COMMANDS_COUNT };
 
 
-/** Komendy wywołujące pocelnia. 
+/** Komendy wywołujące polecenia.
     Kolejność zgodna z tą w enum @ref Command.
   */
 static const char *commands[] =
@@ -51,7 +54,10 @@ static const char *commands[] =
     "hints",
     "save",
     "load",
+    "save_lang",
+    "load_lang",
     "quit",
+    "lang_list",
     "clear"
 };
 
@@ -83,7 +89,7 @@ void skip_line()
 }
 
 
-/** Ignoruje wiersz 
+/** Ignoruje wiersz
  */
 int ignored()
 {
@@ -113,7 +119,7 @@ int make_lowercase(wchar_t *word)
   @param[in] c Komenda.
   @return 0, jeśli należy zakończyć proram, 1 w p.p.
  */
-static int dict_command(struct dictionary **dict, enum Command c) 
+static int dict_command(struct dictionary **dict, enum Command c)
 {
     wchar_t word[MAX_WORD_LENGTH+1];
     if (scanf("%" xstr(MAX_WORD_LENGTH) "ls", word) <= 0)
@@ -150,7 +156,7 @@ static int dict_command(struct dictionary **dict, enum Command c)
             {
                 struct word_list list;
                 dictionary_hints(*dict, word, &list);
-                const wchar_t * const *a = word_list_get(&list);
+                const wchar_t **a = word_list_get(&list);
                 for (size_t i = 0; i < word_list_size(&list); ++i)
                 {
                     if (i)
@@ -172,9 +178,9 @@ static int dict_command(struct dictionary **dict, enum Command c)
 /** Przetwarza komendę operującą na plikach.
   @param[in,out] dict Słownik, na którym wykonywane są operacje.
   @param[in] c Komenda.
-  @return 0, jeśli należy zakończyć proram, 1 w p.p.
+  @return 0, jeśli należy zakończyć program, 1 w p.p.
  */
-static int file_command(struct dictionary **dict, enum Command c) 
+static int file_command(struct dictionary **dict, enum Command c)
 {
     char filename[MAX_FILE_LENGTH+1];
     if (scanf("%" xstr(MAX_FILE_LENGTH) "s", filename) <= 0)
@@ -184,6 +190,27 @@ static int file_command(struct dictionary **dict, enum Command c)
     }
     switch (c)
     {
+       case DICT_SAVE:
+            {
+                if (dictionary_save_lang(*dict, filename) < 0)
+                    printf("Dictionary_save_lang failed\n");
+                else
+                    printf("Dictionary_save_lang succeeded\n");
+                break;
+            }
+        case DICT_LOAD:
+            {
+                struct dictionary *new_dict = dictionary_load_lang(filename);
+                if (new_dict == NULL)
+                    printf("Dictionary_load_lang failed.\n");
+                else
+                {
+                    printf("Dictionary_load_lang succeeded.\n");
+                    dictionary_done(*dict);
+                    *dict = new_dict;
+                }
+                break;
+            }
         case SAVE:
             {
                 FILE *f = fopen(filename, "w");
@@ -194,6 +221,7 @@ static int file_command(struct dictionary **dict, enum Command c)
                 }
                 fclose(f);
                 printf("dictionary saved in file %s\n", filename);
+                printf("save\n");
                 break;
             }
         case LOAD:
@@ -209,6 +237,7 @@ static int file_command(struct dictionary **dict, enum Command c)
                 printf("dictionary loaded from file %s\n", filename);
                 dictionary_done(*dict);
                 *dict = new_dict;
+                printf("load\n");
                 break;
             }
         default:
@@ -255,6 +284,24 @@ int try_process_command(struct dictionary **dict)
         skip_line();
         return 1;
     }
+    else if (c == DICT_LANG)
+    {
+        char *lang_list;
+        size_t list_len;
+        if (dictionary_lang_list(&lang_list, &list_len) < 0)
+            printf("Dictionary_lang_list failed.\n");
+        else
+        {
+            printf("===============================\n");
+            printf("Dictionary_lang_list succeeded:\n");
+            char *entry = 0;
+            while ((entry = argz_next(lang_list, list_len, entry)))
+                printf("%s\n", entry);
+            printf("===============================\n");
+        }
+        free(lang_list);
+        return 1;
+    }
     else if (c < SAVE)
     {
         return dict_command(dict, c);
@@ -267,7 +314,7 @@ int try_process_command(struct dictionary **dict)
 
 /**
   Funkcja main.
-  Główna funkcja programu do testowania słownika. 
+  Główna funkcja programu do testowania słownika.
  */
 int main(void)
 {

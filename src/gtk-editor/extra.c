@@ -52,6 +52,7 @@ struct old_dictionary {
 } old_dict;
 
 struct dictionary* dict = NULL; //chyba nie tutaj
+char* dict_location = "slownik.dict";
 
 void update_actual_dict(FILE* stream)
 {
@@ -105,6 +106,96 @@ void old_dictionary_hints (const struct dictionary *dict, const wchar_t* word,
   }
 }
 
+// Procedura ładowania języka
+
+static void ChooseLang (GtkMenuItem *item, gpointer data)
+{
+    GtkWidget *dialog, *vbox, *label, *combo;
+    dialog = gtk_dialog_new_with_buttons("Wybierz...", NULL, 0, 
+                                         GTK_STOCK_OK,
+                                         GTK_RESPONSE_ACCEPT,
+                                         GTK_STOCK_CANCEL,
+                                         GTK_RESPONSE_REJECT,
+                                         NULL);
+    // W treści dialogu dwa elementy
+    vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    // Tekst
+    label =
+      gtk_label_new("Oto lista języków,\ndla których są dostępne słowniki");
+    gtk_widget_show(label);
+    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 1);
+
+    char *list = NULL;
+    size_t len = 0;
+    if(dictionary_lang_list(&list, &len) < 0) {
+      GtkWidget* err_dialog = 
+                      gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
+                                             GTK_BUTTONS_OK,
+                                             "Błąd pobierania listy języków!");
+      gtk_dialog_run(GTK_DIALOG(err_dialog));
+      gtk_widget_destroy(err_dialog);
+      return;  
+    }
+
+    // Spuszczane menu
+    combo = gtk_combo_box_text_new();
+
+    char* lastFirst = list;
+    for (size_t i = 0; i < len; i++)
+    {
+      if ((list + i)[0] == '\0')
+      {
+        // GtkWidget* err_dialog = 
+        //               gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
+        //                                      GTK_BUTTONS_OK,
+        //                                      lastFirst);
+        // gtk_dialog_run(GTK_DIALOG(err_dialog));
+        // gtk_widget_destroy(err_dialog);
+
+        //char *uword = g_ucs4_to_utf8((gunichar *)(lastFirst), -1, NULL, NULL, NULL);
+      
+        // Dodajemy kolejny element
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), lastFirst);
+        //g_free(uword);
+        
+        lastFirst = list + i + 1;
+      }
+    }
+
+    gtk_combo_box_set_active(GTK_COMBO_BOX(combo), 0);
+    gtk_box_pack_start(GTK_BOX(vbox), combo, FALSE, FALSE, 1);
+    gtk_widget_show(combo);
+
+    if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
+    {
+       const char* wybranyJezyk
+          = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo));
+          fprintf(stderr, ">%s<\n", wybranyJezyk);
+
+        dict_location = wybranyJezyk;
+
+       struct dictionary* tempDict = dictionary_load_lang(wybranyJezyk);
+       if(tempDict == NULL)
+      {
+        GtkWidget* err_dialog = 
+                      gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
+                                             GTK_BUTTONS_OK,
+                                             "Nie udało się wczytać słownika!");
+        gtk_dialog_run(GTK_DIALOG(err_dialog));
+        gtk_widget_destroy(err_dialog);
+      }
+        if(dict == NULL)
+          fprintf(stderr, "dict to null\n");
+        if(dict != NULL)
+          dictionary_done(dict);
+
+        dict = tempDict;
+    }
+    gtk_widget_destroy(dialog);
+
+    free(list);
+}
+
 // Procedurka obsługi
 
 static void WhatCheck (GtkMenuItem *item, gpointer data) {
@@ -135,13 +226,13 @@ static void WhatCheck (GtkMenuItem *item, gpointer data) {
 
   // Zamieniamy na wide char (no prawie)
   wword = g_utf8_to_ucs4_fast(word, -1, NULL);
-  char* dict_location = "slownik.dict";
+  //char* dict_location = "slownik.dict";
   FILE* f = fopen(dict_location, "r");
   if(!f)
   {
     dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
                                     GTK_BUTTONS_OK,
-                                    "Nie da się otworzyć pliku słownika!\n Sprawdź, czy plik istnieje"
+              "Nie da się otworzyć pliku słownika!\n Sprawdź, czy plik istnieje"
                                     );
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
@@ -240,8 +331,6 @@ static void WhatCheck (GtkMenuItem *item, gpointer data) {
         break;
 
     }
-
-
     gtk_widget_destroy(dialog);
   }
   g_free(word);
@@ -252,7 +341,7 @@ static void WhatCheck (GtkMenuItem *item, gpointer data) {
 // Tutaj dodacie nowe pozycje menu
 
 void extend_menu (GtkWidget *menubar) {
-  GtkWidget *spell_menu_item, *spell_menu, *check_item;
+  GtkWidget *spell_menu_item, *spell_menu, *check_item, *lang_load_item;
 
   spell_menu_item = gtk_menu_item_new_with_label("Spell");
   spell_menu = gtk_menu_new();
@@ -265,6 +354,12 @@ void extend_menu (GtkWidget *menubar) {
                    G_CALLBACK(WhatCheck), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(spell_menu), check_item);
   gtk_widget_show(check_item);
+
+  lang_load_item = gtk_menu_item_new_with_label("Load lang...");
+  g_signal_connect(G_OBJECT(lang_load_item), "activate", 
+                   G_CALLBACK(ChooseLang), NULL);
+  gtk_menu_shell_append(GTK_MENU_SHELL(spell_menu), lang_load_item);
+  gtk_widget_show(lang_load_item);
 }
 
 /*EOF*/
