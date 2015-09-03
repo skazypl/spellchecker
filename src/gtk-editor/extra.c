@@ -60,21 +60,25 @@ void update_actual_dict(FILE* stream)
   if(dict != NULL)
   {
     dictionary_done(dict);
-    free(dict);
+    //free(dict);
   }
 
   dict = dictionary_load(stream);
 
   if(dict == NULL)
   {
+    char* err_msg =
+    "Błąd ładowania słownika z pliku!\nPlik może być niepoprawny lub uszkodzony";
+    
     dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
                                     GTK_BUTTONS_OK,
-                                    "Błąd ładowania słownika z pliku!");
+                                    err_msg);
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
     return;
   }
-  //na koniec funkcji, dict jest NULLem albo wskaznikiem na poprawny slownik
+  // na koniec funkcji, dict jest NULLem albo wskaznikiem na poprawny slownik
+  // TODO: gdzieś go niszczyć na wyjściu z programu
 }
 
 gboolean old_dictionary_find(const struct dictionary *dict, const wchar_t* word) {
@@ -131,7 +135,8 @@ static void WhatCheck (GtkMenuItem *item, gpointer data) {
 
   // Zamieniamy na wide char (no prawie)
   wword = g_utf8_to_ucs4_fast(word, -1, NULL);
-  FILE* f = fopen("slownik.dict", "r");
+  char* dict_location = "slownik.dict";
+  FILE* f = fopen(dict_location, "r");
   if(!f)
   {
     dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
@@ -184,24 +189,64 @@ static void WhatCheck (GtkMenuItem *item, gpointer data) {
       gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), uword);
       g_free(uword);
     }
+    //gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo),"<inne...>");
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo), 0);
     gtk_box_pack_start(GTK_BOX(vbox), combo, FALSE, FALSE, 1);
     gtk_widget_show(combo);
 
-    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
-      char *korekta =
-        gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo));
+    char *korekta, *question;
+    GtkWidget *ask_dialog, *ask_vbox, *ask_label, *err_dialog;
+    switch (gtk_dialog_run(GTK_DIALOG(dialog))) {
+      case GTK_RESPONSE_ACCEPT:
+        korekta =
+          gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo));
 
-      // Usuwamy stare
-      gtk_text_buffer_delete(editor_buf, &start, &end);
-      // Wstawiamy nowe
-      gtk_text_buffer_insert(editor_buf, &start, korekta, -1);
-      g_free(korekta);
+        // Usuwamy stare
+        gtk_text_buffer_delete(editor_buf, &start, &end);
+        // Wstawiamy nowe
+        gtk_text_buffer_insert(editor_buf, &start, korekta, -1);
+        g_free(korekta);
+        break;
+
+      case GTK_RESPONSE_REJECT:
+        question = "Czy chcesz dodać to słowo do słownika?";
+        ask_dialog = gtk_dialog_new_with_buttons(question, NULL, 0, 
+                                                 GTK_STOCK_OK,
+                                                 GTK_RESPONSE_ACCEPT,
+                                                 GTK_STOCK_CANCEL,
+                                                 GTK_RESPONSE_REJECT,
+                                                 NULL);
+        ask_vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+        // Tekst
+        ask_label = gtk_label_new("Coś nie tak, mam kilka propozycji");
+        gtk_widget_show(ask_label);
+        gtk_box_pack_start(GTK_BOX(ask_vbox), ask_label, FALSE, FALSE, 1);
+
+        if (gtk_dialog_run(GTK_DIALOG(ask_dialog)) == GTK_RESPONSE_ACCEPT) {
+          dictionary_insert(dict, (wchar_t *)wword);
+          fclose(f);
+          f = fopen(dict_location, "w");
+          if(dictionary_save(dict, f) < 0) {
+            err_dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
+                                    GTK_BUTTONS_OK,
+                                    "Nie da się zapisać pliku słownika!"
+                                              );
+              gtk_dialog_run(GTK_DIALOG(err_dialog));
+              gtk_widget_destroy(err_dialog);
+              //return;
+          }
+        }
+        gtk_widget_destroy(ask_dialog);
+        break;
+
     }
+
+
     gtk_widget_destroy(dialog);
   }
   g_free(word);
   g_free(wword);
+  fclose(f);
 }
 
 // Tutaj dodacie nowe pozycje menu
