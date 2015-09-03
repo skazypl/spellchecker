@@ -148,6 +148,8 @@ int dictionary_delete(struct dictionary *dict, const wchar_t *word)
 
 bool dictionary_find(const struct dictionary *dict, const wchar_t* word)
 {
+    if(dict == NULL)
+        return false;
     wchar_t* smallWord = decapitalize(word);
     for (int i = 0; i < wcslen(smallWord); ++i)
         if(!iswalpha(smallWord[i]))

@@ -54,22 +54,21 @@ struct old_dictionary {
 struct dictionary* dict = NULL; //chyba nie tutaj
 char* dict_location = "slownik.dict";
 
-void update_actual_dict(FILE* stream)
+void update_actual_dict(void)
 {
   GtkWidget *dialog;
+  FILE* stream;
 
   if(dict != NULL)
   {
     dictionary_done(dict);
     //free(dict);
   }
-
-  dict = dictionary_load(stream);
-
-  if(dict == NULL)
+  stream = fopen(dict_location, "r");
+  if(!stream)
   {
     char* err_msg =
-    "Błąd ładowania słownika z pliku!\nPlik może być niepoprawny lub uszkodzony";
+    "Błąd ładowania poprzedniego słownika!\nPlik może być uszkodzony";
     
     dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
                                     GTK_BUTTONS_OK,
@@ -78,6 +77,24 @@ void update_actual_dict(FILE* stream)
     gtk_widget_destroy(dialog);
     return;
   }
+
+  dict = dictionary_load(stream);
+
+  if(dict == NULL)
+  {
+    char* err_msg =
+    "Błąd ładowania słownika z pliku!\nPlik może być uszkodzony";
+    
+    dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
+                                    GTK_BUTTONS_OK,
+                                    err_msg);
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+    return;
+  }
+  printf("zaladowano slownik %s\n", dict_location);
+  printf("%i\n", dictionary_find(dict, L"litwa"));
+  fclose(stream);
   // na koniec funkcji, dict jest NULLem albo wskaznikiem na poprawny slownik
   // TODO: gdzieś go niszczyć na wyjściu z programu
 }
@@ -196,6 +213,60 @@ static void ChooseLang (GtkMenuItem *item, gpointer data)
     free(list);
 }
 
+
+// Koloruje słowa nie ze słownika na czerwono
+
+static void ColorMistakes (GtkMenuItem *item, gpointer data) {
+  GtkTextIter start, end, prevStart;
+  update_actual_dict();
+
+  gtk_text_buffer_get_start_iter(editor_buf, &end);
+  gtk_text_buffer_get_end_iter(editor_buf, &start); //inicjalizacja
+
+  gtk_text_buffer_create_tag(editor_buf, "red_fg", 
+                             "foreground", "red", 
+                             "weight", PANGO_WEIGHT_BOLD, NULL);
+
+  gtk_text_buffer_create_tag(editor_buf, "default_bg", 
+                             "foreground", NULL, 
+                             NULL, NULL, NULL);
+
+  int i=0;
+  //prevStart = end;
+  prevStart = start;
+  printf("ciagle\n");
+  gtk_text_iter_forward_word_end(&end); 
+  start = end;
+  gtk_text_iter_backward_word_start(&start);
+
+  while (!gtk_text_iter_equal(&prevStart, &start) && (i++ < 50)) {
+
+    gtk_text_buffer_apply_tag_by_name(editor_buf, "default_bg", 
+                                      &start, &end);
+    char* word = gtk_text_iter_get_text(&start, &end);
+    gunichar* wword = g_utf8_to_ucs4_fast(word, -1, NULL);
+    g_printf("pocz... word = >%ls<\n", (const wchar_t*)wword);
+    if(!dictionary_find(dict, (const wchar_t*)wword))
+    {
+      printf("przed kolorem\n");
+      gtk_text_buffer_apply_tag_by_name(editor_buf, "red_fg", 
+                                      &start, &end);
+      printf("po kolorze\n");
+    }
+    printf("...kon\n");
+    g_free(word);
+    printf("petla %i\n", i);
+
+    prevStart = start;
+    printf("ciagle\n");
+    gtk_text_iter_forward_word_end(&end); 
+    start = end;
+    gtk_text_iter_backward_word_start(&start);
+  }
+
+}
+
+
 // Procedurka obsługi
 
 static void WhatCheck (GtkMenuItem *item, gpointer data) {
@@ -239,7 +310,7 @@ static void WhatCheck (GtkMenuItem *item, gpointer data) {
     return;
   }
 
-  update_actual_dict(f);
+  update_actual_dict();
 
   // Sprawdzamy
   if (dictionary_find(dict, (wchar_t *)wword)) {
@@ -341,7 +412,8 @@ static void WhatCheck (GtkMenuItem *item, gpointer data) {
 // Tutaj dodacie nowe pozycje menu
 
 void extend_menu (GtkWidget *menubar) {
-  GtkWidget *spell_menu_item, *spell_menu, *check_item, *lang_load_item;
+  GtkWidget *spell_menu_item, *spell_menu, *check_item, *lang_load_item,
+            *color_mist_item;
 
   spell_menu_item = gtk_menu_item_new_with_label("Spell");
   spell_menu = gtk_menu_new();
@@ -360,6 +432,12 @@ void extend_menu (GtkWidget *menubar) {
                    G_CALLBACK(ChooseLang), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(spell_menu), lang_load_item);
   gtk_widget_show(lang_load_item);
+
+  color_mist_item = gtk_menu_item_new_with_label("Color the mistakes");
+  g_signal_connect(G_OBJECT(color_mist_item), "activate", 
+                   G_CALLBACK(ColorMistakes), NULL);
+  gtk_menu_shell_append(GTK_MENU_SHELL(spell_menu), color_mist_item);
+  gtk_widget_show(color_mist_item);
 }
 
 /*EOF*/
