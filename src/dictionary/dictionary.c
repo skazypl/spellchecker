@@ -319,9 +319,6 @@ void addLang(char** buffer, const char* lang, int* lastZero)
         (*buffer)[i + *lastZero + 1] = lang[i];
 
     *lastZero += (langLeng + 1);
-
-    
-
 }
 
 
@@ -362,9 +359,6 @@ int dictionary_lang_list(char **list, size_t *list_len)
 
             closedir(d);
         }
-    }
-    for (int i = 0; i < *list_len; ++i)
-    {
     }
     return 0;
 }
