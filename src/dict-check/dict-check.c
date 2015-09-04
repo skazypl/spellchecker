@@ -162,6 +162,7 @@ int main(int argc, char const *argv[])
 
 		default:
 			printf("ERR: zla liczba argumentow\n");
+			parseInput = false;
 			break;
 	}
 

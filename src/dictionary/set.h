@@ -19,8 +19,9 @@
 
 struct InsertSet
 {
-    short int size; ///< Liczba elementów zbioru.
-    wchar_t array[MAX_ALPH_SIZE]; ///< Tablica przechowująca elementy zbioru.
+    int size; ///< Liczba elementów zbioru.
+    int buffer_size;
+    wchar_t *array; ///< Tablica przechowująca elementy zbioru.
 };
 
 

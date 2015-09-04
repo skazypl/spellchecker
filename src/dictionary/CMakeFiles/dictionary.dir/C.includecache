@@ -51,6 +51,8 @@ wchar.h
 /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/set.c
 set.h
 /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/set.h
+stdlib.h
+-
 
 /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/set.h
 wchar.h

@@ -109,6 +109,7 @@ struct dictionary * dictionary_new()
 void dictionary_done(struct dictionary *dict)
 {
     dictionary_free(dict);
+    set_done(dict->usedLetters);
     free(dict->usedLetters);
     free(dict->tree);
     free(dict);
