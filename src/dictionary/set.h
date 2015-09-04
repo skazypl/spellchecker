@@ -20,7 +20,7 @@
 struct InsertSet
 {
     int size; ///< Liczba elementów zbioru.
-    int buffer_size;
+    int buffer_size; ///< Rozmiar zaalokowanej tablicy
     wchar_t *array; ///< Tablica przechowująca elementy zbioru.
 };
 

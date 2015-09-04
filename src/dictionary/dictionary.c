@@ -317,16 +317,22 @@ void addLang(char** buffer, const char* lang, int* lastZero)
         (*buffer)[i + *lastZero + 1] = lang[i];
 
     *lastZero += (langLeng + 1);
-
-    
-
 }
 
 
 int dictionary_lang_list(char **list, size_t *list_len)
 {
     struct stat st = {0};
-    const char* dirPath = "dict_database/";
+    int pathLen = strlen(CONF_PATH);
+    char tryDirPath[pathLen + 2];
+    strcpy(tryDirPath, CONF_PATH);
+    if(tryDirPath[pathLen] != '/')
+    {
+        tryDirPath[pathLen] = '/';
+        tryDirPath[pathLen + 1] = '\0';
+    }
+    
+    const char* dirPath = tryDirPath;
 
     if(stat(dirPath, &st) == -1)
     {
@@ -351,8 +357,8 @@ int dictionary_lang_list(char **list, size_t *list_len)
             int lastZero = -1;
             while((dir = readdir(d)) != NULL)
             {
-                if(strcmp(dir->d_name, ".") != 0 && 
-                    (strcmp(dir->d_name, "..") != 0))
+                if(strcmp(dir->d_name, ".") != 0 &&
+                    strcmp(dir->d_name, "..") != 0)
                 {
                     addLang(list, dir->d_name, &lastZero);
                 }
@@ -361,16 +367,23 @@ int dictionary_lang_list(char **list, size_t *list_len)
             closedir(d);
         }
     }
-    for (int i = 0; i < *list_len; ++i)
-    {
-    }
+
     return 0;
 }
 
 
 struct dictionary * dictionary_load_lang(const char *lang)
 {
-    const char* dirPath = "dict_database/"; // nie wiem czy nie ./
+    int pathLen = strlen(CONF_PATH);
+    char tryDirPath[pathLen + 2];
+    strcpy(tryDirPath, CONF_PATH);
+    if(tryDirPath[pathLen] != '/')
+    {
+        tryDirPath[pathLen] = '/';
+        tryDirPath[pathLen + 1] = '\0';
+    }
+    
+    const char* dirPath = tryDirPath;
     char* langPath = 
         calloc(sizeof(char), (strlen(dirPath) + strlen(lang) + 1));
     strcat(langPath, dirPath);
@@ -404,8 +417,20 @@ struct dictionary * dictionary_load_lang(const char *lang)
 
 int dictionary_save_lang(const struct dictionary *dict, const char *lang)
 {
+    if(strlen(lang) > MAX_LINE_LENG)
+        return -1;
+
     struct stat st = {0};
-    const char* dirPath = "dict_database/";
+    int pathLen = strlen(CONF_PATH);
+    char tryDirPath[pathLen + 2];
+    strcpy(tryDirPath, CONF_PATH);
+    if(tryDirPath[pathLen] != '/')
+    {
+        tryDirPath[pathLen] = '/';
+        tryDirPath[pathLen + 1] = '\0';
+    }
+    
+    const char* dirPath = tryDirPath;
     char* langPath = 
         calloc(sizeof(char), (strlen(dirPath) + strlen(lang) + 1));
     strcat(langPath, dirPath);
