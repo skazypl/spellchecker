@@ -11,11 +11,12 @@
 #include <cmocka.h>
 #include "word_list.h"
 
-const wchar_t* test   = L"Test string";
-const wchar_t* first  = L"First string";
-const wchar_t* second = L"Second string";
-const wchar_t* third  = L"Third string";
+const wchar_t* test   = L"Test string";///< Wstawiany string.
+const wchar_t* first  = L"First string";///< Wstawiany string.
+const wchar_t* second = L"Second string";///< Wstawiany string.
+const wchar_t* third  = L"Third string";///< Wstawiany string.
 
+/// Test inicjalizacji word_list.
 static void word_list_init_test(void** state) {
 	struct word_list l;
 	word_list_init(&l);
@@ -23,6 +24,7 @@ static void word_list_init_test(void** state) {
 	word_list_done(&l);
 }
 
+/// Test dodawania do word_listy.
 static void word_list_add_test(void** state) {
 	struct word_list l;
 	word_list_init(&l);
@@ -32,7 +34,7 @@ static void word_list_add_test(void** state) {
 	word_list_done(&l);
 }
 
-
+/// Ustawia listę do testów setup_teardown.
 static int word_list_setup(void **state) {
 	struct word_list *l = malloc(sizeof(struct word_list));
 	if (!l) 
@@ -44,6 +46,8 @@ static int word_list_setup(void **state) {
 	*state = l;
 	return 0;
 }
+
+/// Niszczy listę w testach setup_teardown.
 static int word_list_teardown(void **state) {
 	struct word_list *l = *state;
 	word_list_done(l);
@@ -51,6 +55,7 @@ static int word_list_teardown(void **state) {
 	return 0;
 }
 
+/// Testuje pobieranie z listy słów tablicy.
 static void word_list_get_test(void** state) {
 	struct word_list *l = *state;
 	assert_true(wcscmp(first, word_list_get(l)[0]) == 0);
@@ -58,6 +63,7 @@ static void word_list_get_test(void** state) {
 	assert_true(wcscmp(third, word_list_get(l)[2]) == 0);
 }
 
+/// Testuje powtórne wstawianie.
 static void word_list_repeat_test(void** state) {
 	struct word_list *l = *state;
 	word_list_add(l, third);
@@ -65,7 +71,7 @@ static void word_list_repeat_test(void** state) {
 	assert_true(wcscmp(third, word_list_get(l)[3]) == 0);
 }
 
-
+/// Funkcja main testów.
 int main(void) {
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(word_list_init_test),

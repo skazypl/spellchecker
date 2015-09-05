@@ -1,5 +1,6 @@
 /**
-	@file Testy funkcji interfejsu dictionary
+	@file
+	Testy funkcji interfejsu dictionary
 		
 	@ingroup dictionary
 	@author Jarosław Socha <js347267@students.mimuw.edu.pl>	
@@ -15,25 +16,26 @@
 #include <stdio.h>
 #include "dictionary.h"
 
-const wchar_t* first  =  L"ax";
-const wchar_t* second =  L"ay";
-const wchar_t* third  =  L"b";
-const wchar_t* forth  =  L"c";
-const wchar_t* fifth  =  L"cpq";
+const wchar_t* first  =  L"ax"; ///< Wstawiany string.
+const wchar_t* second =  L"ay"; ///< Wstawiany string.
+const wchar_t* third  =  L"b"; ///< Wstawiany string.
+const wchar_t* forth  =  L"c"; ///< Wstawiany string.
+const wchar_t* fifth  =  L"cpq"; ///< Wstawiany string.
 
-const wchar_t* firstSimilar  =  L"aa";
-const wchar_t* secondSimilar =  L"ab";
-const wchar_t* thirdSimilar  =  L"b";
-const wchar_t* forthSimilar  =  L"c";
-const wchar_t* fifthSimilar  =  L"cab";
+const wchar_t* firstSimilar  =  L"aa"; ///< Wstawiany string.
+const wchar_t* secondSimilar =  L"ab"; ///< Wstawiany string.
+const wchar_t* thirdSimilar  =  L"b"; ///< Wstawiany string.
+const wchar_t* forthSimilar  =  L"c"; ///< Wstawiany string.
+const wchar_t* fifthSimilar  =  L"cab"; ///< Wstawiany string.
 
-
+/// Funkcja sprawdzająca inicjalizację i od razu destrukcję słownika.
 static void dict_new_done_test(void **state) {
 	struct dictionary* d = dictionary_new();
 	assert_non_null(d);
 	dictionary_done(d);
 }
 
+/// Funkcja sprawdzająca inicjalizację, dodanie słów ze stałych i destrukcję.
 static void dict_setup_done_test(void **state) {
 	struct dictionary* d = dictionary_new();
 	assert_non_null(d);
@@ -45,6 +47,7 @@ static void dict_setup_done_test(void **state) {
 	dictionary_done(d);
 }
 
+/// Ustawia słownik do testów setup_teardown.b
 static int dict_setup(void **state) {
 	struct dictionary* d = dictionary_new();
 	if(!d)
@@ -58,6 +61,7 @@ static int dict_setup(void **state) {
 	return 0;
 }
 
+/// Ustawia słownik z podobnych stringów do testów setup_teardown.
 static int dict_setup_similar(void **state) {
 	struct dictionary* d = dictionary_new();
 	if(!d)
@@ -71,12 +75,14 @@ static int dict_setup_similar(void **state) {
 	return 0;
 }
 
+/// Niszczy słownik w testach setup_teardown.
 static int dict_teardown(void **state) {
 	struct dictionary* d = *state;
 	dictionary_done(d);
 	return 0;
 }
 
+/// Test na znajdowanie słów w słowniku.
 static void dict_find_test(void **state) {
 	struct dictionary* d = *state;
 	assert_non_null(d);
@@ -121,6 +127,7 @@ static void dict_find_test(void **state) {
 
 }
 
+/// Test na usuwanie słów ze słownika.
 static void dict_delete_test(void** state) {
 	struct dictionary* d = *state;
 	assert_int_equal(dictionary_delete(d, first), 1);
@@ -168,6 +175,7 @@ static void dict_delete_test(void** state) {
    
 }
 
+/// Testuje dodawanie słów do słownika po wszystkich ścieżkach drzewa.
 static void dict_insert_test(void** state) {
 	struct dictionary* d = *state;
 	
@@ -222,6 +230,7 @@ static void dict_insert_test(void** state) {
 
 }
 
+/// Testuje listę podpowiedzi do różnych słów
 static void dict_hints_test(void **state) {
 	struct dictionary* d = *state;
 	struct word_list* l = malloc(sizeof(struct word_list));
@@ -269,9 +278,11 @@ static void dict_hints_test(void **state) {
 	free(l);
 }
 
+/** Makro dla czytelności. */
 #define run_dict_test(x) cmocka_unit_test_setup_teardown(x, dict_setup, \
 	dict_teardown)
 
+/// Funkcja main testów.
 int main(void) {
 	setlocale(LC_ALL, "pl_PL.UTF-8");
 	const struct CMUnitTest tests[] = {

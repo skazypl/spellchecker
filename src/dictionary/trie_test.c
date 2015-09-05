@@ -15,14 +15,14 @@
 #include <stdio.h>
 #include "trie.h"
 
-const wchar_t* first  =  L"masą";
-const wchar_t* second =  L"ma";
-const wchar_t* third  =  L"mat";
-const wchar_t* forth  =  L"noga";
-const wchar_t* fifth  =  L"noś";
-const wchar_t* sixth  =  L"nota";
+const wchar_t* first  =  L"masą";///< Wstawiany string.
+const wchar_t* second =  L"ma";///< Wstawiany string.
+const wchar_t* third  =  L"mat";///< Wstawiany string.
+const wchar_t* forth  =  L"noga";///< Wstawiany string.
+const wchar_t* fifth  =  L"noś";///< Wstawiany string.
+const wchar_t* sixth  =  L"nota";///< Wstawiany string.
 
-/*
+/**
 	Sprawdza inicjalizację drzewa - dodanie kilku słów, zlicza liczbę węzłów
 	i przeprowadza destrukcję.
 */
@@ -48,7 +48,7 @@ static void trie_init_test(void **state) {
 	free(t);
 }
 
-/*
+/**
 	Ustawia drzewo do testów z setup i teardown
 */
 static int trie_setup(void **state) {
@@ -74,7 +74,7 @@ static int trie_setup(void **state) {
 	return 0;
 }
 
-/*
+/**
 	Niszczy drzewo w testach setup i teardown
 */
 static int trie_teardown(void **state) {
@@ -84,7 +84,7 @@ static int trie_teardown(void **state) {
 	return 0;
 }
 
-/*
+/**
 	Test dodawania do drzewa stringów które tam są i tych których tam nie ma - 
 	wszystkie możliwe ścieżki w drzewie, oraz rozróżnienie wielkości liter
 */
@@ -127,7 +127,7 @@ static void trie_add_test(void** state) {
 	assert_int_equal(Tree_add(t, veryLong), 1);
 }
 
-/*
+/**
 	Test przeszukiwania drzewa
 */
 static void trie_find_test(void** state) {
@@ -168,7 +168,7 @@ static void trie_find_test(void** state) {
 
 }
 
-/*
+/**
 	Test usuwania z drzewa i ponownego dodawania
 */
 static void trie_delete_test(void** state) {
@@ -243,9 +243,11 @@ static void trie_delete_test(void** state) {
 */
 
 
+/** Makro dla czytelności. */
 #define run_trie_test(x) cmocka_unit_test_setup_teardown(x, trie_setup, \
 	trie_teardown)
 
+/// Funkcja main testów.
 int main(void) {
 	setlocale(LC_ALL, "pl_PL.UTF-8");
 	const struct CMUnitTest tests[] = {

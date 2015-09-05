@@ -15,18 +15,15 @@
 #include <stdio.h>
 #include "trie.h"
 
-#define MAX_BUFF 10000
+#define MAX_BUFF 10000///<Maksymalny rozmiar bufora. Nasze testy są raczej małe.
 
-/*
-	Bufor na który przekierujemy strumienie czytania i pisania do pliku -
-	patrz io_mock.h
-*/
-static wchar_t wcBuff[MAX_BUFF];
-static int iBuff[MAX_BUFF];
+static wchar_t wcBuff[MAX_BUFF]; ///< Bufor zastępujący stdio na wchary.
+static int iBuff[MAX_BUFF];///< Bufor zastępujący stdio na inty.
 
-static int wcSize, iSize;
+static int wcSize;///< Zmienna do przechodzenia bufora wcBuff do zapisu.
+static int iSize;///<  Zmienna do przechodzenia bufora iBuff do zapisu.
 
-// Funkcje - zaślepki
+/// Funkcja-zaślepka dla printf.
 int new_fprintf(FILE* stream, const char *format, int i, wchar_t wc)
 {
 	if(wc == L'\n')
@@ -42,8 +39,10 @@ int new_fprintf(FILE* stream, const char *format, int i, wchar_t wc)
 	return 1;
 }
 
-static int wcActual, iActual;
+static int wcActual;///< Zmienna do przechodzenia bufora wcBuff do odczytu.
+static int iActual;///< Zmienna do przechodzenia bufora iBuff do odczytu.
 
+/// Funkcja-zaślepka dla scanf.
 int new_fscanf(FILE* stream, const char *format, int* i, wchar_t* wc)
 {
 	if((wcBuff[wcActual] == -1) || (iBuff[iActual] == -1))
@@ -59,16 +58,15 @@ int new_fscanf(FILE* stream, const char *format, int* i, wchar_t* wc)
 	return 1;
 }
 
-const wchar_t* first  =  L"masą";
-const wchar_t* second =  L"ma";
-const wchar_t* third  =  L"mat";
-const wchar_t* forth  =  L"noga";
-const wchar_t* fifth  =  L"noś";
-const wchar_t* sixth  =  L"nota";
+const wchar_t* first  =  L"masą";///< Wstawiany string.
+const wchar_t* second =  L"ma";///< Wstawiany string.
+const wchar_t* third  =  L"mat";///< Wstawiany string.
+const wchar_t* forth  =  L"noga";///< Wstawiany string.
+const wchar_t* fifth  =  L"noś";///< Wstawiany string.
+const wchar_t* sixth  =  L"nota";///< Wstawiany string.
 
-/*
-	Test samego bufora
-*/
+
+/// Test samego bufora.
 static void buffer_test(void **state) {
 	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));
 
@@ -87,38 +85,33 @@ static void buffer_test(void **state) {
 	assert_int_equal(wcBuff[wcSize], -1);
 	assert_int_equal(wcSize, 8);
 
-	#define check_wcBuf(x,y) assert_int_equal(wcBuff[x],y)
-	check_wcBuf(0, L'\0');    
-	check_wcBuf(1, L'm');
-	check_wcBuf(2, L'a');
-	check_wcBuf(3, L's');
-	check_wcBuf(4, L'ą');
-	check_wcBuf(5, L'!');
-	check_wcBuf(6, L't');
-	check_wcBuf(7, L'!');
-	check_wcBuf(8, -1); //-1 == EOF
-	#undef check_wcBuf
+	assert_int_equal(wcBuff[0], L'\0');    
+	assert_int_equal(wcBuff[1], L'm');
+	assert_int_equal(wcBuff[2], L'a');
+	assert_int_equal(wcBuff[3], L's');
+	assert_int_equal(wcBuff[4], L'ą');
+	assert_int_equal(wcBuff[5], L'!');
+	assert_int_equal(wcBuff[6], L't');
+	assert_int_equal(wcBuff[7], L'!');
+	assert_int_equal(wcBuff[8], -1); //-1 == EOF
 
-	#define check_iBuf(x,y) assert_int_equal(iBuff[x],y)
-	check_iBuf(0, 1);
-	check_iBuf(1, 1);
-	check_iBuf(2, 2);
-	check_iBuf(3, 1);
-	check_iBuf(4, 1);
-	check_iBuf(5, 0);
-	check_iBuf(6, 1);
-	check_iBuf(7, 0);
-	check_iBuf(8, -1);
-	#undef check_iBuf
+	assert_int_equal(iBuff[0], 1);
+	assert_int_equal(iBuff[1], 1);
+	assert_int_equal(iBuff[2], 2);
+	assert_int_equal(iBuff[3], 1);
+	assert_int_equal(iBuff[4], 1);
+	assert_int_equal(iBuff[5], 0);
+	assert_int_equal(iBuff[6], 1);
+	assert_int_equal(iBuff[7], 0);
+	assert_int_equal(iBuff[8], -1);
 
 	Tree_destroy(t);
 	free(t);
 
 }
 
-/*
-	Test inicjalizacji drzewa i zapisania do pliku a następnie wczytania
-*/
+
+/// Test inicjalizacji drzewa i zapisania do pliku a następnie wczytania.
 static void trie_init_test(void **state) {
 	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));
 	Tree_init(t);
@@ -160,9 +153,8 @@ static void trie_init_test(void **state) {
 	free(t2);
 }
 
-/*
-	Test dodawania słów do wczytanego już drzewa
-*/
+
+/// Test dodawania słów do wczytanego już drzewa
 static void trie_add_test(void **state) {
 	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));	
 
@@ -228,9 +220,7 @@ static void trie_add_test(void **state) {
 	free(t2);
 }
 
-/*
-	Test samego niszczenia drzewa wczytanego ze strumienia
-*/
+/// Test samego niszczenia drzewa wczytanego ze strumienia.
 static void trie_destroy_test(void **state) {
 
 	wcActual = 0;
@@ -240,9 +230,8 @@ static void trie_destroy_test(void **state) {
 	free(t);
 }
 
-/*
-	Test wyszukiwania we wczytanym drzewie
-*/
+
+/// Test wyszukiwania we wczytanym drzewie.
 static void trie_find_test(void** state) {
 	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));	
 
@@ -309,9 +298,8 @@ static void trie_find_test(void** state) {
 	free(t2);
 }
 
-/*
-	Test usuwania z wczytanego drzewa
-*/
+
+/// Test usuwania z wczytanego drzewa
 static void trie_delete_test(void** state) {
 	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));	
 
@@ -451,9 +439,11 @@ static void trie_delete_test(void** state) {
 	free(t2);
 }
 
+/** Makro dla czytelności. */
 #define run_trie_test(x) cmocka_unit_test_setup_teardown(x, trie_setup, \
 	trie_teardown)
 
+/// Funkcja main testów.
 int main(void) {
 	setlocale(LC_ALL, "pl_PL.UTF-8");
 	const struct CMUnitTest tests[] = {

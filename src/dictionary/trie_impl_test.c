@@ -15,12 +15,13 @@
 #include <stdio.h>
 #include "trie.c"
 
-const wchar_t* emptyWord = L"";
-const wchar_t* oneLetter = L"x";
-const wchar_t* kind      = L"kind";
-const wchar_t* kinder    = L"kinder";
-const wchar_t* kiss      = L"kiss";
+const wchar_t* emptyWord = L"";///< Wstawiany string.
+const wchar_t* oneLetter = L"x";///< Wstawiany string.
+const wchar_t* kind      = L"kind";///< Wstawiany string.
+const wchar_t* kinder    = L"kinder";///< Wstawiany string.
+const wchar_t* kiss      = L"kiss";///< Wstawiany string.
 
+/// Testuje tworzenie węzła funkcją createNode i jego niszczenie.
 static void createNode_test(void** state) {
 	struct Node* n = createNode(0, '\0', NULL);
 	assert_non_null(n);
@@ -38,6 +39,7 @@ static void createNode_test(void** state) {
 	assert_true(n == NULL);
 }
 
+/// Testuje samo niszczenie węzła.
 static void Node_destroy_test(void** state) {
 	struct Node* n = createNode(1, L'a', NULL);
 	struct Node* m = createNode(1, L'b', NULL);
@@ -47,6 +49,7 @@ static void Node_destroy_test(void** state) {
 	Node_destroy(n);
 }
 
+/// Testuje komparator nodeComp.
 static void nodeComp_test(void** state) {
 	assert_true(L'a' < L'z');
 	struct Node* n = createNode(0, L'a', NULL);
@@ -70,6 +73,7 @@ static void nodeComp_test(void** state) {
 	free(m);
 }
 
+/// Testuje wyszukiwanie binarne w posortowanej tablicy.
 static void binSearch_test(void** state) {
 	struct Node* array[2];
 	array[0] = createNode(0, L'c', NULL);
@@ -99,7 +103,7 @@ static void binSearch_test(void** state) {
 	free(nextArray[2]);
 }
 
-
+/// Testuje dodawanie węzła metodą addNode.
 static void addNode_test(void** state) {
 	struct Node* m = createNode(1, 0, NULL);
 	struct Node* n = createNode(0, L'k', m);
@@ -181,7 +185,8 @@ static void addNode_test(void** state) {
 	Node_destroy(m);
 }
 
-static int trie_setup(void** state) {
+/// Ustawia węzły do testów setup_teardown.
+static int node_setup(void** state) {
 	struct Node* n = malloc(sizeof(struct Node));
 	Node_init(n);
 	addNode(n, kind);
@@ -191,12 +196,14 @@ static int trie_setup(void** state) {
 	return 0;
 }
 
-static int trie_teardown(void** state) {
+/// Niszczy strukturę węzłów w testach setup_teardown.
+static int node_teardown(void** state) {
 	struct Node* n = *state;
 	Node_destroy(n);
 	return 0;
 }
 
+/// Testuje wyszukiwanie węzła za pomocą funkcji findNode.
 static void findNode_test(void** state) {
 	struct Node* m = malloc(sizeof(struct Node));
 	Node_init(m);
@@ -223,6 +230,7 @@ static void findNode_test(void** state) {
 	Node_destroy(m);
 }
 
+/// Testuje wyszukiwanie liścia kończącego słowo za pomocą findLeaf.
 static void findLeaf_test(void** state) {
 	struct Node* n = *state;
 	struct Node* leaf = findLeaf(n, kind);
@@ -255,7 +263,7 @@ static void findLeaf_test(void** state) {
 	assert_int_equal(leaf, temp);
 }
 
-
+/// Testuje sprawdzanie rozmiaru poddrzewa.
 static void NodeSize_test(void** state) {
 	struct Node* n = *state;
 	assert_int_equal(NodeSize(n), 12);
@@ -267,10 +275,11 @@ static void NodeSize_test(void** state) {
 	assert_int_equal(NodeSize(NULL), 0);
 }
 
+/** Makro dla czytelności. */
+#define run_node_test(x) cmocka_unit_test_setup_teardown(x, node_setup, \
+	node_teardown)
 
-#define run_trie_test(x) cmocka_unit_test_setup_teardown(x, trie_setup, \
-	trie_teardown)
-
+/// Funkcja main testów.
 int main(void) {
 	setlocale(LC_ALL, "pl_PL.UTF-8");
 	const struct CMUnitTest tests[] = {
@@ -280,8 +289,8 @@ int main(void) {
 		cmocka_unit_test(binSearch_test),
 		cmocka_unit_test(addNode_test),
 		cmocka_unit_test(findNode_test),
-		run_trie_test(findLeaf_test),
-		run_trie_test(NodeSize_test),
+		run_node_test(findLeaf_test),
+		run_node_test(NodeSize_test),
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);

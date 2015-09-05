@@ -13,8 +13,10 @@
   Ścieżka do pliku konfiguracyjnego
   */
 #define CONF_PATH "/home/skazy/.dictionary.rc"
+///< Ścieżka do katalogu z zapisanymi słownikami różnych języków.
 
 #define MAX_LINE_LENG 255
+///< Maksymalny rozmiar linii, jak i najdłuższa dopuszczalna nazwa pliku.
 
 
 #endif /* __CONF_H__ */
