@@ -65,21 +65,6 @@ static wchar_t* decapitalize(const wchar_t* word)
 }
 
 /**
-    Zamienia miejscami w tablicy wchar-ów dwa elementy o zadanych indeksach. 
-    @param[in] a, b Indeksy zamienianych elementów.
-    @param[in, out] array Tablica.
-    */
-
-static void swap(wchar_t** array, int a, int b)
-{
-    wchar_t* aWord = array[a];
-    wchar_t* bWord = array[b];
-    array[a] = bWord;
-    array[b] = aWord;
-}
-
-
-/**
     Komparator dla qsorta w zastępstwie alphaInsertSorta
     @param[in] a, b Wskaźniki na wide stringi.
     @return Wynik funkcji wcscoll - dobra funkcja dla komparatora.

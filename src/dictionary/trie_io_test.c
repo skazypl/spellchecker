@@ -1,6 +1,6 @@
 /**
 	@file
-	Testy zapisu i odczytu drzewa z pliku podmieniające funkcje I/O na atrapy
+	Testy zapisu i odczytu drzewa z pliku podmieniające funkcje I/O na atrapy.
 	
 	@ingroup dictionary
 	@author Jarosław Socha <js347267@students.mimuw.edu.pl>	

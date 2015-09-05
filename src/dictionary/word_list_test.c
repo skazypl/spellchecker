@@ -1,5 +1,5 @@
 /** @file
-	Testy funkcji interfejsu word_list
+	Testy funkcji interfejsu word_list.
 	
 	@ingroup dictionary
 	@author Jarosław Socha <js347267@students.mimuw.edu.pl>	

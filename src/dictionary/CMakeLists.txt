@@ -67,6 +67,14 @@ if (CMOCKA)
         --error-exitcode=1 --read-var-info=yes
          --leak-check=full --show-leak-kinds=all ./dictionary_test)    
     
+    add_executable (dictionary_impl_test trie.c set.c word_list.c dictionary_impl_test.c)
+    target_link_libraries (dictionary_impl_test ${CMOCKA})
+    add_test (dictionary_impl_unit_test dictionary_impl_test)    
+    add_test (dictionary_impl_val valgrind 
+    
+        --error-exitcode=1 --read-var-info=yes
+         --leak-check=full --show-leak-kinds=all ./dictionary_impl_test)    
+    
 
 
 endif (CMOCKA)

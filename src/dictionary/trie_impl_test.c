@@ -1,6 +1,6 @@
 /**
 	@file
-	Testy funkcji pomocniczych trie
+	Testy funkcji pomocniczych trie.
 	
 	@ingroup dictionary
 	@author Jarosław Socha <js347267@students.mimuw.edu.pl>	

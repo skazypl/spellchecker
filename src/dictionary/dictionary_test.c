@@ -1,6 +1,6 @@
 /**
 	@file
-	Testy funkcji interfejsu dictionary
+	Testy funkcji interfejsu dictionary.
 		
 	@ingroup dictionary
 	@author Jarosław Socha <js347267@students.mimuw.edu.pl>	

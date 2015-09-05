@@ -20,7 +20,7 @@
 	@param[in, out] n Węzeł drzewa.
    */
 
-void Node_init(struct Node *n)
+static void Node_init(struct Node *n)
 {
 	n->key = L'\0';
 	n->parent = NULL;
@@ -37,7 +37,7 @@ void Node_init(struct Node *n)
 
 	*/
 
-struct Node* createNode(int childCount, wchar_t key, struct Node* parent)
+static struct Node* createNode(int childCount, wchar_t key, struct Node* parent)
 {
 	if(childCount < 0)
 		return NULL;
@@ -68,7 +68,7 @@ struct Node* createNode(int childCount, wchar_t key, struct Node* parent)
 	*/
 
 
-void Node_destroy(struct Node *n)
+static void Node_destroy(struct Node *n)
 {
 	if(n != NULL)
 	{	
@@ -89,7 +89,7 @@ void Node_destroy(struct Node *n)
 
 	*/
 
-int nodeComp(const void* a, const void* b)
+static int nodeComp(const void* a, const void* b)
 {
 	struct Node* a_ = *(struct Node**)a;
 	struct Node* b_ = *(struct Node**)b;
@@ -113,7 +113,7 @@ int nodeComp(const void* a, const void* b)
 	nie ma takiego.
 	*/
 
-int binSearch(struct Node* arr[], int size, wchar_t patt)
+static int binSearch(struct Node* arr[], int size, wchar_t patt)
 {
 	if(size < 1)
 		return -1;
@@ -147,7 +147,7 @@ int binSearch(struct Node* arr[], int size, wchar_t patt)
 	@todo przerobić na void lub dodać inne zwracane wartości.
 	*/
 
-int addNode(struct Node *n, const wchar_t* word)
+static int addNode(struct Node *n, const wchar_t* word)
 {
 	if(wcslen(word) != 0)
 	{
@@ -198,7 +198,7 @@ int addNode(struct Node *n, const wchar_t* word)
 	*/
 
 
-int findNode(struct Node* n, const wchar_t* word)
+static int findNode(struct Node* n, const wchar_t* word)
 {
 	int ind = binSearch(n->children, n->childCount, word[0]);
 	if(ind != -1)
@@ -222,7 +222,7 @@ int findNode(struct Node* n, const wchar_t* word)
 	@return Wskaźnik na liść jeśli słowo jest w słowniku, NULL wpp.
 	*/
 
-struct Node* findLeaf(struct Node* n, const wchar_t* word)
+static struct Node* findLeaf(struct Node* n, const wchar_t* word)
 {
 	int ind = binSearch(n->children, n->childCount, word[0]);
 	if(ind != -1)
@@ -241,7 +241,7 @@ struct Node* findLeaf(struct Node* n, const wchar_t* word)
 	@return Rozmiar poddrzewa rozpiętego przez n.
 	*/
 
-int NodeSize(struct Node* n)
+static int NodeSize(struct Node* n)
 
 {
 	if(n == NULL)
@@ -339,20 +339,6 @@ int Tree_size(struct Tree* t)
 /** @name Funkcje pomocnicze do zapisywania i wczytywania.
    	@{
 	*/
-
-/**
-	Ustawia relację <dziecko, rodzic> dla węzłów z tablicy dzieci danego węzła.
-	@param[in] n Wskaźnik na węzeł.
-	*/
-
-static void setParents(struct Node* n)
-{
-	for (int i = 0; i < n->childCount; ++i)
-	{
-		n->children[i]->parent = n;
-		setParents(n->children[i]);
-	}	
-}
 
 /**
 	Dodaje do zbioru (bez powtórzeń) wszystkie znaki z kluczy dzieci zadanego

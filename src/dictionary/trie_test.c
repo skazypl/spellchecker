@@ -1,6 +1,6 @@
 /**
 	@file
-	Testy funkcji interfejsu trie, poza zapisem i odczytem z pliku
+	Testy funkcji interfejsu trie, poza zapisem i odczytem z pliku.
 	
 	@ingroup dictionary
 	@author Jarosław Socha <js347267@students.mimuw.edu.pl>	
@@ -241,7 +241,6 @@ static void trie_delete_test(void** state) {
 /* 
 	Nie testujemy usedInTree() - w zasadzie nie ma czego testować.
 */
-
 
 /** Makro dla czytelności. */
 #define run_trie_test(x) cmocka_unit_test_setup_teardown(x, trie_setup, \
