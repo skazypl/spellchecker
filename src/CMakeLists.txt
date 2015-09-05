@@ -9,6 +9,7 @@ project (Spellcheck C)
 
 enable_testing ()
 
+
 # deklarujemy opcję DEBUG, domyślnie wyłączoną (opcję można włączyć przez argument -DDEBUG=ON)
 option (DEBUG OFF)
 
@@ -31,8 +32,8 @@ endif (NOT CMOCKA)
 set(CMAKE_C_FLAGS_DEBUG "-std=gnu99 -Wall -pedantic -g")
 set(CMAKE_C_FLAGS_RELEASE "-std=gnu99 -O3")
 
-# wskazujemy na foldery, gdzie znajdują się pliki nagłówkowe.
-include_directories (dictionary gtk-editor ${CMAKE_BINARY_DIR})
+# wskazujemy na foldery, gdzie znajdują się pliki nagłówkowe.
+include_directories (dictionary ${CMAKE_BINARY_DIR})
 
 # ustawiamy, gdzie trzymać plik konfiguracyjny. Jeśli przy uruchamianiu CMake'a coś podano, już nie zmieniamy.
 if (NOT CONF_PATH)

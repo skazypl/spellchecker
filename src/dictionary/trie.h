@@ -15,9 +15,6 @@
 #include <wchar.h>
 #include "set.h"
 
-#define MAX_CHILD 50 ///< Maksymalna zakładana liczba synów liścia.
-///< Nie przekroczy rozmiaru alfabetu.
-
 /**
 	Struktura pojedynczego węzła w drzewie.
 	*/
@@ -37,7 +34,7 @@ struct Node
 
 struct Tree
 {
-	struct Node* root; /**< Wskaźnik do korzenia drzewa typu węzłowego Node.
+	struct Node* root;	/**< Wskaźnik do korzenia drzewa typu węzłowego Node.
 	Węzeł atrapa - nie przechowywujemy w nim klucza.
 	*/
 };
@@ -86,7 +83,7 @@ int Tree_delete(struct Tree *t, const wchar_t* word);
 
 /**
 	Zwraca zbiór typu InsertSet (z nagłówka set) 
-	zawierający litery użyte w drzewie.
+	zawierający litery użyte w drzewie, bez powtórzeń.
 	@param[in] t Drzewo.
 	@return Zbiór użytych liter w drzewie.
 	*/
@@ -124,10 +121,5 @@ int Tree_save_DFS(struct Tree* t, FILE* stream);
 
 int Tree_size(struct Tree* t);
 
-
-/**
-	Funkcja tylko do debugowania - wypisuje drzewo na ekran.
-	*/
-void printTree(struct Node* n, int k);
 
 #endif /* TRIE_H */

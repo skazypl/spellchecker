@@ -126,6 +126,20 @@ dictionary/fast:
 .PHONY : dictionary/fast
 
 # Convenience name for target.
+dictionary/CMakeFiles/dictionary_impl_test.dir/rule:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f CMakeFiles/Makefile2 dictionary/CMakeFiles/dictionary_impl_test.dir/rule
+.PHONY : dictionary/CMakeFiles/dictionary_impl_test.dir/rule
+
+# Convenience name for target.
+dictionary_impl_test: dictionary/CMakeFiles/dictionary_impl_test.dir/rule
+.PHONY : dictionary_impl_test
+
+# fast build rule for target.
+dictionary_impl_test/fast:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_impl_test.dir/build.make dictionary/CMakeFiles/dictionary_impl_test.dir/build
+.PHONY : dictionary_impl_test/fast
+
+# Convenience name for target.
 dictionary/CMakeFiles/dictionary_test.dir/rule:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f CMakeFiles/Makefile2 dictionary/CMakeFiles/dictionary_test.dir/rule
 .PHONY : dictionary/CMakeFiles/dictionary_test.dir/rule
@@ -236,6 +250,30 @@ dictionary.c.s:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_test.dir/build.make dictionary/CMakeFiles/dictionary_test.dir/dictionary.c.s
 .PHONY : dictionary.c.s
 
+dictionary_impl_test.o: dictionary_impl_test.c.o
+.PHONY : dictionary_impl_test.o
+
+# target to build an object file
+dictionary_impl_test.c.o:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_impl_test.dir/build.make dictionary/CMakeFiles/dictionary_impl_test.dir/dictionary_impl_test.c.o
+.PHONY : dictionary_impl_test.c.o
+
+dictionary_impl_test.i: dictionary_impl_test.c.i
+.PHONY : dictionary_impl_test.i
+
+# target to preprocess a source file
+dictionary_impl_test.c.i:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_impl_test.dir/build.make dictionary/CMakeFiles/dictionary_impl_test.dir/dictionary_impl_test.c.i
+.PHONY : dictionary_impl_test.c.i
+
+dictionary_impl_test.s: dictionary_impl_test.c.s
+.PHONY : dictionary_impl_test.s
+
+# target to generate assembly for a file
+dictionary_impl_test.c.s:
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_impl_test.dir/build.make dictionary/CMakeFiles/dictionary_impl_test.dir/dictionary_impl_test.c.s
+.PHONY : dictionary_impl_test.c.s
+
 dictionary_test.o: dictionary_test.c.o
 .PHONY : dictionary_test.o
 
@@ -266,6 +304,7 @@ set.o: set.c.o
 # target to build an object file
 set.c.o:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/set.c.o
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_impl_test.dir/build.make dictionary/CMakeFiles/dictionary_impl_test.dir/set.c.o
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_test.dir/build.make dictionary/CMakeFiles/dictionary_test.dir/set.c.o
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/set_test.dir/build.make dictionary/CMakeFiles/set_test.dir/set.c.o
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_impl_test.dir/build.make dictionary/CMakeFiles/trie_impl_test.dir/set.c.o
@@ -279,6 +318,7 @@ set.i: set.c.i
 # target to preprocess a source file
 set.c.i:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/set.c.i
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_impl_test.dir/build.make dictionary/CMakeFiles/dictionary_impl_test.dir/set.c.i
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_test.dir/build.make dictionary/CMakeFiles/dictionary_test.dir/set.c.i
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/set_test.dir/build.make dictionary/CMakeFiles/set_test.dir/set.c.i
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_impl_test.dir/build.make dictionary/CMakeFiles/trie_impl_test.dir/set.c.i
@@ -292,6 +332,7 @@ set.s: set.c.s
 # target to generate assembly for a file
 set.c.s:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/set.c.s
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_impl_test.dir/build.make dictionary/CMakeFiles/dictionary_impl_test.dir/set.c.s
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_test.dir/build.make dictionary/CMakeFiles/dictionary_test.dir/set.c.s
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/set_test.dir/build.make dictionary/CMakeFiles/set_test.dir/set.c.s
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_impl_test.dir/build.make dictionary/CMakeFiles/trie_impl_test.dir/set.c.s
@@ -329,6 +370,7 @@ trie.o: trie.c.o
 # target to build an object file
 trie.c.o:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/trie.c.o
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_impl_test.dir/build.make dictionary/CMakeFiles/dictionary_impl_test.dir/trie.c.o
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_test.dir/build.make dictionary/CMakeFiles/dictionary_test.dir/trie.c.o
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_io_test.dir/build.make dictionary/CMakeFiles/trie_io_test.dir/trie.c.o
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_test.dir/build.make dictionary/CMakeFiles/trie_test.dir/trie.c.o
@@ -340,6 +382,7 @@ trie.i: trie.c.i
 # target to preprocess a source file
 trie.c.i:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/trie.c.i
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_impl_test.dir/build.make dictionary/CMakeFiles/dictionary_impl_test.dir/trie.c.i
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_test.dir/build.make dictionary/CMakeFiles/dictionary_test.dir/trie.c.i
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_io_test.dir/build.make dictionary/CMakeFiles/trie_io_test.dir/trie.c.i
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_test.dir/build.make dictionary/CMakeFiles/trie_test.dir/trie.c.i
@@ -351,6 +394,7 @@ trie.s: trie.c.s
 # target to generate assembly for a file
 trie.c.s:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/trie.c.s
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_impl_test.dir/build.make dictionary/CMakeFiles/dictionary_impl_test.dir/trie.c.s
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_test.dir/build.make dictionary/CMakeFiles/dictionary_test.dir/trie.c.s
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_io_test.dir/build.make dictionary/CMakeFiles/trie_io_test.dir/trie.c.s
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/trie_test.dir/build.make dictionary/CMakeFiles/trie_test.dir/trie.c.s
@@ -434,6 +478,7 @@ word_list.o: word_list.c.o
 # target to build an object file
 word_list.c.o:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/word_list.c.o
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_impl_test.dir/build.make dictionary/CMakeFiles/dictionary_impl_test.dir/word_list.c.o
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_test.dir/build.make dictionary/CMakeFiles/dictionary_test.dir/word_list.c.o
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/word_list_test.dir/build.make dictionary/CMakeFiles/word_list_test.dir/word_list.c.o
 .PHONY : word_list.c.o
@@ -444,6 +489,7 @@ word_list.i: word_list.c.i
 # target to preprocess a source file
 word_list.c.i:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/word_list.c.i
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_impl_test.dir/build.make dictionary/CMakeFiles/dictionary_impl_test.dir/word_list.c.i
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_test.dir/build.make dictionary/CMakeFiles/dictionary_test.dir/word_list.c.i
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/word_list_test.dir/build.make dictionary/CMakeFiles/word_list_test.dir/word_list.c.i
 .PHONY : word_list.c.i
@@ -454,6 +500,7 @@ word_list.s: word_list.c.s
 # target to generate assembly for a file
 word_list.c.s:
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary.dir/build.make dictionary/CMakeFiles/dictionary.dir/word_list.c.s
+	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_impl_test.dir/build.make dictionary/CMakeFiles/dictionary_impl_test.dir/word_list.c.s
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/dictionary_test.dir/build.make dictionary/CMakeFiles/dictionary_test.dir/word_list.c.s
 	cd /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src && $(MAKE) -f dictionary/CMakeFiles/word_list_test.dir/build.make dictionary/CMakeFiles/word_list_test.dir/word_list.c.s
 .PHONY : word_list.c.s
@@ -492,6 +539,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... trie_impl_test"
 	@echo "... dictionary_test"
+	@echo "... dictionary_impl_test"
 	@echo "... word_list_test"
 	@echo "... trie_test"
 	@echo "... set_test"
@@ -501,6 +549,9 @@ help:
 	@echo "... dictionary.o"
 	@echo "... dictionary.i"
 	@echo "... dictionary.s"
+	@echo "... dictionary_impl_test.o"
+	@echo "... dictionary_impl_test.i"
+	@echo "... dictionary_impl_test.s"
 	@echo "... dictionary_test.o"
 	@echo "... dictionary_test.i"
 	@echo "... dictionary_test.s"

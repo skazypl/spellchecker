@@ -53,39 +53,23 @@ static void dictionary_free(struct dictionary *dict)
     @return Słowo złożone tylko z małych liter.
     */
 
-wchar_t* decapitalize(const wchar_t* word)
+static wchar_t* decapitalize(const wchar_t* word)
 {
     wchar_t* smallWord =
         (wchar_t*)malloc((wcslen(word) + 2) * sizeof(wchar_t));
     wcscpy(smallWord, word);
     for (int i = 0; i < wcslen(smallWord); ++i)
-    {
         smallWord[i] = towlower(word[i]);
-    }
+    
     return smallWord;
 }
-
-/**
-    Zamienia miejscami w tablicy wchar-ów dwa elementy o zadanych indeksach. 
-    @param[in] a, b Indeksy zamienianych elementów.
-    @param[in, out] array Tablica.
-    */
-
-void swap(wchar_t** array, int a, int b)
-{
-    wchar_t* aWord = array[a];
-    wchar_t* bWord = array[b];
-    array[a] = bWord;
-    array[b] = aWord;
-}
-
 
 /**
     Komparator dla qsorta w zastępstwie alphaInsertSorta
     @param[in] a, b Wskaźniki na wide stringi.
     @return Wynik funkcji wcscoll - dobra funkcja dla komparatora.
     */
-int wcharComp (const void * a, const void * b)
+static int wcharComp (const void * a, const void * b)
 {
     const wchar_t* a_ = *(const wchar_t**)a;
     const wchar_t* b_ = *(const wchar_t**)b;
@@ -110,6 +94,7 @@ struct dictionary * dictionary_new()
 void dictionary_done(struct dictionary *dict)
 {
     dictionary_free(dict);
+    set_done(dict->usedLetters);
     free(dict->usedLetters);
     free(dict->tree);
     free(dict);
@@ -118,21 +103,14 @@ void dictionary_done(struct dictionary *dict)
 int dictionary_insert(struct dictionary *dict, const wchar_t *word)
 {  
     if(wcslen(word) == 0)
-    {
         return 0;
-    }
+    
     wchar_t* smallWord = decapitalize(word);
     if (dictionary_find(dict, smallWord))
     {
         free(smallWord);
         return 0;
     }
-    for (int i = 0; i < wcslen(smallWord); ++i)
-        if (set_add(dict->usedLetters, smallWord[i]) == 0) 
-        //jesli nie ma takiej litery
-            return 0;
-        
-
     Tree_add(dict->tree, smallWord);
     free(smallWord);
     return 1;
@@ -190,13 +168,18 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
     struct word_list newListObj;
     struct word_list* newList = &newListObj;
     word_list_init(newList);
+    struct InsertSet* usedLetters = usedInTree(dict->tree);
 
     wchar_t* smallWord = decapitalize(word);
     size_t wlen = wcslen(smallWord);
 
+    /*
     assert('A' < 'Z');
     assert('Z' < 'a');
     assert('a' < 'z');
+
+    //Powyższe asercje tracą sens przy zmianach locale'i dla innych języków
+    */
 
     if(dictionary_find(dict, word))
         word_list_add(newList, word);
@@ -206,10 +189,9 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         wchar_t *begin, *end;
 
         //zastepujemy ity znak w slowie word na wszystkie inne mniejsze znaki
-        
-        for (int j = 0; j < dict->usedLetters->size; j++)
+        for (int j = 0; j < usedLetters->size; j++)
         {
-            wchar_t start = dict->usedLetters->array[j];
+            wchar_t start = usedLetters->array[j];
             if (start == smallWord[i])
                 continue;
 
@@ -239,14 +221,13 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
             (wchar_t*)malloc((wlen + 1 + 1) * sizeof(wchar_t));
 
         wcscpy(newWordAdd, begin);
-        newWordAdd[i] = 1; // dowolna litera, wazna inicjalizacja. 
-        ///<  @todo Usunąć lub obejść.
+        newWordAdd[i] = -1; // dowolna litera != 0, wazna inicjal. dla wcscat
         newWordAdd[i + 1] = '\0';
         wcscat(newWordAdd, end);
         
-        for (int j = 0; j < dict->usedLetters->size; j++)
+        for (int j = 0; j < usedLetters->size; j++)
         {
-            wchar_t start = dict->usedLetters->array[j];
+            wchar_t start = usedLetters->array[j];
             newWordAdd[i] = start;            
 
             if(dictionary_find(dict, newWordAdd))
@@ -255,11 +236,10 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         free(newWordAdd);
 
         //i recznie za nieistniejacym znakiem
-        if (i == wlen - 1)
-        {   
-            for (int j = 0; j < dict->usedLetters->size; j++)
+        if (i == wlen - 1)   
+            for (int j = 0; j < usedLetters->size; j++)
             {
-                wchar_t start = dict->usedLetters->array[j];
+                wchar_t start = usedLetters->array[j];
                 newWordAdd =
                     (wchar_t*)malloc((wlen + 1 + 1) * sizeof(wchar_t));
                 wcscpy(newWordAdd, smallWord);
@@ -269,7 +249,6 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
                     word_list_add(newList, newWordAdd);
                 free(newWordAdd);
             }
-        }
 
         //usuwamy ity znak - czyli zmieniamy tylko end
 
@@ -309,6 +288,8 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
                 word_list_add(list, newArray[i]);
     }
     word_list_done(newList);
+    set_done(usedLetters);
+    free(usedLetters);
 }
 
 
@@ -325,7 +306,16 @@ void addLang(char** buffer, const char* lang, int* lastZero)
 int dictionary_lang_list(char **list, size_t *list_len)
 {
     struct stat st = {0};
-    const char* dirPath = "dict_database/";
+    int pathLen = strlen(CONF_PATH);
+    char tryDirPath[pathLen + 2];
+    strcpy(tryDirPath, CONF_PATH);
+    if(tryDirPath[pathLen] != '/')
+    {
+        tryDirPath[pathLen] = '/';
+        tryDirPath[pathLen + 1] = '\0';
+    }
+    
+    const char* dirPath = tryDirPath;
 
     if(stat(dirPath, &st) == -1)
     {
@@ -338,7 +328,7 @@ int dictionary_lang_list(char **list, size_t *list_len)
         *list_len = 0;
         if(d)
         {
-            *list = NULL;//calloc(sizeof(char) , 50); //usunac
+            *list = NULL;
             while((dir = readdir(d)) != NULL)
             {
                 if(strcmp(dir->d_name, ".") != 0 && 
@@ -349,24 +339,32 @@ int dictionary_lang_list(char **list, size_t *list_len)
             rewinddir(d);
             int lastZero = -1;
             while((dir = readdir(d)) != NULL)
-            {
-                if(strcmp(dir->d_name, ".") != 0 && 
-                    (strcmp(dir->d_name, "..") != 0))
+                if(strcmp(dir->d_name, ".") != 0 &&
+                    strcmp(dir->d_name, "..") != 0)
                 {
                     addLang(list, dir->d_name, &lastZero);
                 }
-            }
 
             closedir(d);
         }
     }
+
     return 0;
 }
 
 
 struct dictionary * dictionary_load_lang(const char *lang)
 {
-    const char* dirPath = "dict_database/"; // nie wiem czy nie ./
+    int pathLen = strlen(CONF_PATH);
+    char tryDirPath[pathLen + 2];
+    strcpy(tryDirPath, CONF_PATH);
+    if(tryDirPath[pathLen] != '/')
+    {
+        tryDirPath[pathLen] = '/';
+        tryDirPath[pathLen + 1] = '\0';
+    }
+    
+    const char* dirPath = tryDirPath;
     char* langPath = 
         calloc(sizeof(char), (strlen(dirPath) + strlen(lang) + 1));
     strcat(langPath, dirPath);
@@ -400,8 +398,20 @@ struct dictionary * dictionary_load_lang(const char *lang)
 
 int dictionary_save_lang(const struct dictionary *dict, const char *lang)
 {
+    if(strlen(lang) > MAX_LINE_LENG)
+        return -1;
+
     struct stat st = {0};
-    const char* dirPath = "dict_database/";
+    int pathLen = strlen(CONF_PATH);
+    char tryDirPath[pathLen + 2];
+    strcpy(tryDirPath, CONF_PATH);
+    if(tryDirPath[pathLen] != '/')
+    {
+        tryDirPath[pathLen] = '/';
+        tryDirPath[pathLen + 1] = '\0';
+    }
+    
+    const char* dirPath = tryDirPath;
     char* langPath = 
         calloc(sizeof(char), (strlen(dirPath) + strlen(lang) + 1));
     strcat(langPath, dirPath);
@@ -430,6 +440,5 @@ int dictionary_save_lang(const struct dictionary *dict, const char *lang)
     free(langPath);
     return 0;
 }
-    
 
 /**@}*/

@@ -9,9 +9,6 @@
 #define SET_H 
 
 #include <wchar.h>
-#include <stdbool.h>
-
-#define MAX_ALPH_SIZE 50 ///< Założenie o maksymalnym rozmiarze alfabetu
 
 /**
 	Struktura zbioru z możliwością wstawiania elementów typu wchar.
@@ -19,8 +16,9 @@
 
 struct InsertSet
 {
-    short int size; ///< Liczba elementów zbioru.
-    wchar_t array[MAX_ALPH_SIZE]; ///< Tablica przechowująca elementy zbioru.
+    int size; ///< Liczba elementów zbioru.
+    int buffer_size; ///< Rozmiar zaalokowanej tablicy
+    wchar_t *array; ///< Tablica przechowująca elementy zbioru.
 };
 
 
@@ -42,7 +40,7 @@ void set_init(struct InsertSet* s);
 	(w dictionary_hints).
 	*/
 
-int set_add(struct InsertSet* s, wchar_t wc);
+void set_add(struct InsertSet* s, wchar_t wc);
 
 /**
 	Niszczy	zbiór zainicjalizowany w set_init.
