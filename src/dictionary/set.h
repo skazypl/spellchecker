@@ -43,7 +43,7 @@ void set_init(struct InsertSet* s);
 	(w dictionary_hints).
 	*/
 
-int set_add(struct InsertSet* s, wchar_t wc);
+void set_add(struct InsertSet* s, wchar_t wc);
 
 /**
 	Niszczy	zbiór zainicjalizowany w set_init.

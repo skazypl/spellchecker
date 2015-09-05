@@ -11,6 +11,7 @@
 #include "trie.h"
 #include "dictionary.h"
 #include "word_list.h"
+#include "conf.h"
 #include <stdio.h>
 #include <wctype.h>
 #include <stdlib.h>
@@ -52,15 +53,14 @@ static void dictionary_free(struct dictionary *dict)
     @return Słowo złożone tylko z małych liter.
     */
 
-wchar_t* decapitalize(const wchar_t* word)
+static wchar_t* decapitalize(const wchar_t* word)
 {
     wchar_t* smallWord =
         (wchar_t*)malloc((wcslen(word) + 2) * sizeof(wchar_t));
     wcscpy(smallWord, word);
     for (int i = 0; i < wcslen(smallWord); ++i)
-    {
         smallWord[i] = towlower(word[i]);
-    }
+    
     return smallWord;
 }
 
@@ -70,7 +70,7 @@ wchar_t* decapitalize(const wchar_t* word)
     @param[in, out] array Tablica.
     */
 
-void swap(wchar_t** array, int a, int b)
+static void swap(wchar_t** array, int a, int b)
 {
     wchar_t* aWord = array[a];
     wchar_t* bWord = array[b];
@@ -84,7 +84,7 @@ void swap(wchar_t** array, int a, int b)
     @param[in] a, b Wskaźniki na wide stringi.
     @return Wynik funkcji wcscoll - dobra funkcja dla komparatora.
     */
-int wcharComp (const void * a, const void * b)
+static int wcharComp (const void * a, const void * b)
 {
     const wchar_t* a_ = *(const wchar_t**)a;
     const wchar_t* b_ = *(const wchar_t**)b;
@@ -118,22 +118,15 @@ void dictionary_done(struct dictionary *dict)
 int dictionary_insert(struct dictionary *dict, const wchar_t *word)
 {  
     if(wcslen(word) == 0)
-    {
         return 0;
-    }
+    
     wchar_t* smallWord = decapitalize(word);
     if (dictionary_find(dict, smallWord))
     {
         free(smallWord);
         return 0;
     }
-    for (int i = 0; i < wcslen(smallWord); ++i)
-        if (set_add(dict->usedLetters, smallWord[i]) == 0) 
-        //jesli nie ma takiej litery
-            return 0;
-        
-
-    add(dict->tree, smallWord);
+    Tree_add(dict->tree, smallWord);
     free(smallWord);
     return 1;
 }
@@ -141,7 +134,7 @@ int dictionary_insert(struct dictionary *dict, const wchar_t *word)
 int dictionary_delete(struct dictionary *dict, const wchar_t *word)
 {
     wchar_t* smallWord = decapitalize(word);
-    int toReturn = delete(dict->tree, smallWord);
+    int toReturn = Tree_delete(dict->tree, smallWord);
     free(smallWord);
     return toReturn;
 }
@@ -153,7 +146,7 @@ bool dictionary_find(const struct dictionary *dict, const wchar_t* word)
         if(!iswalpha(smallWord[i]))
             return false;
 
-    if (find(dict->tree, smallWord) == 0)
+    if (Tree_find(dict->tree, smallWord) == 0)
     {
         free(smallWord);
         return false;
@@ -188,13 +181,18 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
     struct word_list newListObj;
     struct word_list* newList = &newListObj;
     word_list_init(newList);
+    struct InsertSet* usedLetters = usedInTree(dict->tree);
 
     wchar_t* smallWord = decapitalize(word);
     size_t wlen = wcslen(smallWord);
 
+    /*
     assert('A' < 'Z');
     assert('Z' < 'a');
     assert('a' < 'z');
+
+    //Powyższe asercje tracą sens przy zmianach locale'i dla innych języków
+    */
 
     if(dictionary_find(dict, word))
         word_list_add(newList, word);
@@ -204,10 +202,9 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         wchar_t *begin, *end;
 
         //zastepujemy ity znak w slowie word na wszystkie inne mniejsze znaki
-        
-        for (int j = 0; j < dict->usedLetters->size; j++)
+        for (int j = 0; j < usedLetters->size; j++)
         {
-            wchar_t start = dict->usedLetters->array[j];
+            wchar_t start = usedLetters->array[j];
             if (start == smallWord[i])
                 continue;
 
@@ -242,9 +239,9 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         newWordAdd[i + 1] = '\0';
         wcscat(newWordAdd, end);
         
-        for (int j = 0; j < dict->usedLetters->size; j++)
+        for (int j = 0; j < usedLetters->size; j++)
         {
-            wchar_t start = dict->usedLetters->array[j];
+            wchar_t start = usedLetters->array[j];
             newWordAdd[i] = start;            
 
             if(dictionary_find(dict, newWordAdd))
@@ -253,11 +250,10 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         free(newWordAdd);
 
         //i recznie za nieistniejacym znakiem
-        if (i == wlen - 1)
-        {   
-            for (int j = 0; j < dict->usedLetters->size; j++)
+        if (i == wlen - 1)   
+            for (int j = 0; j < usedLetters->size; j++)
             {
-                wchar_t start = dict->usedLetters->array[j];
+                wchar_t start = usedLetters->array[j];
                 newWordAdd =
                     (wchar_t*)malloc((wlen + 1 + 1) * sizeof(wchar_t));
                 wcscpy(newWordAdd, smallWord);
@@ -267,7 +263,6 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
                     word_list_add(newList, newWordAdd);
                 free(newWordAdd);
             }
-        }
 
         //usuwamy ity znak - czyli zmieniamy tylko end
 
@@ -307,6 +302,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
                 word_list_add(list, newArray[i]);
     }
     word_list_done(newList);
+    set_done(usedLetters);
 }
 
 
@@ -345,7 +341,7 @@ int dictionary_lang_list(char **list, size_t *list_len)
         *list_len = 0;
         if(d)
         {
-            *list = NULL;//calloc(sizeof(char) , 50); //usunac
+            *list = NULL;
             while((dir = readdir(d)) != NULL)
             {
                 if(strcmp(dir->d_name, ".") != 0 && 
@@ -356,13 +352,11 @@ int dictionary_lang_list(char **list, size_t *list_len)
             rewinddir(d);
             int lastZero = -1;
             while((dir = readdir(d)) != NULL)
-            {
                 if(strcmp(dir->d_name, ".") != 0 &&
                     strcmp(dir->d_name, "..") != 0)
                 {
                     addLang(list, dir->d_name, &lastZero);
                 }
-            }
 
             closedir(d);
         }
@@ -459,6 +453,5 @@ int dictionary_save_lang(const struct dictionary *dict, const char *lang)
     free(langPath);
     return 0;
 }
-    
 
 /**@}*/

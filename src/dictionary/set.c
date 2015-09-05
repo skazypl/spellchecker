@@ -20,13 +20,12 @@ void set_init(struct InsertSet* s)
     s->array = malloc(sizeof(wchar_t));
 }
 
-int set_add(struct InsertSet* s, wchar_t wc)
+void set_add(struct InsertSet* s, wchar_t wc)
 {
     for (int i = 0; i < s->size; ++i)
-    {
         if(s->array[i] == wc)
-            return 1;
-    }
+            return;
+
     ++(s->size);
     if(s->size > s->buffer_size)
     {   
@@ -43,9 +42,6 @@ int set_add(struct InsertSet* s, wchar_t wc)
         s->array = newArray;
     }
     s->array[s->size - 1] = wc;
-    //s->bufferSize += (wcslen(word) + 1);
-
-    return 1;
 }
 
 void set_done(struct InsertSet* s)

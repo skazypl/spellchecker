@@ -30,12 +30,11 @@ const int MAX_LINE_SIZE = 1024; ///< Rozsądnie maksymalna zakładana długość
 	@param[in] z Numer znaku w wierszu, od którego zaczyna się słowo.
 	*/
 
-void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int w, 
+static void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int w, 
 	int z)
 //zakladamy ze na wejsciu jest slowo w sensie samych liter z jezyka pl
 {
-	//printf(">%ls<\n", word);
-	if(wcslen(word) > 0)//if(word[0] != '\0')
+	if(wcslen(word) > 0)
 	{
 		if(dictionary_find(dict, word))
 		{
@@ -76,11 +75,10 @@ void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int w,
 	@param[in] lineNr Numer parsowanej linii.
 */
 
-void parseWord(struct dictionary* dict, wchar_t* line, bool ifDbg, int lineNr)
+static void parseWord(struct dictionary* dict, wchar_t* line, bool ifDbg, int lineNr)
 {
 	wchar_t* word = (wchar_t*)malloc(MAX_LINE_SIZE * sizeof(wchar_t));
 	//rozsadny rozmiar
-	//todo - const!
 
 	int i = 0;
 	int j = 0;
@@ -99,13 +97,6 @@ void parseWord(struct dictionary* dict, wchar_t* line, bool ifDbg, int lineNr)
 		{
 			word[j] = '\0';
 			wchar_t* onlyWord = (wchar_t*)malloc((j + 1) * sizeof(wchar_t));
-			/// ^ moze j+1? todo wazne!
-			// for (int k = 0; word[k] >= 0; k++)
-			// {
-			// 	onlyWord[k] = word[k];
-			// 	if(word[k] == 0)
-			// 		break;
-			// }
 
 			wcscpy(onlyWord, word);
 			checkForWord(onlyWord, dict, ifDbg, lineNr, i);

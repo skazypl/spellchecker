@@ -22,13 +22,9 @@ wctype.h
 errno.h
 -
 
-conf.h
-
 dictionary/dictionary.h
 word_list.h
 dictionary/word_list.h
-conf.h
-dictionary/conf.h
 stdbool.h
 -
 stdio.h
