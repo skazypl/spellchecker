@@ -73,6 +73,14 @@ assert.h
 -
 stdbool.h
 -
+stdint.h
+-
+stdio.h
+-
+stddef.h
+-
+stdlib.h
+-
 
 /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/trie.h
 stdint.h

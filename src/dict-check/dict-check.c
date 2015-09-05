@@ -30,8 +30,8 @@ const int MAX_LINE_SIZE = 1024; ///< Rozsądnie maksymalna zakładana długość
 	@param[in] z Numer znaku w wierszu, od którego zaczyna się słowo.
 	*/
 
-static void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int w, 
-	int z)
+static void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, 
+	int w, int z)
 //zakladamy ze na wejsciu jest slowo w sensie samych liter z jezyka pl
 {
 	if(wcslen(word) > 0)
@@ -75,7 +75,8 @@ static void checkForWord(wchar_t* word, struct dictionary* dict, bool ifDbg, int
 	@param[in] lineNr Numer parsowanej linii.
 */
 
-static void parseWord(struct dictionary* dict, wchar_t* line, bool ifDbg, int lineNr)
+static void parseWord(struct dictionary* dict, wchar_t* line, bool ifDbg, 
+	int lineNr)
 {
 	wchar_t* word = (wchar_t*)malloc(MAX_LINE_SIZE * sizeof(wchar_t));
 	//rozsadny rozmiar
@@ -167,9 +168,7 @@ int main(int argc, char const *argv[])
 		}
 		else
 		{
-			wchar_t* line = malloc(sizeof(wchar_t) * MAX_LINE_SIZE);
-			for (int i = 0; i < MAX_LINE_SIZE; ++i)
-					line[i] = L'\0'; //zeruj inaczej. po co w ogole ten malloc?
+			wchar_t* line = calloc(sizeof(wchar_t), MAX_LINE_SIZE);
 
 			int lineNr = 0;
 			while(fgetws(line, MAX_LINE_SIZE, stdin))
