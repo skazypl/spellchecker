@@ -1,3 +1,10 @@
+/**
+	@file Testy funkcji interfejsu dictionary
+		
+	@ingroup dictionary
+	@author Jarosław Socha <js347267@students.mimuw.edu.pl>	
+*/
+
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>

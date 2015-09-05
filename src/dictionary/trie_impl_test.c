@@ -1,3 +1,10 @@
+/**
+	@file
+	Testy funkcji pomocniczych trie
+	
+	@ingroup dictionary
+	@author Jarosław Socha <js347267@students.mimuw.edu.pl>	
+*/
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
@@ -8,16 +15,11 @@
 #include <stdio.h>
 #include "trie.c"
 
-#define MAX_CHILD 50 ///< Maksymalna zakładana liczba synów liścia.
-///< Nie przekroczy rozmiaru alfabetu.
-
 const wchar_t* emptyWord = L"";
 const wchar_t* oneLetter = L"x";
 const wchar_t* kind      = L"kind";
 const wchar_t* kinder    = L"kinder";
 const wchar_t* kiss      = L"kiss";
-
-static void emptyTest(void** state) {}
 
 static void createNode_test(void** state) {
 	struct Node* n = createNode(0, '\0', NULL);
@@ -43,7 +45,6 @@ static void Node_destroy_test(void** state) {
 	n->children[0] = m;
 	m->children[0] = o;
 	Node_destroy(n);
-	//free(n);
 }
 
 static void nodeComp_test(void** state) {
@@ -273,7 +274,6 @@ static void NodeSize_test(void** state) {
 int main(void) {
 	setlocale(LC_ALL, "pl_PL.UTF-8");
 	const struct CMUnitTest tests[] = {
-		cmocka_unit_test(emptyTest),
 		cmocka_unit_test(createNode_test),
 		cmocka_unit_test(Node_destroy_test),
 		cmocka_unit_test(nodeComp_test),
@@ -282,9 +282,6 @@ int main(void) {
 		cmocka_unit_test(findNode_test),
 		run_trie_test(findLeaf_test),
 		run_trie_test(NodeSize_test),
-		//run_trie_test(trie_find_test),
-		//run_trie_test(trie_delete_test)
-
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);

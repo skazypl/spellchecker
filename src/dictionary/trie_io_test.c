@@ -1,3 +1,10 @@
+/**
+	@file
+	Testy zapisu i odczytu drzewa z pliku podmieniające funkcje I/O na atrapy
+	
+	@ingroup dictionary
+	@author Jarosław Socha <js347267@students.mimuw.edu.pl>	
+*/
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
@@ -8,14 +15,18 @@
 #include <stdio.h>
 #include "trie.h"
 
-//const int MAX_BUFF = 10000; //dziesiec tysiecy
 #define MAX_BUFF 10000
 
+/*
+	Bufor na który przekierujemy strumienie czytania i pisania do pliku -
+	patrz io_mock.h
+*/
 static wchar_t wcBuff[MAX_BUFF];
 static int iBuff[MAX_BUFF];
 
 static int wcSize, iSize;
 
+// Funkcje - zaślepki
 int new_fprintf(FILE* stream, const char *format, int i, wchar_t wc)
 {
 	if(wc == L'\n')
@@ -55,7 +66,9 @@ const wchar_t* forth  =  L"noga";
 const wchar_t* fifth  =  L"noś";
 const wchar_t* sixth  =  L"nota";
 
-
+/*
+	Test samego bufora
+*/
 static void buffer_test(void **state) {
 	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));
 
@@ -103,6 +116,9 @@ static void buffer_test(void **state) {
 
 }
 
+/*
+	Test inicjalizacji drzewa i zapisania do pliku a następnie wczytania
+*/
 static void trie_init_test(void **state) {
 	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));
 	Tree_init(t);
@@ -144,37 +160,9 @@ static void trie_init_test(void **state) {
 	free(t2);
 }
 
-static int trie_setup(void **state) {
-	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));	
-	if(!t)
-		return -1;
-
-	Tree_init(t);
-	assert_non_null(t);
-	assert_int_equal(Tree_size(t), 1);
-	assert_int_equal(Tree_add(t, first), 1);
-	assert_int_equal(Tree_size(t), 6);
-	assert_int_equal(Tree_add(t, second), 1);
-	assert_int_equal(Tree_size(t), 7);
-	assert_int_equal(Tree_add(t, third), 1);
-	assert_int_equal(Tree_size(t), 9);
-	assert_int_equal(Tree_add(t, forth), 1);
-	assert_int_equal(Tree_size(t), 14);
-	assert_int_equal(Tree_add(t, fifth) , 1);
-	assert_int_equal(Tree_size(t), 16);
-	assert_int_equal(Tree_add(t, sixth), 1);
-	assert_int_equal(Tree_size(t), 19);
-	*state = t;
-	return 0;
-}
-
-static int trie_teardown(void **state) {
-	struct Tree* t = *state;
-	Tree_destroy(t);
-	free(t);
-	return 0;
-}
-
+/*
+	Test dodawania słów do wczytanego już drzewa
+*/
 static void trie_add_test(void **state) {
 	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));	
 
@@ -240,6 +228,9 @@ static void trie_add_test(void **state) {
 	free(t2);
 }
 
+/*
+	Test samego niszczenia drzewa wczytanego ze strumienia
+*/
 static void trie_destroy_test(void **state) {
 
 	wcActual = 0;
@@ -249,6 +240,9 @@ static void trie_destroy_test(void **state) {
 	free(t);
 }
 
+/*
+	Test wyszukiwania we wczytanym drzewie
+*/
 static void trie_find_test(void** state) {
 	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));	
 
@@ -315,6 +309,9 @@ static void trie_find_test(void** state) {
 	free(t2);
 }
 
+/*
+	Test usuwania z wczytanego drzewa
+*/
 static void trie_delete_test(void** state) {
 	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));	
 

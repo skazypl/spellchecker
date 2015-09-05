@@ -1,3 +1,10 @@
+/**
+	@file
+	Testy funkcji interfejsu trie, poza zapisem i odczytem z pliku
+	
+	@ingroup dictionary
+	@author Jarosław Socha <js347267@students.mimuw.edu.pl>	
+*/
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
@@ -15,6 +22,10 @@ const wchar_t* forth  =  L"noga";
 const wchar_t* fifth  =  L"noś";
 const wchar_t* sixth  =  L"nota";
 
+/*
+	Sprawdza inicjalizację drzewa - dodanie kilku słów, zlicza liczbę węzłów
+	i przeprowadza destrukcję.
+*/
 static void trie_init_test(void **state) {
 	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));
 
@@ -37,6 +48,9 @@ static void trie_init_test(void **state) {
 	free(t);
 }
 
+/*
+	Ustawia drzewo do testów z setup i teardown
+*/
 static int trie_setup(void **state) {
 	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));
 	if (!t)
@@ -60,6 +74,9 @@ static int trie_setup(void **state) {
 	return 0;
 }
 
+/*
+	Niszczy drzewo w testach setup i teardown
+*/
 static int trie_teardown(void **state) {
 	struct Tree* t = *state;
 	Tree_destroy(t);
@@ -67,7 +84,10 @@ static int trie_teardown(void **state) {
 	return 0;
 }
 
-
+/*
+	Test dodawania do drzewa stringów które tam są i tych których tam nie ma - 
+	wszystkie możliwe ścieżki w drzewie, oraz rozróżnienie wielkości liter
+*/
 static void trie_add_test(void** state) {
 	struct Tree* t = *state;
 	assert_int_equal(Tree_size(t), 19);
@@ -107,6 +127,9 @@ static void trie_add_test(void** state) {
 	assert_int_equal(Tree_add(t, veryLong), 1);
 }
 
+/*
+	Test przeszukiwania drzewa
+*/
 static void trie_find_test(void** state) {
 	struct Tree* t = *state;
 	assert_int_equal(Tree_find(t, first), 1);
@@ -145,6 +168,9 @@ static void trie_find_test(void** state) {
 
 }
 
+/*
+	Test usuwania z drzewa i ponownego dodawania
+*/
 static void trie_delete_test(void** state) {
 	struct Tree* t = *state;
 	assert_int_equal(Tree_delete(t, first), 1);
@@ -212,7 +238,8 @@ static void trie_delete_test(void** state) {
 	assert_int_equal(Tree_delete(t, L"notatka"), 0);
 }
 
-/* na razie nie testujemy usedInTree() - w zasadzie nie ma czego testować.
+/* 
+	Nie testujemy usedInTree() - w zasadzie nie ma czego testować.
 */
 
 
@@ -223,7 +250,6 @@ int main(void) {
 	setlocale(LC_ALL, "pl_PL.UTF-8");
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(trie_init_test),
-		//cmocka_unit_test(trie_destroy_test),
 		run_trie_test(trie_add_test),
 		run_trie_test(trie_find_test),
 		run_trie_test(trie_delete_test)
