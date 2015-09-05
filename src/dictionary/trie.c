@@ -6,9 +6,10 @@
 	*/
 
 #include "trie.h"
+#include "io_mock.h"
 #include <string.h>
 #include <assert.h>
-#include "io_mock.h"
+#include <stdbool.h>
 
 /** @name Funkcje pomocnicze.
    @{
@@ -48,8 +49,11 @@ struct Node* createNode(int childCount, wchar_t key, struct Node* parent)
 	toReturn->parent = parent;
 	toReturn->key = key;
 
-	toReturn->children = (struct Node**)
-		malloc(sizeof(struct Node*) * childCount);
+	if(childCount != 0)
+		toReturn->children = (struct Node**)
+			malloc(sizeof(struct Node*) * childCount);
+	else
+		toReturn->children = NULL;
 
 	for (int i = 0; i < childCount; ++i)
 		toReturn->children[i] = NULL;

@@ -47,6 +47,8 @@ wchar.h
 /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/io_mock.h
 stdio.h
 -
+stdlib.h
+-
 wchar.h
 -
 
@@ -59,18 +61,18 @@ stdlib.h
 /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/set.h
 wchar.h
 -
-stdbool.h
--
 
 /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/trie.c
 trie.h
 /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/trie.h
+io_mock.h
+/home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/io_mock.h
 string.h
 -
 assert.h
 -
-io_mock.h
-/home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/io_mock.h
+stdbool.h
+-
 
 /home/skazy/programy/ipp/2015/spellchecker/1/spellcheck-js347267/src/dictionary/trie.h
 stdint.h

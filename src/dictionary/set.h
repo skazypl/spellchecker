@@ -9,9 +9,6 @@
 #define SET_H 
 
 #include <wchar.h>
-#include <stdbool.h>
-
-#define MAX_ALPH_SIZE 50 ///< Założenie o maksymalnym rozmiarze alfabetu
 
 /**
 	Struktura zbioru z możliwością wstawiania elementów typu wchar.

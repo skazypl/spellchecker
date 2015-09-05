@@ -234,8 +234,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
             (wchar_t*)malloc((wlen + 1 + 1) * sizeof(wchar_t));
 
         wcscpy(newWordAdd, begin);
-        newWordAdd[i] = 1; // dowolna litera, wazna inicjalizacja. 
-        ///<  @todo Usunąć lub obejść.
+        newWordAdd[i] = -1; // dowolna litera != 0, wazna inicjal. dla wcscat
         newWordAdd[i + 1] = '\0';
         wcscat(newWordAdd, end);
         
@@ -303,6 +302,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
     }
     word_list_done(newList);
     set_done(usedLetters);
+    free(usedLetters);
 }
 
 

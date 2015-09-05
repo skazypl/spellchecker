@@ -20,14 +20,17 @@ const wchar_t* kiss      = L"kiss";
 static void emptyTest(void** state) {}
 
 static void createNode_test(void** state) {
-	struct Node* n = createNode(0, 0, NULL);
+	struct Node* n = createNode(0, '\0', NULL);
 	assert_non_null(n);
-	struct Node* m = createNode(1, -1, n);
+	Node_destroy(n);
+
+	n = createNode(1, '\0', NULL);
+	assert_non_null(n);
+	struct Node* m = createNode(0, '\0', n);
+	n->children[0] = m;
 	assert_non_null(m);
 	assert_int_equal(m->parent, n);
-	assert_int_equal(m->children[0], NULL);
-	free(m);
-	free(n);
+	Node_destroy(n);
 
 	n = createNode(-1, 0, NULL);
 	assert_true(n == NULL);
@@ -40,6 +43,7 @@ static void Node_destroy_test(void** state) {
 	n->children[0] = m;
 	m->children[0] = o;
 	Node_destroy(n);
+	//free(n);
 }
 
 static void nodeComp_test(void** state) {
@@ -257,6 +261,7 @@ static void NodeSize_test(void** state) {
 
 	struct Node* m = createNode(0, 0, NULL);
 	assert_int_equal(NodeSize(m), 1);
+	Node_destroy(m);
 
 	assert_int_equal(NodeSize(NULL), 0);
 }
@@ -270,13 +275,13 @@ int main(void) {
 	const struct CMUnitTest tests[] = {
 		cmocka_unit_test(emptyTest),
 		cmocka_unit_test(createNode_test),
+		cmocka_unit_test(Node_destroy_test),
 		cmocka_unit_test(nodeComp_test),
 		cmocka_unit_test(binSearch_test),
 		cmocka_unit_test(addNode_test),
 		cmocka_unit_test(findNode_test),
 		run_trie_test(findLeaf_test),
 		run_trie_test(NodeSize_test),
-		cmocka_unit_test(Node_destroy_test),
 		//run_trie_test(trie_find_test),
 		//run_trie_test(trie_delete_test)
 

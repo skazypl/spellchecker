@@ -105,7 +105,6 @@ static void buffer_test(void **state) {
 
 static void trie_init_test(void **state) {
 	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));
-
 	Tree_init(t);
 	assert_non_null(t);
 	assert_int_equal(Tree_size(t), 1);
@@ -142,14 +141,14 @@ static void trie_init_test(void **state) {
 	assert_int_equal(Tree_find(t2, sixth), 1);
 
 	Tree_destroy(t2);
-	//free(t2); //czemu?????? moze dlatego ze nie my alokujemy
+	free(t2);
 }
 
 static int trie_setup(void **state) {
-	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));
-	if (!t)
+	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));	
+	if(!t)
 		return -1;
-	
+
 	Tree_init(t);
 	assert_non_null(t);
 	assert_int_equal(Tree_size(t), 1);
@@ -165,7 +164,35 @@ static int trie_setup(void **state) {
 	assert_int_equal(Tree_size(t), 16);
 	assert_int_equal(Tree_add(t, sixth), 1);
 	assert_int_equal(Tree_size(t), 19);
+	*state = t;
+	return 0;
+}
 
+static int trie_teardown(void **state) {
+	struct Tree* t = *state;
+	Tree_destroy(t);
+	free(t);
+	return 0;
+}
+
+static void trie_add_test(void **state) {
+	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));	
+
+	Tree_init(t);
+	assert_non_null(t);
+	assert_int_equal(Tree_size(t), 1);
+	assert_int_equal(Tree_add(t, first), 1);
+	assert_int_equal(Tree_size(t), 6);
+	assert_int_equal(Tree_add(t, second), 1);
+	assert_int_equal(Tree_size(t), 7);
+	assert_int_equal(Tree_add(t, third), 1);
+	assert_int_equal(Tree_size(t), 9);
+	assert_int_equal(Tree_add(t, forth), 1);
+	assert_int_equal(Tree_size(t), 14);
+	assert_int_equal(Tree_add(t, fifth) , 1);
+	assert_int_equal(Tree_size(t), 16);
+	assert_int_equal(Tree_add(t, sixth), 1);
+	assert_int_equal(Tree_size(t), 19);
 	
 	wcSize = 0;
 	iSize = 0;
@@ -176,205 +203,256 @@ static int trie_setup(void **state) {
 	wcActual = 0;
 	iActual = 0;
 	struct Tree* t2 = Tree_load_DFS(stderr);
-	
-	*state = t2;
-	return 0;
-}
 
-static int trie_teardown(void **state) {
-	struct Tree* t = *state;
-	Tree_destroy(t);
-	//free(t);
-	return 0;
-}
+	assert_int_equal(Tree_add(t2, first), 0);
+	assert_int_equal(Tree_add(t2, second), 0);
+	assert_int_equal(Tree_add(t2, third), 0);
+	assert_int_equal(Tree_add(t2, forth), 0);
+	assert_int_equal(Tree_add(t2, fifth), 0);
+	assert_int_equal(Tree_add(t2, sixth), 0);
 
-
-static void trie_add_test(void** state) {
-	struct Tree* t = *state;
-	assert_int_equal(Tree_size(t), 19);
-	assert_int_equal(Tree_add(t, L""), 0);
-	assert_int_equal(Tree_size(t), 19);
-
-	assert_int_equal(Tree_add(t, first), 0);
-	assert_int_equal(Tree_add(t, second), 0);
-	assert_int_equal(Tree_add(t, third), 0);
-	assert_int_equal(Tree_add(t, forth), 0);
-	assert_int_equal(Tree_add(t, fifth), 0);
-	assert_int_equal(Tree_add(t, sixth), 0);
-
-	assert_int_equal(Tree_add(t, L""), 0);
-	assert_int_equal(Tree_add(t, L"x"), 1);
-	assert_int_equal(Tree_add(t, L"mi"), 1);
-	assert_int_equal(Tree_add(t, L"mas"), 1);
-	assert_int_equal(Tree_add(t, L"max"), 1);
-	assert_int_equal(Tree_add(t, L"masy"), 1);
-	assert_int_equal(Tree_add(t, L"mata"), 1);
-	assert_int_equal(Tree_add(t, L"masąc"), 1);
-	assert_int_equal(Tree_add(t, L"nie"), 1);
-	assert_int_equal(Tree_add(t, L"no"), 1);
-	assert_int_equal(Tree_add(t, L"na"), 1);
-	assert_int_equal(Tree_add(t, L"nog"), 1);
-	assert_int_equal(Tree_add(t, L"not"), 1); 
-	assert_int_equal(Tree_add(t, L"nora"), 1);
-	assert_int_equal(Tree_add(t, L"notaa"), 1);
-	assert_int_equal(Tree_add(t, L"nośnik"), 1);
-	assert_int_equal(Tree_add(t, L"nogami"), 1);
-	assert_int_equal(Tree_add(t, L"notatka"), 1);
+	assert_int_equal(Tree_add(t2, L""), 0);
+	assert_int_equal(Tree_add(t2, L"x"), 1);
+	assert_int_equal(t2->root->childCount, 3);
+	assert_int_equal(Tree_add(t2, L"mi"), 1);
+	assert_int_equal(Tree_add(t2, L"mas"), 1);
+	assert_int_equal(Tree_add(t2, L"max"), 1);
+	assert_int_equal(Tree_add(t2, L"masy"), 1);
+	assert_int_equal(Tree_add(t2, L"mata"), 1);
+	assert_int_equal(Tree_add(t2, L"masąc"), 1);
+	assert_int_equal(Tree_add(t2, L"nie"), 1);
+	assert_int_equal(Tree_add(t2, L"no"), 1);
+	assert_int_equal(Tree_add(t2, L"na"), 1);
+	assert_int_equal(Tree_add(t2, L"nog"), 1);
+	assert_int_equal(Tree_add(t2, L"not"), 1); 
+	assert_int_equal(Tree_add(t2, L"nora"), 1);
+	assert_int_equal(Tree_add(t2, L"notaa"), 1);
+	assert_int_equal(Tree_add(t2, L"nośnik"), 1);
+	assert_int_equal(Tree_add(t2, L"nogami"), 1);
+	assert_int_equal(Tree_add(t2, L"notatka"), 1);
 
 	const wchar_t* veryLong = 
 		L"verylongwordnotintreewithpolishcharsxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxqwertyuiopąęćńźżół";
 	
-	assert_int_equal(Tree_add(t, veryLong), 1);
+	assert_int_equal(Tree_add(t2, veryLong), 1);
+
+	Tree_destroy(t2);
+	free(t2);
+}
+
+static void trie_destroy_test(void **state) {
+
+	wcActual = 0;
+	iActual = 0;
+	struct Tree* t = Tree_load_DFS(stderr);
+	Tree_destroy(t);
+	free(t);
 }
 
 static void trie_find_test(void** state) {
-	struct Tree* t = *state;
-	assert_int_equal(Tree_find(t, first), 1);
-	assert_int_equal(Tree_find(t, second), 1);
-	assert_int_equal(Tree_find(t, third), 1);
-	assert_int_equal(Tree_find(t, forth), 1);
-	assert_int_equal(Tree_find(t, fifth), 1);
-	assert_int_equal(Tree_find(t, sixth), 1);
+	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));	
 
-	assert_int_equal(Tree_find(t, L""), 0);
-	assert_int_equal(Tree_find(t, L"x"), 0);
-	assert_int_equal(Tree_find(t, L"mi"), 0);
-	assert_int_equal(Tree_find(t, L"mas"), 0);
-	assert_int_equal(Tree_find(t, L"max"), 0);
-	assert_int_equal(Tree_find(t, L"masy"), 0);
-	assert_int_equal(Tree_find(t, L"mata"), 0);
-	assert_int_equal(Tree_find(t, L"masąc"), 0);
-	assert_int_equal(Tree_find(t, L"nie"), 0);
-	assert_int_equal(Tree_find(t, L"no"), 0);
-	assert_int_equal(Tree_find(t, L"na"), 0);
-	assert_int_equal(Tree_find(t, L"nog"), 0);
-	assert_int_equal(Tree_find(t, L"not"), 0);    
-	assert_int_equal(Tree_find(t, L"nora"), 0);
-	assert_int_equal(Tree_find(t, L"notaa"), 0);
-	assert_int_equal(Tree_find(t, L"nośnik"), 0);
-	assert_int_equal(Tree_find(t, L"nogami"), 0);
-	assert_int_equal(Tree_find(t, L"notatka"), 0);
+	Tree_init(t);
+	assert_non_null(t);
+	assert_int_equal(Tree_size(t), 1);
+	assert_int_equal(Tree_add(t, first), 1);
+	assert_int_equal(Tree_size(t), 6);
+	assert_int_equal(Tree_add(t, second), 1);
+	assert_int_equal(Tree_size(t), 7);
+	assert_int_equal(Tree_add(t, third), 1);
+	assert_int_equal(Tree_size(t), 9);
+	assert_int_equal(Tree_add(t, forth), 1);
+	assert_int_equal(Tree_size(t), 14);
+	assert_int_equal(Tree_add(t, fifth) , 1);
+	assert_int_equal(Tree_size(t), 16);
+	assert_int_equal(Tree_add(t, sixth), 1);
+	assert_int_equal(Tree_size(t), 19);
+	
+	wcSize = 0;
+	iSize = 0;
+	assert_int_equal(Tree_save_DFS(t, stderr), 0);
+	Tree_destroy(t);
+	free(t);
+
+	wcActual = 0;
+	iActual = 0;
+	struct Tree* t2 = Tree_load_DFS(stderr);
+	assert_int_equal(Tree_find(t2, first), 1);
+	assert_int_equal(Tree_find(t2, second), 1);
+	assert_int_equal(Tree_find(t2, third), 1);
+	assert_int_equal(Tree_find(t2, forth), 1);
+	assert_int_equal(Tree_find(t2, fifth), 1);
+	assert_int_equal(Tree_find(t2, sixth), 1);
+
+	assert_int_equal(Tree_find(t2, L""), 0);
+	assert_int_equal(Tree_find(t2, L"x"), 0);
+	assert_int_equal(Tree_find(t2, L"mi"), 0);
+	assert_int_equal(Tree_find(t2, L"mas"), 0);
+	assert_int_equal(Tree_find(t2, L"max"), 0);
+	assert_int_equal(Tree_find(t2, L"masy"), 0);
+	assert_int_equal(Tree_find(t2, L"mata"), 0);
+	assert_int_equal(Tree_find(t2, L"masąc"), 0);
+	assert_int_equal(Tree_find(t2, L"nie"), 0);
+	assert_int_equal(Tree_find(t2, L"no"), 0);
+	assert_int_equal(Tree_find(t2, L"na"), 0);
+	assert_int_equal(Tree_find(t2, L"nog"), 0);
+	assert_int_equal(Tree_find(t2, L"not"), 0);    
+	assert_int_equal(Tree_find(t2, L"nora"), 0);
+	assert_int_equal(Tree_find(t2, L"notaa"), 0);
+	assert_int_equal(Tree_find(t2, L"nośnik"), 0);
+	assert_int_equal(Tree_find(t2, L"nogami"), 0);
+	assert_int_equal(Tree_find(t2, L"notatka"), 0);
 
 	const wchar_t* veryLong = 
 		L"verylongwordnotintreewithpolishcharsxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\
 		xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxqwertyuiopąęćńźżół";
 	
-	assert_int_equal(Tree_find(t, veryLong), 0);
-	assert_int_equal(Tree_add(t, veryLong), 1);
-	assert_int_equal(Tree_find(t, veryLong), 1);
-
+	assert_int_equal(Tree_find(t2, veryLong), 0);
+	assert_int_equal(Tree_add(t2, veryLong), 1);
+	assert_int_equal(Tree_find(t2, veryLong), 1);
+	
+	Tree_destroy(t2);
+	free(t2);
 }
 
 static void trie_delete_test(void** state) {
-	struct Tree* t = *state;
-	assert_int_equal(Tree_delete(t, first), 1);
-	assert_int_equal(Tree_find(t, first), 0);
+	struct Tree* t = (struct Tree*)malloc(sizeof(struct Tree));	
+
+	Tree_init(t);
+	assert_non_null(t);
+	assert_int_equal(Tree_size(t), 1);
 	assert_int_equal(Tree_add(t, first), 1);
-	assert_int_equal(Tree_find(t, first), 1);
-	assert_int_equal(Tree_size(t), 19);
-
-	assert_int_equal(Tree_delete(t, second), 1);
-	assert_int_equal(Tree_find(t, second), 0);
+	assert_int_equal(Tree_size(t), 6);
 	assert_int_equal(Tree_add(t, second), 1);
-	assert_int_equal(Tree_find(t, second), 1);
-	assert_int_equal(Tree_size(t), 19);
-
-	assert_int_equal(Tree_delete(t, third), 1);
-	assert_int_equal(Tree_find(t, third), 0);
+	assert_int_equal(Tree_size(t), 7);
 	assert_int_equal(Tree_add(t, third), 1);
-	assert_int_equal(Tree_find(t, third), 1);
-	assert_int_equal(Tree_size(t), 19);
-
-	assert_int_equal(Tree_delete(t, forth), 1);
-	assert_int_equal(Tree_find(t, forth), 0);
+	assert_int_equal(Tree_size(t), 9);
 	assert_int_equal(Tree_add(t, forth), 1);
-	assert_int_equal(Tree_find(t, forth), 1);
-	assert_int_equal(Tree_size(t), 19);
-
-	assert_int_equal(Tree_delete(t, fifth), 1);
-	assert_int_equal(Tree_find(t, fifth), 0);
-	assert_int_equal(Tree_add(t, fifth), 1);
-	assert_int_equal(Tree_find(t, fifth), 1);
-	assert_int_equal(Tree_size(t), 19);
-
-	assert_int_equal(Tree_delete(t, sixth), 1);
-	assert_int_equal(Tree_find(t, sixth), 0);
+	assert_int_equal(Tree_size(t), 14);
+	assert_int_equal(Tree_add(t, fifth) , 1);
+	assert_int_equal(Tree_size(t), 16);
 	assert_int_equal(Tree_add(t, sixth), 1);
-	assert_int_equal(Tree_find(t, sixth), 1);
 	assert_int_equal(Tree_size(t), 19);
+	
+	wcSize = 0;
+	iSize = 0;
+	assert_int_equal(Tree_save_DFS(t, stderr), 0);
+	Tree_destroy(t);
+	free(t);
+
+	wcActual = 0;
+	iActual = 0;
+	struct Tree* t2 = Tree_load_DFS(stderr);
+
+	assert_int_equal(Tree_delete(t2, first), 1);
+	assert_int_equal(Tree_find(t2, first), 0);
+	assert_int_equal(Tree_add(t2, first), 1);
+	assert_int_equal(Tree_find(t2, first), 1);
+	assert_int_equal(Tree_size(t2), 19);
+
+	assert_int_equal(Tree_delete(t2, second), 1);
+	assert_int_equal(Tree_find(t2, second), 0);
+	assert_int_equal(Tree_add(t2, second), 1);
+	assert_int_equal(Tree_find(t2, second), 1);
+	assert_int_equal(Tree_size(t2), 19);
+
+	assert_int_equal(Tree_delete(t2, third), 1);
+	assert_int_equal(Tree_find(t2, third), 0);
+	assert_int_equal(Tree_add(t2, third), 1);
+	assert_int_equal(Tree_find(t2, third), 1);
+	assert_int_equal(Tree_size(t2), 19);
+
+	assert_int_equal(Tree_delete(t2, forth), 1);
+	assert_int_equal(Tree_find(t2, forth), 0);
+	assert_int_equal(Tree_add(t2, forth), 1);
+	assert_int_equal(Tree_find(t2, forth), 1);
+	assert_int_equal(Tree_size(t2), 19);
+
+	assert_int_equal(Tree_delete(t2, fifth), 1);
+	assert_int_equal(Tree_find(t2, fifth), 0);
+	assert_int_equal(Tree_add(t2, fifth), 1);
+	assert_int_equal(Tree_find(t2, fifth), 1);
+	assert_int_equal(Tree_size(t2), 19);
+
+	assert_int_equal(Tree_delete(t2, sixth), 1);
+	assert_int_equal(Tree_find(t2, sixth), 0);
+	assert_int_equal(Tree_add(t2, sixth), 1);
+	assert_int_equal(Tree_find(t2, sixth), 1);
+	assert_int_equal(Tree_size(t2), 19);
 
 
 	/* testy podwójnego usuwania */
-	assert_int_equal(Tree_delete(t, first), 1);
-	assert_int_equal(Tree_find(t, first), 0);
-	assert_int_equal(Tree_delete(t, first), 0);
-	assert_int_equal(Tree_find(t, first), 0);
-	assert_int_equal(Tree_add(t, first), 1);
-	assert_int_equal(Tree_find(t, first), 1);
-	assert_int_equal(Tree_size(t), 19);
+	assert_int_equal(Tree_delete(t2, first), 1);
+	assert_int_equal(Tree_find(t2, first), 0);
+	assert_int_equal(Tree_delete(t2, first), 0);
+	assert_int_equal(Tree_find(t2, first), 0);
+	assert_int_equal(Tree_add(t2, first), 1);
+	assert_int_equal(Tree_find(t2, first), 1);
+	assert_int_equal(Tree_size(t2), 19);
 
-	assert_int_equal(Tree_delete(t, second), 1);
-	assert_int_equal(Tree_find(t, second), 0);
-	assert_int_equal(Tree_delete(t, second), 0);
-	assert_int_equal(Tree_find(t, second), 0);
-	assert_int_equal(Tree_add(t, second), 1);
-	assert_int_equal(Tree_find(t, second), 1);
-	assert_int_equal(Tree_size(t), 19);
+	assert_int_equal(Tree_delete(t2, second), 1);
+	assert_int_equal(Tree_find(t2, second), 0);
+	assert_int_equal(Tree_delete(t2, second), 0);
+	assert_int_equal(Tree_find(t2, second), 0);
+	assert_int_equal(Tree_add(t2, second), 1);
+	assert_int_equal(Tree_find(t2, second), 1);
+	assert_int_equal(Tree_size(t2), 19);
 
-	assert_int_equal(Tree_delete(t, third), 1);
-	assert_int_equal(Tree_find(t, third), 0);
-	assert_int_equal(Tree_delete(t, third), 0);
-	assert_int_equal(Tree_find(t, third), 0);
-	assert_int_equal(Tree_add(t, third), 1);
-	assert_int_equal(Tree_find(t, third), 1);
-	assert_int_equal(Tree_size(t), 19);
+	assert_int_equal(Tree_delete(t2, third), 1);
+	assert_int_equal(Tree_find(t2, third), 0);
+	assert_int_equal(Tree_delete(t2, third), 0);
+	assert_int_equal(Tree_find(t2, third), 0);
+	assert_int_equal(Tree_add(t2, third), 1);
+	assert_int_equal(Tree_find(t2, third), 1);
+	assert_int_equal(Tree_size(t2), 19);
 
-	assert_int_equal(Tree_delete(t, forth), 1);
-	assert_int_equal(Tree_find(t, forth), 0);
-	assert_int_equal(Tree_delete(t, forth), 0);
-	assert_int_equal(Tree_find(t, forth), 0);
-	assert_int_equal(Tree_add(t, forth), 1);
-	assert_int_equal(Tree_find(t, forth), 1);
-	assert_int_equal(Tree_size(t), 19);
+	assert_int_equal(Tree_delete(t2, forth), 1);
+	assert_int_equal(Tree_find(t2, forth), 0);
+	assert_int_equal(Tree_delete(t2, forth), 0);
+	assert_int_equal(Tree_find(t2, forth), 0);
+	assert_int_equal(Tree_add(t2, forth), 1);
+	assert_int_equal(Tree_find(t2, forth), 1);
+	assert_int_equal(Tree_size(t2), 19);
 
-	assert_int_equal(Tree_delete(t, fifth), 1);
-	assert_int_equal(Tree_find(t, fifth), 0);
-	assert_int_equal(Tree_delete(t, fifth), 0);
-	assert_int_equal(Tree_find(t, fifth), 0);
-	assert_int_equal(Tree_add(t, fifth), 1);
-	assert_int_equal(Tree_find(t, fifth), 1);
-	assert_int_equal(Tree_size(t), 19);
+	assert_int_equal(Tree_delete(t2, fifth), 1);
+	assert_int_equal(Tree_find(t2, fifth), 0);
+	assert_int_equal(Tree_delete(t2, fifth), 0);
+	assert_int_equal(Tree_find(t2, fifth), 0);
+	assert_int_equal(Tree_add(t2, fifth), 1);
+	assert_int_equal(Tree_find(t2, fifth), 1);
+	assert_int_equal(Tree_size(t2), 19);
 
-	assert_int_equal(Tree_delete(t, sixth), 1);
-	assert_int_equal(Tree_find(t, sixth), 0);
-	assert_int_equal(Tree_delete(t, sixth), 0);
-	assert_int_equal(Tree_find(t, sixth), 0);
-	assert_int_equal(Tree_add(t, sixth), 1);
-	assert_int_equal(Tree_find(t, sixth), 1);
-	assert_int_equal(Tree_size(t), 19);    
+	assert_int_equal(Tree_delete(t2, sixth), 1);
+	assert_int_equal(Tree_find(t2, sixth), 0);
+	assert_int_equal(Tree_delete(t2, sixth), 0);
+	assert_int_equal(Tree_find(t2, sixth), 0);
+	assert_int_equal(Tree_add(t2, sixth), 1);
+	assert_int_equal(Tree_find(t2, sixth), 1);
+	assert_int_equal(Tree_size(t2), 19);    
 
 	//--------
-	assert_int_equal(Tree_delete(t, L""), 0);
-	assert_int_equal(Tree_delete(t, L"x"), 0);
-	assert_int_equal(Tree_delete(t, L"mi"), 0);
-	assert_int_equal(Tree_delete(t, L"mas"), 0);
-	assert_int_equal(Tree_delete(t, L"max"), 0);
-	assert_int_equal(Tree_delete(t, L"masy"), 0);
-	assert_int_equal(Tree_delete(t, L"mata"), 0);
-	assert_int_equal(Tree_delete(t, L"masąc"), 0);
-	assert_int_equal(Tree_delete(t, L"nie"), 0);
-	assert_int_equal(Tree_delete(t, L"no"), 0);
-	assert_int_equal(Tree_delete(t, L"na"), 0);
-	assert_int_equal(Tree_delete(t, L"nog"), 0);
-	assert_int_equal(Tree_delete(t, L"not"), 0);    
-	assert_int_equal(Tree_delete(t, L"nora"), 0);
-	assert_int_equal(Tree_delete(t, L"notaa"), 0);
-	assert_int_equal(Tree_delete(t, L"nośnik"), 0);
-	assert_int_equal(Tree_delete(t, L"nogami"), 0);
-	assert_int_equal(Tree_delete(t, L"notatka"), 0);
+	assert_int_equal(Tree_delete(t2, L""), 0);
+	assert_int_equal(Tree_delete(t2, L"x"), 0);
+	assert_int_equal(Tree_delete(t2, L"mi"), 0);
+	assert_int_equal(Tree_delete(t2, L"mas"), 0);
+	assert_int_equal(Tree_delete(t2, L"max"), 0);
+	assert_int_equal(Tree_delete(t2, L"masy"), 0);
+	assert_int_equal(Tree_delete(t2, L"mata"), 0);
+	assert_int_equal(Tree_delete(t2, L"masąc"), 0);
+	assert_int_equal(Tree_delete(t2, L"nie"), 0);
+	assert_int_equal(Tree_delete(t2, L"no"), 0);
+	assert_int_equal(Tree_delete(t2, L"na"), 0);
+	assert_int_equal(Tree_delete(t2, L"nog"), 0);
+	assert_int_equal(Tree_delete(t2, L"not"), 0);    
+	assert_int_equal(Tree_delete(t2, L"nora"), 0);
+	assert_int_equal(Tree_delete(t2, L"notaa"), 0);
+	assert_int_equal(Tree_delete(t2, L"nośnik"), 0);
+	assert_int_equal(Tree_delete(t2, L"nogami"), 0);
+	assert_int_equal(Tree_delete(t2, L"notatka"), 0);
+
+	Tree_destroy(t2);
+	free(t2);
 }
-
-
 
 #define run_trie_test(x) cmocka_unit_test_setup_teardown(x, trie_setup, \
 	trie_teardown)
@@ -382,13 +460,12 @@ static void trie_delete_test(void** state) {
 int main(void) {
 	setlocale(LC_ALL, "pl_PL.UTF-8");
 	const struct CMUnitTest tests[] = {
-		cmocka_unit_test(trie_init_test),
 		cmocka_unit_test(buffer_test),
-		//cmocka_unit_test(trie_destroy_test),
-		run_trie_test(trie_add_test),
-		run_trie_test(trie_find_test),
-		run_trie_test(trie_delete_test)
-
+		cmocka_unit_test(trie_init_test),
+		cmocka_unit_test(trie_destroy_test),
+		cmocka_unit_test(trie_add_test),
+		cmocka_unit_test(trie_find_test),
+		cmocka_unit_test(trie_delete_test)
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);
