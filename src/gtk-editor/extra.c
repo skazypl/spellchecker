@@ -177,7 +177,7 @@ static void ChooseLang (GtkMenuItem *item, gpointer data)
 
       dict = tempDict;
       strcpy(dict_location, wybranyJezyk);
-      free(wybranyJezyk);
+      //free(wybranyJezyk);
     }
     gtk_widget_destroy(dialog);
 
