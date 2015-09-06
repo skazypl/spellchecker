@@ -1,3 +1,4 @@
+// Jarosław Socha <js347267>
 #ifndef __EDITOR_H__
 #define __EDITOR_H__
 
@@ -5,7 +6,11 @@ GtkWidget *editor_window;   // Main Gtk window
 GtkWidget *editor_view;     // Text view widget where all the typing is done
 GtkTextBuffer *editor_buf;  // Textview buffer
 
+#include "dictionary.h"
+#define DEFAULT_LOC "default"
+
 char *filename;
+struct dictionary* dict;
 
 void show_about (void);
 void show_help (void);

@@ -18,7 +18,7 @@
 #include <wctype.h>
 #include <errno.h>
 
-const int MAX_LINE_SIZE = 1024; ///< Rozsądnie maks zakładana długość linii.
+const int MAX_LINE_SIZE = 100000; ///< Rozsądnie maks zakładana długość linii.
 
 /**
 	Sprawdza czy w argumentowanym słowniku jest zadane słowo w określonym 
@@ -160,7 +160,6 @@ int main(int argc, char const *argv[])
 
 	if (parseInput)
 	{
-		//struct word_list list;
 		struct dictionary* dict = dictionary_load(dictLocation);
 		if(dict == NULL)
 		{

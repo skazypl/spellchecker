@@ -1,3 +1,4 @@
+// Jarosław Socha <js347267> 
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <errno.h>
@@ -24,12 +25,22 @@ static void err_msg (const gchar *msg) {
   gtk_widget_destroy(dialog);  // destroy the window after ok is pressed
 }
 
+// Funkcja do niszczenia słownika przy wyjściu z programu
+void save_destroy_dict()
+{
+  if(dict == NULL)
+    return;
+  dictionary_done(dict);
+}
+
 // When the user clicks on quit button or quits the app fire the delete event 
 // signal but first check if the file is modified or not
 
 static gboolean delete_event (GtkWidget *widget, GdkEvent *event,
                               gpointer data) {
-  return !save_if_modified();
+  gboolean toReturn = !save_if_modified();
+  save_destroy_dict();
+  return toReturn;
 }
 
 // Main function

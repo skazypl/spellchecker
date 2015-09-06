@@ -32,31 +32,14 @@ static void decapitalize_test(void **state) {
 	free(small);
 }
 
-/// Testuje komparator wcharComp.
-static void wcharComp_test(void** state) {
-	assert_true(L'm' < L'n');
-	wchar_t array[2];
-	array[0] = L'n';
-	array[1] = L'm';
-
-	//qsort(array, 2, sizeof(wchar_t), wcharComp);
-	//assert_int_equal(array[0], L'n');
-	//assert_int_equal(array[1], L'n');
-
-	// array[0] = L'm';
-	// array[1] = L'n';
-
-	// qsort(array, 2, sizeof(wchar_t), wcharComp);
-	// assert_int_equal(array[0], L'm');
-	// assert_int_equal(array[1], L'n');
-}
+// Nie testuję pozostałych funkcji, bo są raczej trywialne lub pomocnicze do
+// funkcji multilang
 
 /// Funkcja main testów.
 int main(void) {
 	setlocale(LC_ALL, "pl_PL.UTF-8");
 	const struct CMUnitTest tests[] = {
-		cmocka_unit_test(decapitalize_test),
-		//cmocka_unit_test(wcharComp_test),
+		cmocka_unit_test(decapitalize_test)
 	};
 
 	return cmocka_run_group_tests(tests, NULL, NULL);

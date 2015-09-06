@@ -1,3 +1,4 @@
+// Jarosław Socha <js347267>
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <errno.h>
@@ -5,7 +6,6 @@
 #include <string.h>
 #include "editor.h"
 #include "word_list.h"
-#include "dictionary.h"
 
 void show_about () {
   GtkWidget *dialog = gtk_about_dialog_new();
@@ -43,21 +43,22 @@ void show_help (void) {
   gtk_widget_show_all(help_window);
 }
 
-struct dictionary* dict = NULL;
-char dict_location[255];
+//dict = NULL;
+char dict_location[255] = DEFAULT_LOC;
 
 void update_actual_dict()
 {
   GtkWidget *dialog;
-  FILE* stream;
 
   if(dict == NULL)
   {
-    if(strcmp(dict_location, "default") != 0)
+    if(strcmp(dict_location, DEFAULT_LOC) == 0)
     {
-      char** list;
-      size_t* len;
-      if(dictionary_lang_list(list, len) < 0)
+      printf("Nie znaleziono słownika, ładuję pierwszy z folderu\n");
+      char* list = NULL;
+      size_t len = 0;
+
+      if(dictionary_lang_list(&list, &len) < 0)
       {
         char* err_msg =
         "Błąd ładowania listy słowników!";
@@ -69,7 +70,7 @@ void update_actual_dict()
         gtk_widget_destroy(dialog);
         return; 
       }
-      if(*len == 0)
+      if(len == 0)
       {
         char* err_msg =
         "Brak słowników!";
@@ -81,7 +82,7 @@ void update_actual_dict()
         gtk_widget_destroy(dialog);
         return; 
       }
-      if((dict = dictionary_load_lang(*list)) == NULL)
+      if((dict = dictionary_load_lang(list)) == NULL)
       {
         char* err_msg =
         "Nie udało się załadować słownika!";
@@ -93,11 +94,11 @@ void update_actual_dict()
         gtk_widget_destroy(dialog);
         return; 
       }
-      strcpy(dict_location, *list);
-      free(*list);
+      strcpy(dict_location, list);
+      free(list);
+      printf("Uaktualniono słownik - obecnie %s\n", dict_location);
     }
   }
-  printf("uaktualniono słownik\n");
 }
 
 // Procedura ładowania języka
@@ -151,14 +152,18 @@ static void ChooseLang (GtkMenuItem *item, gpointer data)
 
     if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT)
     {
-       const char* wybranyJezyk
-          = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo));
+      const char* wybranyJezyk
+        = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(combo));
        
-       dictionary_save_lang(dict, dict_location);
-       //zapisujemy stary słownik - ktoś mógł coś tam dodać
+       //zapisujemy stary słownik - ktoś mógł coś tam dodać i mógł się zmienić
+      if(strcmp(dict_location, DEFAULT_LOC) != 0)
+        dictionary_save_lang(dict, dict_location);
 
-       struct dictionary* tempDict = dictionary_load_lang(wybranyJezyk);
-       if(tempDict == NULL)
+       // i ładujemy wybrany
+      struct dictionary* tempDict = dictionary_load_lang(wybranyJezyk);
+
+      // Jeśli wybrany jest ok, to podmienimy go
+      if(tempDict == NULL)
       {
         GtkWidget* err_dialog = 
                       gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
@@ -167,13 +172,12 @@ static void ChooseLang (GtkMenuItem *item, gpointer data)
         gtk_dialog_run(GTK_DIALOG(err_dialog));
         gtk_widget_destroy(err_dialog);
       }
-        if(dict != NULL)
-          dictionary_done(dict);
+      if(dict != NULL)
+        dictionary_done(dict);
 
-        dict = tempDict;
-        strcpy(dict_location, wybranyJezyk);
-        //free(wybranyJezyk); //? na koniec
-
+      dict = tempDict;
+      strcpy(dict_location, wybranyJezyk);
+      free(wybranyJezyk);
     }
     gtk_widget_destroy(dialog);
 
@@ -186,33 +190,38 @@ static void ColorMistakes (GtkMenuItem *item, gpointer data) {
   GtkTextIter start, end, buffEnd;
 
   gtk_text_buffer_get_start_iter(editor_buf, &end);
+
+  //Teraz sztuczką przesuwamy końcowy iterator na koniec ostatniego słowa
   gtk_text_buffer_get_end_iter(editor_buf, &buffEnd);
   gtk_text_iter_backward_word_start(&buffEnd);
-  gtk_text_iter_forward_word_end(&buffEnd); //inicjalizacja
+  gtk_text_iter_forward_word_end(&buffEnd);
 
   gtk_text_buffer_create_tag(editor_buf, "red_fg", 
                              "foreground", "red", 
                              "weight", PANGO_WEIGHT_BOLD, NULL);
 
-  printf("uaktualniam słownik\n");
+  // Aktualizacja słownika
   update_actual_dict();
-
   start = end;
 
   while (!gtk_text_iter_equal(&end, &buffEnd)) {
+    // Inkrementacja zmiennych
 		gtk_text_iter_forward_word_end(&end); 
 		start = end;
 		gtk_text_iter_backward_word_start(&start);
+
+    // Usuwamy etykietkę ze słowa jeśli jest
     gtk_text_buffer_remove_tag_by_name(editor_buf, "red_fg", 
                                       &start, &end);
 
+    // Separujemy słowo
     char* word = gtk_text_iter_get_text(&start, &end);
     gunichar* wword = g_utf8_to_ucs4_fast(word, -1, NULL);
 
+    // Jeśli znaleziono w słowniku to kolorujemy
     if(!dictionary_find(dict, (const wchar_t*)wword))
-    
       gtk_text_buffer_apply_tag_by_name(editor_buf, "red_fg", 
-                                      &start, &end);
+                                        &start, &end);
     g_free(word);
 
   }
@@ -249,18 +258,6 @@ static void WhatCheck (GtkMenuItem *item, gpointer data) {
 
   // Zamieniamy na wide char (no prawie)
   wword = g_utf8_to_ucs4_fast(word, -1, NULL);
-  //char* dict_location = "slownik.dict";
-  // FILE* f = fopen(dict_location, "r");
-  // if(!f)
-  // {
-  //   dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
-  //                                   GTK_BUTTONS_OK,
-  //             "Nie da się otworzyć pliku słownika!\n Sprawdź, czy plik istnieje"
-  //                                   );
-  //   gtk_dialog_run(GTK_DIALOG(dialog));
-  //   gtk_widget_destroy(dialog);
-  //   return;
-  // }
 
   update_actual_dict();
 
@@ -336,19 +333,10 @@ static void WhatCheck (GtkMenuItem *item, gpointer data) {
         gtk_widget_show(ask_label);
         gtk_box_pack_start(GTK_BOX(ask_vbox), ask_label, FALSE, FALSE, 1);
 
+        // Jeśli chiciał dodać nowe słowo do słownika to dodamy i zapiszemy
         if (gtk_dialog_run(GTK_DIALOG(ask_dialog)) == GTK_RESPONSE_ACCEPT) {
           dictionary_insert(dict, (wchar_t *)wword);
           dictionary_save_lang(dict, dict_location);
-          // fclose(f);
-          // f = fopen(dict_location, "w");
-          // if(dictionary_save(dict, f) < 0) {
-          //   err_dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
-          //                           GTK_BUTTONS_OK,
-          //                           "Nie da się zapisać pliku słownika!"
-          //                                     );
-          //     gtk_dialog_run(GTK_DIALOG(err_dialog));
-          //     gtk_widget_destroy(err_dialog);
-          //     //return;
         }
         
         gtk_widget_destroy(ask_dialog);

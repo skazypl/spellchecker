@@ -93,6 +93,8 @@ struct dictionary * dictionary_new()
 
 void dictionary_done(struct dictionary *dict)
 {
+	if(dict == NULL)
+		return;
     dictionary_free(dict);
     set_done(dict->usedLetters);
     free(dict->usedLetters);
@@ -316,7 +318,6 @@ int dictionary_lang_list(char **list, size_t *list_len)
     }
     
     const char* dirPath = tryDirPath;
-
     if(stat(dirPath, &st) == -1)
     {
         return -1;
