@@ -61,7 +61,7 @@ int update_actual_dict()
       if(dictionary_lang_list(&list, &len) < 0)
       {
         char* err_msg =
-        "Błąd ładowania listy słowników!\nSprawdź, czy w katalogu jakieś są";
+        "Błąd ładowania listy słowników!\nSprawdź zawartość katalogu CONF_PATH";
         
         dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
                                         GTK_BUTTONS_OK,
@@ -310,7 +310,7 @@ static void WhatCheck (GtkMenuItem *item, gpointer data) {
     gtk_widget_show(combo);
 
     char *korekta, *question;
-    GtkWidget *ask_dialog, *ask_vbox, *ask_label, *err_dialog;
+    GtkWidget *ask_dialog, *ask_vbox, *ask_label;
     switch (gtk_dialog_run(GTK_DIALOG(dialog))) {
       case GTK_RESPONSE_ACCEPT:
         korekta =
