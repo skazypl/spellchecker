@@ -46,7 +46,7 @@ void show_help (void) {
 //dict = NULL;
 char dict_location[255] = DEFAULT_LOC;
 
-void update_actual_dict()
+int update_actual_dict()
 {
   GtkWidget *dialog;
 
@@ -61,14 +61,14 @@ void update_actual_dict()
       if(dictionary_lang_list(&list, &len) < 0)
       {
         char* err_msg =
-        "Błąd ładowania listy słowników!";
+        "Błąd ładowania listy słowników!\nSprawdź, czy w katalogu jakieś są";
         
         dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_ERROR,
                                         GTK_BUTTONS_OK,
                                         err_msg);
         gtk_dialog_run(GTK_DIALOG(dialog));
         gtk_widget_destroy(dialog);
-        return; 
+        return -1; 
       }
       if(len == 0)
       {
@@ -80,7 +80,7 @@ void update_actual_dict()
                                         err_msg);
         gtk_dialog_run(GTK_DIALOG(dialog));
         gtk_widget_destroy(dialog);
-        return; 
+        return -1; 
       }
       if((dict = dictionary_load_lang(list)) == NULL)
       {
@@ -92,13 +92,16 @@ void update_actual_dict()
                                         err_msg);
         gtk_dialog_run(GTK_DIALOG(dialog));
         gtk_widget_destroy(dialog);
-        return; 
+        return -1; 
       }
       strcpy(dict_location, list);
       free(list);
       printf("Uaktualniono słownik - obecnie %s\n", dict_location);
+      return 0;
     }
+    return -1;
   }
+  return 0;
 }
 
 // Procedura ładowania języka
@@ -201,7 +204,8 @@ static void ColorMistakes (GtkMenuItem *item, gpointer data) {
                              "weight", PANGO_WEIGHT_BOLD, NULL);
 
   // Aktualizacja słownika
-  update_actual_dict();
+  if(update_actual_dict() < 0)
+    return;
   start = end;
 
   while (!gtk_text_iter_equal(&end, &buffEnd)) {
@@ -259,8 +263,8 @@ static void WhatCheck (GtkMenuItem *item, gpointer data) {
   // Zamieniamy na wide char (no prawie)
   wword = g_utf8_to_ucs4_fast(word, -1, NULL);
 
-  update_actual_dict();
-
+  if(update_actual_dict() < 0)
+    return;
   // Sprawdzamy
   if (dictionary_find(dict, (wchar_t *)wword)) {
     dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
