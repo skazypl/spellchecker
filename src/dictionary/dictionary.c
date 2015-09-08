@@ -114,6 +114,10 @@ int dictionary_insert(struct dictionary *dict, const wchar_t *word)
         return 0;
     }
     Tree_add(dict->tree, smallWord);
+    int smallLen = wcslen(smallWord);
+    for (int i = 0; i < smallLen; i++)
+        set_add(dict->usedLetters, smallWord[i]);
+
     free(smallWord);
     return 1;
 }
@@ -170,7 +174,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
     struct word_list newListObj;
     struct word_list* newList = &newListObj;
     word_list_init(newList);
-    struct InsertSet* usedLetters = usedInTree(dict->tree);
+    struct InsertSet* usedLetters = dict->usedLetters;// usedInTree(dict->tree);
 
     wchar_t* smallWord = decapitalize(word);
     size_t wlen = wcslen(smallWord);
@@ -290,8 +294,8 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
                 word_list_add(list, newArray[i]);
     }
     word_list_done(newList);
-    set_done(usedLetters);
-    free(usedLetters);
+    //set_done(usedLetters);
+    //free(usedLetters);
 }
 
 
