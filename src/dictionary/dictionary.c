@@ -174,7 +174,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
     struct word_list newListObj;
     struct word_list* newList = &newListObj;
     word_list_init(newList);
-    struct InsertSet* usedLetters = dict->usedLetters;// usedInTree(dict->tree);
+    struct InsertSet* usedLetters = dict->usedLetters;
 
     wchar_t* smallWord = decapitalize(word);
     size_t wlen = wcslen(smallWord);
@@ -234,7 +234,7 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
         for (int j = 0; j < usedLetters->size; j++)
         {
             wchar_t start = usedLetters->array[j];
-            newWordAdd[i] = start;            
+            newWordAdd[i] = start;
 
             if(dictionary_find(dict, newWordAdd))
                 word_list_add(newList, newWordAdd);
@@ -294,8 +294,6 @@ void dictionary_hints(const struct dictionary *dict, const wchar_t* word,
                 word_list_add(list, newArray[i]);
     }
     word_list_done(newList);
-    //set_done(usedLetters);
-    //free(usedLetters);
 }
 
 

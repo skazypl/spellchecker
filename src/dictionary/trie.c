@@ -470,10 +470,10 @@ int writeDFS(struct Node* n, FILE* stream)
 {
 	int err = 0;
 	if (n->childCount == 0)
-		err = fprintf(stream, "\n%i%lc", 0, L'!');
+		err = fprintf(stream, "%i%lc", 0, L'!');
 	else
-		err = fprintf(stream, "\n%i%lc", n->childCount, 
-			(n->key == L'\0') ? L'\n' : n->key);
+		err = fprintf(stream, "%i%lc", n->childCount, 
+			(n->key == L'\0') ? L'\n' : n->key); //Zastosowane tylko dla roota
 
 	if(err < 0)
 		return err;

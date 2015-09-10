@@ -1,1 +1,1 @@
-/usr/bin/cc  -std=gnu99 -Wall -pedantic -g   CMakeFiles/dict-check.dir/dict-check.c.o  -o dict-check -rdynamic ../dictionary/libdictionary.a 
+/usr/bin/cc  -std=gnu99 -Wall -pedantic -g -pg   CMakeFiles/dict-check.dir/dict-check.c.o  -o dict-check -rdynamic ../dictionary/libdictionary.a 
