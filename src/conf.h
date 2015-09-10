@@ -12,7 +12,7 @@
 /**
   Ścieżka do pliku konfiguracyjnego
   */
-#define CONF_PATH "~/.dictionary.rc"
+#define CONF_PATH "/home/skazy/.dictionary.rc"
 ///< Ścieżka do katalogu z zapisanymi słownikami różnych języków.
 
 #define MAX_LINE_LENG 255

@@ -5,7 +5,7 @@
 cmake_minimum_required (VERSION 2.6)
 
 # nazwa projektu i język źródeł
-project (Spellcheck C)    
+project (Spellcheck C)
 
 enable_testing ()
 
