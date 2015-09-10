@@ -29,8 +29,8 @@ if (NOT CMOCKA)
 endif (NOT CMOCKA)
 
 # ustawiamy flagi kompilacji w wersji debug i release
-set(CMAKE_C_FLAGS_DEBUG "-std=gnu99 -Wall -pedantic -g -pg")
-set(CMAKE_C_FLAGS_RELEASE "-std=gnu99 -O3 -pg")
+set(CMAKE_C_FLAGS_DEBUG "-std=gnu99 -Wall -pedantic -g")
+set(CMAKE_C_FLAGS_RELEASE "-std=gnu99 -O3")
 
 # wskazujemy na foldery, gdzie znajdują się pliki nagłówkowe.
 include_directories (dictionary ${CMAKE_BINARY_DIR})
